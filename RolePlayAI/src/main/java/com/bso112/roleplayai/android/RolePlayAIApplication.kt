@@ -1,7 +1,7 @@
 package com.bso112.roleplayai.android
 
 import android.app.Application
-import com.bso112.roleplayai.android.feature.main.HomeViewModel
+import com.bso112.roleplayai.android.feature.chat.ChatViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -21,5 +21,5 @@ class RolePlayAIApplication : Application() {
 }
 
 val appModule = module {
-    viewModel { HomeViewModel() }
+    viewModel { ChatViewModel() }
 }

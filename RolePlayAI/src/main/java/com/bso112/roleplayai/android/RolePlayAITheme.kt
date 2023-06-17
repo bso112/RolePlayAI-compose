@@ -2,6 +2,7 @@ package com.bso112.roleplayai.android
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Shapes
 import androidx.compose.material.Typography
@@ -24,7 +25,7 @@ fun RolePlayAITheme(
         darkColors(
             primary = Color(0xFFBB86FC),
             primaryVariant = Color(0xFF3700B3),
-            secondary = Color(0xFF03DAC5)
+            secondary = Color(0xFF03DAC5),
         )
     } else {
         lightColors(
@@ -53,3 +54,5 @@ fun RolePlayAITheme(
         content = content
     )
 }
+
+val Colors.placeHolder get() = Color.LightGray

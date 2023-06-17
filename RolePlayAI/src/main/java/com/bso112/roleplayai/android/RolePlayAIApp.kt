@@ -1,13 +1,10 @@
 package com.bso112.roleplayai.android
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -17,8 +14,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
-import com.bso112.roleplayai.android.feature.main.HOME_ROUTE
-import com.bso112.roleplayai.android.feature.main.homeScreen
+import com.bso112.roleplayai.android.feature.chat.CHAT_ROUTE
+import com.bso112.roleplayai.android.feature.chat.chatScreen
 
 @Composable
 fun RolePlayAIApp(
@@ -29,11 +26,7 @@ fun RolePlayAIApp(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colors.background,
         ) {
-            Scaffold(
-                bottomBar = { HomeBottomNavigation(appState::navigateToTopLevelDestination) }
-            ) { padding ->
-                RolePlayAINavHost(padding, appState)
-            }
+            RolePlayAINavHost(appState)
         }
     }
 }
@@ -68,15 +61,13 @@ fun HomeBottomNavigation(
 
 @Composable
 fun RolePlayAINavHost(
-    paddingValues: PaddingValues,
     appState: RolePlayAppState
 ) {
     NavHost(
-        modifier = Modifier.padding(paddingValues),
         navController = appState.navController,
-        startDestination = HOME_ROUTE
+        startDestination = CHAT_ROUTE
     ) {
-        homeScreen()
+        chatScreen()
     }
 
 }
