@@ -40,6 +40,11 @@ android {
 
 dependencies {
     implementation(project(":shared"))
+    implementation(project(":data"))
+
+    implementation(libs.bundles.koin)
+    implementation(libs.bundles.ktor)
+    implementation(libs.lifecycle.compose)
     implementation("androidx.compose.ui:ui:1.4.3")
     implementation("androidx.compose.ui:ui-tooling:1.4.3")
     implementation("androidx.compose.ui:ui-tooling-preview:1.4.3")
@@ -51,5 +56,4 @@ dependencies {
     implementation("io.coil-kt:coil:2.3.0")
     implementation("io.coil-kt:coil-compose:2.3.0")
     implementation("androidx.navigation:navigation-compose:2.6.0")
-    implementation("io.insert-koin:koin-androidx-compose:3.4.5")
 }

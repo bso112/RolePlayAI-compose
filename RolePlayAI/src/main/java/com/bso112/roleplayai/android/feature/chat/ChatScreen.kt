@@ -20,55 +20,48 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
-import com.bso112.roleplayai.android.Empty
 import com.bso112.roleplayai.android.RolePlayAITheme
 import com.bso112.roleplayai.android.feature.chat.data.Character
 import com.bso112.roleplayai.android.feature.chat.data.Chat
 import com.bso112.roleplayai.android.placeHolder
+import kotlinx.coroutines.flow.update
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ChatScreenRoute(
     viewModel: ChatViewModel = koinViewModel()
 ) {
-    val user = Character(name = "유저", thumbnail = "")
-    var chatList by remember {
-        mutableStateOf(fakeChatData)
-    }
-    var userChat by remember { mutableStateOf(TextFieldValue(String.Empty)) }
+    val chatList by viewModel.chatList.collectAsStateWithLifecycle()
+    val userChat by viewModel.userChat.collectAsStateWithLifecycle()
 
     ChatScreen(
         chatList = chatList,
         userChat = userChat,
-        onUserTextChanged = {
-            userChat = it
+        onUserTextChanged = { newText ->
+            viewModel.userChat.update { newText }
         },
         onUserSubmitChat = {
-            chatList = listOf(Chat(speaker = user, content = it.text)) + chatList
-            userChat = TextFieldValue(String.Empty)
+            viewModel.sendChat(it)
         })
 }
 
 @Composable
 fun ChatScreen(
     chatList: List<Chat>,
-    userChat: TextFieldValue,
-    onUserTextChanged: (TextFieldValue) -> Unit = {},
-    onUserSubmitChat: (TextFieldValue) -> Unit = {}
+    userChat: String,
+    onUserTextChanged: (String) -> Unit = {},
+    onUserSubmitChat: (String) -> Unit = {}
 ) {
     val navController = rememberNavController()
     val focusManager = LocalFocusManager.current
@@ -131,13 +124,13 @@ fun ChatScreenPreView() {
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colors.background,
         ) {
-            ChatScreen(fakeChatData, TextFieldValue(""))
+            ChatScreen(fakeChatData, "")
         }
     }
 }
 
 
-private val fakeChatData = buildList {
+val fakeChatData = buildList {
     repeat(20) {
         add(Chat(speaker = Character(name = "Saber", thumbnail = ""), content = "$it"))
     }
