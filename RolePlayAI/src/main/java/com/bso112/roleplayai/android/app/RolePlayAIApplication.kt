@@ -1,4 +1,4 @@
-package com.bso112.roleplayai.android
+package com.bso112.roleplayai.android.app
 
 import android.app.Application
 import com.bso112.data.RolePlayService

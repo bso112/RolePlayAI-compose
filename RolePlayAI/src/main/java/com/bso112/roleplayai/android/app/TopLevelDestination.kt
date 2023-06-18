@@ -1,4 +1,4 @@
-package com.bso112.roleplayai.android
+package com.bso112.roleplayai.android.app
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite

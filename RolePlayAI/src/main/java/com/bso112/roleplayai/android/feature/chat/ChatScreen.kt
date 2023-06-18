@@ -31,10 +31,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
-import com.bso112.roleplayai.android.RolePlayAITheme
+import com.bso112.roleplayai.android.app.RolePlayAITheme
 import com.bso112.roleplayai.android.feature.chat.data.Character
 import com.bso112.roleplayai.android.feature.chat.data.Chat
-import com.bso112.roleplayai.android.placeHolder
+import com.bso112.roleplayai.android.app.placeHolder
 import kotlinx.coroutines.flow.update
 import org.koin.androidx.compose.koinViewModel
 

@@ -1,4 +1,4 @@
-package com.bso112.roleplayai.android
+package com.bso112.roleplayai.android.app
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.BottomNavigation
