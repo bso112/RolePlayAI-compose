@@ -1,7 +1,12 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.kotlinx.serialization)
 }
+
 
 android {
     namespace = "com.bso112.data"
@@ -13,6 +18,13 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+
+        buildConfigField(
+            "String",
+            "CHAT_GPT_API_KEY",
+            gradleLocalProperties(rootDir)
+                .getProperty("CHAT_GPT_API_KEY", "")
+        )
     }
 
     buildTypes {

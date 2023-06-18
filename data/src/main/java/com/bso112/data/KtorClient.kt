@@ -18,16 +18,17 @@ import kotlinx.serialization.json.Json
 object KtorClient {
 
     //http 클라이언트
-    val httpClient : HttpClient = HttpClient(CIO) {
+    val httpClient: HttpClient = HttpClient(CIO) {
         // json 설정
-        install(ContentNegotiation){
+        install(ContentNegotiation) {
             json(Json {
                 prettyPrint = true
+                ignoreUnknownKeys = true
             })
         }
 
         // 로깅 설정
-        install(Logging){
+        install(Logging) {
             logger = object : Logger {
                 override fun log(message: String) {
                     Log.d("test", "api log: $message")
@@ -35,7 +36,7 @@ object KtorClient {
             }
             level = LogLevel.ALL
         }
-        install(HttpTimeout){
+        install(HttpTimeout) {
             requestTimeoutMillis = 10000
             connectTimeoutMillis = 10000
             socketTimeoutMillis = 10000

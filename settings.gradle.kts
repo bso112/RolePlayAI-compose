@@ -45,6 +45,8 @@ dependencyResolutionManagement {
             bundle("koin", listOf("koin-android", "koin_compose"))
 
             library("lifecycle-compose", "androidx.lifecycle:lifecycle-runtime-compose:2.6.1")
+
+            plugin("kotlinx-serialization", "org.jetbrains.kotlin.plugin.serialization").version("1.5.0")
         }
     }
 

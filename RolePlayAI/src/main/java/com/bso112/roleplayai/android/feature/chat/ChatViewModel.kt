@@ -35,14 +35,17 @@ class ChatViewModel(
             )
         }
         viewModelScope.launch(dispatcherProvider.io) {
-            val response = service.sendChat(message)
-            _chatList.update {
-                it.addFirst(
-                    Chat(
-                        speaker = Character(thumbnail = "", name = "상대"),
-                        content = response
+            service.sendChat(message).onSuccess { response ->
+                _chatList.update {
+                    it.addFirst(
+                        Chat(
+                            speaker = Character(thumbnail = "", name = "상대"),
+                            content = response.choices.firstOrNull()?.message?.content.orEmpty()
+                        )
                     )
-                )
+                }
+            }.onFailure {
+                it.printStackTrace()
             }
         }
     }
