@@ -6,6 +6,7 @@ import com.bso112.data.RolePlayService
 import com.bso112.roleplayai.android.feature.chat.data.Character
 import com.bso112.roleplayai.android.feature.chat.data.Chat
 import com.bso112.roleplayai.android.util.DispatcherProvider
+import com.bso112.roleplayai.android.util.Empty
 import com.bso112.roleplayai.android.util.addFirst
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -48,5 +49,6 @@ class ChatViewModel(
                 it.printStackTrace()
             }
         }
+        userChat.update { String.Empty }
     }
 }

@@ -1,73 +1,56 @@
 package com.bso112.roleplayai.android.app
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.bso112.roleplayai.android.feature.chat.CHAT_ROUTE
 import com.bso112.roleplayai.android.feature.chat.chatScreen
+import com.bso112.roleplayai.android.feature.chathistory.chatHistory
+import com.bso112.roleplayai.android.feature.home.HOME_ROUTE
+import com.bso112.roleplayai.android.feature.home.homeScreen
 
 @Composable
 fun RolePlayAIApp(
     appState: RolePlayAppState = rememberRolePlayAIAppState()
 ) {
+    val navBackStackEntry by appState.navController.currentBackStackEntryAsState()
+
+    val excludeBottomBarRoute = listOf(CHAT_ROUTE)
+
     RolePlayAITheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colors.background,
-        ) {
-            RolePlayAINavHost(appState)
+        Scaffold(
+            modifier = Modifier
+                .fillMaxSize(),
+            bottomBar = {
+                if (navBackStackEntry?.destination?.route.orEmpty() !in excludeBottomBarRoute) {
+                    RolePlayBottomNavigation(appState.navController)
+                }
+            }
+        ) { padding ->
+            RolePlayAINavHost(Modifier.padding(padding), appState)
         }
     }
 }
 
-@Composable
-fun HomeBottomNavigation(
-    onClickNavItem: (TopLevelDestination) -> Unit
-) {
-    var selectedItemIndex by remember { mutableStateOf(0) }
-    BottomNavigation {
-        TopLevelDestination.values().mapIndexed { index, type ->
-            val isSelected = index == selectedItemIndex
-            BottomNavigationItem(
-                selected = isSelected,
-                icon = {
-                    Icon(
-                        imageVector = if (isSelected) type.selectedImage else type.deselectedImage,
-                        contentDescription = null
-                    )
-                },
-                label = {
-                    Text(text = type.title)
-                },
-                onClick = {
-                    selectedItemIndex = index
-                    onClickNavItem(type)
-                }
-            )
-        }
-    }
-}
 
 @Composable
 fun RolePlayAINavHost(
+    modifier: Modifier,
     appState: RolePlayAppState
 ) {
     NavHost(
+        modifier = modifier,
         navController = appState.navController,
-        startDestination = CHAT_ROUTE
+        startDestination = HOME_ROUTE
     ) {
-        chatScreen()
+        homeScreen(appState)
+        chatHistory(appState)
+        chatScreen(appState)
     }
 
 }

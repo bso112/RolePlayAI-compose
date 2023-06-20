@@ -12,10 +12,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
@@ -29,17 +29,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.bso112.roleplayai.android.app.RolePlayAITheme
+import com.bso112.roleplayai.android.app.RolePlayAppState
+import com.bso112.roleplayai.android.app.placeHolder
 import com.bso112.roleplayai.android.feature.chat.data.Character
 import com.bso112.roleplayai.android.feature.chat.data.Chat
-import com.bso112.roleplayai.android.app.placeHolder
 import kotlinx.coroutines.flow.update
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ChatScreenRoute(
+    appState: RolePlayAppState,
     viewModel: ChatViewModel = koinViewModel()
 ) {
     val chatList by viewModel.chatList.collectAsStateWithLifecycle()
@@ -48,6 +49,9 @@ fun ChatScreenRoute(
     ChatScreen(
         chatList = chatList,
         userChat = userChat,
+        onClickBackButton = {
+            appState.navController.popBackStack()
+        },
         onUserTextChanged = { newText ->
             viewModel.userChat.update { newText }
         },
@@ -60,48 +64,44 @@ fun ChatScreenRoute(
 fun ChatScreen(
     chatList: List<Chat>,
     userChat: String,
+    onClickBackButton: () -> Unit = {},
     onUserTextChanged: (String) -> Unit = {},
     onUserSubmitChat: (String) -> Unit = {}
 ) {
-    val navController = rememberNavController()
     val focusManager = LocalFocusManager.current
-
-    Scaffold(
-        topBar = {
-            IconButton(onClick = { navController.navigateChat() }) {
+    Column {
+        TopAppBar {
+            IconButton(onClick = onClickBackButton) {
                 Icon(Icons.Filled.ArrowBack, contentDescription = "go back")
             }
         }
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
-            LazyColumn(modifier = Modifier.weight(1f), reverseLayout = true) {
-                items(chatList.size) {
-                    ChatItem(chat = chatList[it])
-                }
+        LazyColumn(modifier = Modifier.weight(1f), reverseLayout = true) {
+            items(chatList.size) {
+                ChatItem(chat = chatList[it])
             }
-            TextField(
-                value = userChat,
-                onValueChange = onUserTextChanged,
-                modifier = Modifier
-                    .fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(onDone = {
-                    onUserSubmitChat(userChat)
-                    focusManager.clearFocus()
-                })
-            )
         }
+        TextField(
+            value = userChat,
+            onValueChange = onUserTextChanged,
+            modifier = Modifier
+                .fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = {
+                onUserSubmitChat(userChat)
+                focusManager.clearFocus()
+            })
+        )
     }
 
 }
 
 @Composable
 fun ChatItem(chat: Chat) {
-    Row(Modifier.padding(15.dp)) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(15.dp)
+    ) {
         AsyncImage(
             modifier = Modifier.size(50.dp),
             model = chat.speaker.thumbnail,

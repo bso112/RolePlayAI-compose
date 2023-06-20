@@ -4,7 +4,7 @@ import com.bso112.data.Message
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ChatResponse(
+data class ChatEntity(
     val id: String,
     val `object`: String,
     val created: Long,

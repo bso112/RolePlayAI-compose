@@ -3,6 +3,8 @@ package com.bso112.roleplayai.android.app
 import android.app.Application
 import com.bso112.data.RolePlayService
 import com.bso112.roleplayai.android.feature.chat.ChatViewModel
+import com.bso112.roleplayai.android.feature.chathistory.ChatHistoryViewModel
+import com.bso112.roleplayai.android.feature.home.HomeViewModel
 import com.bso112.roleplayai.android.util.DispatcherProvider
 import com.bso112.roleplayai.android.util.DispatcherProviderImpl
 import org.koin.android.ext.koin.androidContext
@@ -26,5 +28,7 @@ class RolePlayAIApplication : Application() {
 val appModule = module {
     single { RolePlayService() }
     single<DispatcherProvider> { DispatcherProviderImpl }
+    viewModel { HomeViewModel(get()) }
+    viewModel { ChatHistoryViewModel() }
     viewModel { ChatViewModel(get(), get()) }
 }
