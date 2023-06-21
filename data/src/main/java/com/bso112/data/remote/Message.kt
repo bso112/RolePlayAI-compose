@@ -1,4 +1,4 @@
-package com.bso112.data
+package com.bso112.data.remote
 
 import kotlinx.serialization.Serializable
 

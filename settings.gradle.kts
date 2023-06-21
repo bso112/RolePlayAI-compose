@@ -17,3 +17,4 @@ rootProject.name = "RolePlayAI"
 include(":RolePlayAI")
 include(":shared")
 include(":data")
+include(":domain")

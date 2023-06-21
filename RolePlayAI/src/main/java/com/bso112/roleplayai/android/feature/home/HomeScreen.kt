@@ -23,13 +23,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
-import com.bso112.data.fakeCharacterList
-import com.bso112.data.response.CharacterEntity
+import com.bso112.domain.Profile
 import com.bso112.roleplayai.android.app.RolePlayAppState
 import com.bso112.roleplayai.android.app.placeHolder
-import com.bso112.roleplayai.android.feature.chat.data.Character
-import com.bso112.roleplayai.android.feature.chat.data.toUIModel
 import com.bso112.roleplayai.android.util.DefaultPreview
+import com.bso112.roleplayai.android.util.randomID
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -44,20 +42,20 @@ fun HomeScreenRoute(
 
 @Composable
 private fun HomeScreen(
-    characterList: List<Character>,
+    characterList: List<Profile>,
     navController: NavController
 ) {
     Column {
         LazyColumn {
             items(characterList) {
-                CharacterItem(character = it)
+                CharacterItem(profile = it)
             }
         }
     }
 }
 
 @Composable
-private fun CharacterItem(character: Character) {
+private fun CharacterItem(profile: Profile) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -68,13 +66,13 @@ private fun CharacterItem(character: Character) {
             modifier = Modifier
                 .size(50.dp)
                 .clip(RoundedCornerShape(15.dp)),
-            model = character.thumbnail,
+            model = profile.thumbnail,
             contentDescription = null,
             error = ColorPainter(MaterialTheme.colors.placeHolder),
             placeholder = ColorPainter(MaterialTheme.colors.placeHolder)
         )
         Spacer(modifier = Modifier.size(10.dp))
-        Text(character.name)
+        Text(profile.name)
     }
 }
 
@@ -83,7 +81,11 @@ private fun CharacterItem(character: Character) {
 @Composable
 private fun HomeScreenPreview() {
     DefaultPreview {
-        HomeScreen(fakeCharacterList.map(CharacterEntity::toUIModel), rememberNavController())
+        HomeScreen(fakeProfileList, rememberNavController())
     }
 }
 
+
+private val fakeProfileList = List(20) {
+    Profile(id = randomID, thumbnail = "", name = "Bot $it")
+}

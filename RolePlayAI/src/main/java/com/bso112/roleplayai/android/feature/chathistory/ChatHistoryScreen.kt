@@ -22,9 +22,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.bso112.domain.Chat
 import com.bso112.roleplayai.android.app.RolePlayAppState
 import com.bso112.roleplayai.android.app.placeHolder
-import com.bso112.roleplayai.android.feature.chat.data.Chat
 import com.bso112.roleplayai.android.feature.chat.fakeChatData
 import com.bso112.roleplayai.android.feature.chat.navigateChat
 import com.bso112.roleplayai.android.util.DefaultPreview
@@ -70,7 +70,7 @@ private fun ChatHistoryItem(chat: Chat, onClickChatHistory: (Chat) -> Unit) {
         )
         Column(modifier = Modifier.padding(start = 10.dp)) {
             Text(chat.speaker.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Text(chat.content)
+            Text(chat.message)
         }
     }
 }

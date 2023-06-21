@@ -1,20 +1,17 @@
 package com.bso112.roleplayai.android.feature.home
 
 import androidx.lifecycle.ViewModel
-import com.bso112.data.RolePlayService
-import com.bso112.data.response.CharacterEntity
-import com.bso112.roleplayai.android.feature.chat.data.Character
-import com.bso112.roleplayai.android.feature.chat.data.toUIModel
+import com.bso112.domain.Profile
+import com.bso112.domain.ProfileRepository
 import com.bso112.roleplayai.android.util.stateIn
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
 
 class HomeViewModel(
-    private val rolePlayService: RolePlayService
+    private val profileRepository: ProfileRepository
 ) : ViewModel() {
 
-    val characterList: StateFlow<List<Character>> =
-        stateIn(rolePlayService.getCharacters().map { it.map(CharacterEntity::toUIModel) })
+    val characterList: StateFlow<List<Profile>> =
+        stateIn(profileRepository.getProfiles())
 }
 
 

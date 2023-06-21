@@ -1,4 +1,4 @@
-package com.bso112.data
+package com.bso112.data.remote
 
 import android.util.Log
 import io.ktor.client.HttpClient
@@ -37,9 +37,9 @@ object KtorClient {
             level = LogLevel.ALL
         }
         install(HttpTimeout) {
-            requestTimeoutMillis = 10000
-            connectTimeoutMillis = 10000
-            socketTimeoutMillis = 10000
+            requestTimeoutMillis = 10 * 60 * 1000
+            connectTimeoutMillis = 10 * 60 * 1000
+            socketTimeoutMillis = 10 * 60 * 1000
         }
 
         // 기본적인 api 호출시 넣는 것들 즉, 기본 세팅

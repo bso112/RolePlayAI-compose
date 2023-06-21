@@ -1,9 +1,12 @@
-package com.bso112.data
+package com.bso112.data.remote.datasource
 
-import com.bso112.data.request.ChatRequest
-import com.bso112.data.request.Model
-import com.bso112.data.response.CharacterEntity
-import com.bso112.data.response.ChatEntity
+import com.bso112.data.BuildConfig
+import com.bso112.data.remote.KtorClient
+import com.bso112.data.remote.Message
+import com.bso112.data.remote.Role
+import com.bso112.data.remote.model.ChatApiModel
+import com.bso112.data.remote.request.ChatRequest
+import com.bso112.data.remote.request.Model
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.headers
@@ -12,16 +15,12 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 
-class RolePlayService(
+class ChatRemoteDataSource(
     private val client: HttpClient = KtorClient.httpClient
 ) {
 
-    suspend fun sendChat(
-        message: String
-    ): Result<ChatEntity> = result {
+    suspend fun sendChat(message: String): ChatApiModel {
         val url = "https://api.openai.com/v1/chat/completions"
         val apiKey = BuildConfig.CHAT_GPT_API_KEY
         val body = ChatRequest(
@@ -35,7 +34,7 @@ class RolePlayService(
             temperature = 0.8f
         )
 
-        client.post(url) {
+        return client.post(url) {
             contentType(ContentType.Application.Json)
             setBody(body)
             headers {
@@ -43,15 +42,4 @@ class RolePlayService(
             }
         }.body()
     }
-
-    fun getCharacters(): Flow<List<CharacterEntity>> = flow {
-        emit(fakeCharacterList)
-    }
-}
-
-val fakeCharacterList = List(size = 20) {
-    CharacterEntity(
-        name = "Bot $it",
-        thumbnail = ""
-    )
 }

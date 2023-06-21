@@ -1,7 +1,13 @@
 package com.bso112.roleplayai.android.app
 
 import android.app.Application
-import com.bso112.data.RolePlayService
+import com.bso112.data.local.createDataBase
+import com.bso112.data.local.datasource.ChatLocalDataSource
+import com.bso112.data.remote.datasource.ChatRemoteDataSource
+import com.bso112.data.repository.ChatRepositoryImpl
+import com.bso112.data.repository.ProfileRepositoryImpl
+import com.bso112.domain.ChatRepository
+import com.bso112.domain.ProfileRepository
 import com.bso112.roleplayai.android.feature.chat.ChatViewModel
 import com.bso112.roleplayai.android.feature.chathistory.ChatHistoryViewModel
 import com.bso112.roleplayai.android.feature.home.HomeViewModel
@@ -14,6 +20,19 @@ import org.koin.core.context.GlobalContext.startKoin
 import org.koin.dsl.module
 
 class RolePlayAIApplication : Application() {
+
+    private val appModule = module {
+        single { createDataBase(this@RolePlayAIApplication) }
+        single { ChatRemoteDataSource() }
+        single { ChatLocalDataSource(get()) }
+        single<ChatRepository> { ChatRepositoryImpl(get(), get()) }
+        single<ProfileRepository> { ProfileRepositoryImpl() }
+        single<DispatcherProvider> { DispatcherProviderImpl }
+        viewModel { HomeViewModel(get()) }
+        viewModel { ChatHistoryViewModel() }
+        viewModel { ChatViewModel(get(), get(), get()) }
+    }
+
     override fun onCreate() {
         super.onCreate()
 
@@ -23,12 +42,4 @@ class RolePlayAIApplication : Application() {
             modules(appModule)
         }
     }
-}
-
-val appModule = module {
-    single { RolePlayService() }
-    single<DispatcherProvider> { DispatcherProviderImpl }
-    viewModel { HomeViewModel(get()) }
-    viewModel { ChatHistoryViewModel() }
-    viewModel { ChatViewModel(get(), get()) }
 }

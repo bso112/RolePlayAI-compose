@@ -4,7 +4,9 @@ import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.ksp)
     alias(libs.plugins.kotlinx.serialization)
+
 }
 
 
@@ -25,6 +27,18 @@ android {
             gradleLocalProperties(rootDir)
                 .getProperty("CHAT_GPT_API_KEY", "")
         )
+
+        //이거 필요한가?
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments.putAll(
+                    mapOf(
+                        "room.schemaLocation" to "$projectDir/schemas",
+                        "room.incremental" to "true"
+                    )
+                )
+            }
+        }
     }
 
     buildTypes {
@@ -37,16 +51,20 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_19
+        targetCompatibility = JavaVersion.VERSION_19
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "19"
     }
 }
 
 dependencies {
+    implementation(project(":domain"))
     implementation(libs.bundles.ktor)
+    implementation(libs.bundles.room)
+    annotationProcessor(libs.room.compiler)
+    ksp(libs.room.compiler)
     implementation("androidx.core:core-ktx:1.8.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.9.0")

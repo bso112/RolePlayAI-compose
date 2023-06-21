@@ -1,14 +1,16 @@
-package com.bso112.data.response
+package com.bso112.data.remote.model
 
-import com.bso112.data.Message
+import com.bso112.data.remote.Message
+import com.bso112.domain.Chat
+import com.bso112.domain.Profile
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ChatEntity(
+data class ChatApiModel(
     val id: String,
     val `object`: String,
     val created: Long,
-    val model : String,
+    val model: String,
     val choices: List<Choice>,
     val usage: Usage
 )
@@ -27,3 +29,9 @@ data class Usage(
     val total_tokens: Int
 )
 
+
+fun ChatApiModel.toDomain(speaker : Profile) =
+    Chat(
+        speaker = speaker,
+        message = choices.firstOrNull()?.message?.content.orEmpty()
+    )

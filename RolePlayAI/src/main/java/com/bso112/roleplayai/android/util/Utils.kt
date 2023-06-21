@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.bso112.roleplayai.android.app.RolePlayAITheme
+import kotlin.random.Random
 
 
 @Composable
@@ -28,3 +29,5 @@ fun currentRoute(navController: NavController): String? {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     return navBackStackEntry?.destination?.route
 }
+
+val randomID get() = Random.nextLong()

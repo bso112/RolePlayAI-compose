@@ -41,6 +41,7 @@ android {
 dependencies {
     implementation(project(":shared"))
     implementation(project(":data"))
+    implementation(project(":domain"))
 
     implementation(libs.bundles.koin)
     implementation(libs.bundles.ktor)

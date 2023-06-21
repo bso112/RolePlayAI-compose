@@ -1,6 +1,6 @@
-package com.bso112.data.request
+package com.bso112.data.remote.request
 
-import com.bso112.data.Message
+import com.bso112.data.remote.Message
 import kotlinx.serialization.Serializable
 
 enum class Model(val alias: String) {

@@ -19,6 +19,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.ColorPainter
@@ -30,11 +31,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.bso112.domain.Chat
+import com.bso112.domain.Profile
 import com.bso112.roleplayai.android.app.RolePlayAITheme
 import com.bso112.roleplayai.android.app.RolePlayAppState
 import com.bso112.roleplayai.android.app.placeHolder
-import com.bso112.roleplayai.android.feature.chat.data.Character
-import com.bso112.roleplayai.android.feature.chat.data.Chat
+import com.bso112.roleplayai.android.util.randomID
 import kotlinx.coroutines.flow.update
 import org.koin.androidx.compose.koinViewModel
 
@@ -44,7 +46,13 @@ fun ChatScreenRoute(
     viewModel: ChatViewModel = koinViewModel()
 ) {
     val chatList by viewModel.chatList.collectAsStateWithLifecycle()
-    val userChat by viewModel.userChat.collectAsStateWithLifecycle()
+    val userChat by viewModel.userInput.collectAsStateWithLifecycle()
+
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.saveChatList()
+        }
+    }
 
     ChatScreen(
         chatList = chatList,
@@ -53,7 +61,7 @@ fun ChatScreenRoute(
             appState.navController.popBackStack()
         },
         onUserTextChanged = { newText ->
-            viewModel.userChat.update { newText }
+            viewModel.userInput.update { newText }
         },
         onUserSubmitChat = {
             viewModel.sendChat(it)
@@ -111,7 +119,7 @@ fun ChatItem(chat: Chat) {
         )
         Column(modifier = Modifier.padding(start = 10.dp)) {
             Text(chat.speaker.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Text(chat.content)
+            Text(chat.message)
         }
     }
 }
@@ -132,6 +140,6 @@ fun ChatScreenPreView() {
 
 val fakeChatData = buildList {
     repeat(20) {
-        add(Chat(speaker = Character(name = "Saber", thumbnail = ""), content = "$it"))
+        add(Chat(speaker = Profile(name = "상대", thumbnail = "", id = randomID), message = "$it"))
     }
 }.reversed()
