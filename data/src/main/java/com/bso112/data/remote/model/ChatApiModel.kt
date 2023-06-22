@@ -1,8 +1,8 @@
 package com.bso112.data.remote.model
 
 import com.bso112.data.remote.Message
-import com.bso112.domain.Chat
 import com.bso112.domain.Profile
+import com.bso112.domain.createChat
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -30,8 +30,5 @@ data class Usage(
 )
 
 
-fun ChatApiModel.toDomain(speaker : Profile) =
-    Chat(
-        speaker = speaker,
-        message = choices.firstOrNull()?.message?.content.orEmpty()
-    )
+fun ChatApiModel.toDomain(speaker: Profile) =
+    speaker.createChat(message = choices.firstOrNull()?.message?.content.orEmpty())

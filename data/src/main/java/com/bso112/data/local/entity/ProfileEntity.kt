@@ -6,11 +6,10 @@ import com.bso112.domain.Profile
 
 @Entity
 data class ProfileEntity(
+    @PrimaryKey
+    val id: String,
     val name: String,
     val thumbnail: String
-) {
-    @PrimaryKey(autoGenerate = true)
-    var id: Long = 0
-}
+)
 
 fun ProfileEntity.toDomain() = Profile(id = id, name = name, thumbnail = thumbnail)

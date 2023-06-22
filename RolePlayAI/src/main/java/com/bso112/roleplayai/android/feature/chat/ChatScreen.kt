@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.bso112.domain.Chat
-import com.bso112.domain.Profile
 import com.bso112.roleplayai.android.app.RolePlayAITheme
 import com.bso112.roleplayai.android.app.RolePlayAppState
 import com.bso112.roleplayai.android.app.placeHolder
@@ -112,13 +111,13 @@ fun ChatItem(chat: Chat) {
     ) {
         AsyncImage(
             modifier = Modifier.size(50.dp),
-            model = chat.speaker.thumbnail,
+            model = chat.thumbnail,
             contentDescription = null,
             error = ColorPainter(MaterialTheme.colors.placeHolder),
             placeholder = ColorPainter(MaterialTheme.colors.placeHolder)
         )
         Column(modifier = Modifier.padding(start = 10.dp)) {
-            Text(chat.speaker.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(chat.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
             Text(chat.message)
         }
     }
@@ -140,6 +139,6 @@ fun ChatScreenPreView() {
 
 val fakeChatData = buildList {
     repeat(20) {
-        add(Chat(speaker = Profile(name = "상대", thumbnail = "", id = randomID), message = "$it"))
+        add(Chat(name = "상대", thumbnail = "", id = randomID, message = "$it", profileId = randomID))
     }
 }.reversed()

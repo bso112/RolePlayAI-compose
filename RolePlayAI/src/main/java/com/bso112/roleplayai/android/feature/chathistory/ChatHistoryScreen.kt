@@ -63,13 +63,13 @@ private fun ChatHistoryItem(chat: Chat, onClickChatHistory: (Chat) -> Unit) {
     ) {
         AsyncImage(
             modifier = Modifier.size(50.dp),
-            model = chat.speaker.thumbnail,
+            model = chat.thumbnail,
             contentDescription = null,
             error = ColorPainter(MaterialTheme.colors.placeHolder),
             placeholder = ColorPainter(MaterialTheme.colors.placeHolder)
         )
         Column(modifier = Modifier.padding(start = 10.dp)) {
-            Text(chat.speaker.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(chat.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
             Text(chat.message)
         }
     }

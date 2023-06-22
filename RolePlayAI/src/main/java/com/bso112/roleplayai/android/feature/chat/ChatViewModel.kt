@@ -6,10 +6,13 @@ import com.bso112.domain.Chat
 import com.bso112.domain.ChatRepository
 import com.bso112.domain.Profile
 import com.bso112.domain.ProfileRepository
+import com.bso112.domain.createChat
 import com.bso112.roleplayai.android.util.DispatcherProvider
 import com.bso112.roleplayai.android.util.Empty
 import com.bso112.roleplayai.android.util.addFirst
 import com.bso112.roleplayai.android.util.randomID
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -50,12 +53,7 @@ class ChatViewModel(
 
     fun sendChat(message: String) {
         _chatList.update {
-            it.addFirst(
-                Chat(
-                    speaker = user,
-                    message = message
-                )
-            )
+            it.addFirst(user.createChat(message))
         }
         viewModelScope.launch(dispatcherProvider.io) {
             chatRepository.sendChat(
@@ -70,9 +68,15 @@ class ChatViewModel(
         userInput.update { String.Empty }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     fun saveChatList() {
-        viewModelScope.launch(dispatcherProvider.io) {
-            chatRepository.saveChatList(logId = chatLogId.id, list = chatList.value).onFailure {
+        /**
+         * GlobalScope 내부에서 viewModel의 변수를 참조하면 메모리릭이 날 수도 있기에 얕은 복사를 한다.
+         */
+        val logId = chatLogId.id
+        val chatList = chatList.value.toList()
+        GlobalScope.launch(dispatcherProvider.io) {
+            chatRepository.saveChatList(logId = logId, list = chatList).onFailure {
                 it.printStackTrace()
             }
         }

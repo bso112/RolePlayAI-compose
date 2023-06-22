@@ -6,6 +6,7 @@ import com.bso112.domain.Profile
 import com.bso112.domain.ProfileRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import java.util.UUID
 
 class ProfileRepositoryImpl : ProfileRepository {
     override fun getProfiles(): Flow<List<Profile>> = flow {
@@ -15,6 +16,7 @@ class ProfileRepositoryImpl : ProfileRepository {
 
 val fakeProfileList = List(size = 20) {
     ProfileEntity(
+        id = UUID.randomUUID().toString(),
         name = "Bot $it",
         thumbnail = ""
     )
