@@ -1,5 +1,6 @@
 package com.bso112.roleplayai.android.feature.chat
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bso112.domain.Chat
@@ -7,7 +8,6 @@ import com.bso112.domain.ChatRepository
 import com.bso112.domain.Profile
 import com.bso112.domain.ProfileRepository
 import com.bso112.domain.createChat
-import com.bso112.roleplayai.android.data.ChatLogId
 import com.bso112.roleplayai.android.util.DispatcherProvider
 import com.bso112.roleplayai.android.util.Empty
 import com.bso112.roleplayai.android.util.addFirst
@@ -24,12 +24,14 @@ import kotlinx.coroutines.launch
 class ChatViewModel(
     private val chatRepository: ChatRepository,
     private val profileRepository: ProfileRepository,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val user = Profile(name = "유저", thumbnail = "", id = randomID)
-    private val opponent = Profile(name = "상대", thumbnail = "", id = randomID)
-    private val chatLogId = ChatLogId()
+    private var opponent: Profile? = null
+
+    private val chatLogId: String? = savedStateHandle.get<String>(ARG_CHAT_LOG_ID)
 
     private val _chatList: MutableStateFlow<List<Chat>> = MutableStateFlow(emptyList())
     val chatList: StateFlow<List<Chat>> = _chatList.asStateFlow()
@@ -37,11 +39,22 @@ class ChatViewModel(
     val userInput = MutableStateFlow("")
 
     init {
-        viewModelScope.launch(dispatcherProvider.io) {
-            chatRepository.getAllChat(chatLogId.id).onSuccess { chatLog ->
-                _chatList.update { chatLog }
-            }.onFailure {
-                it.printStackTrace()
+
+        checkNotNull(savedStateHandle.get<String>(ARG_PROFILE_ID)).also {
+            viewModelScope.launch {
+                profileRepository.getProfile(it).collect {
+                    opponent = it
+                }
+            }
+        }
+
+        chatLogId?.let { chatLogId ->
+            viewModelScope.launch(dispatcherProvider.io) {
+                chatRepository.getAllChat(chatLogId).onSuccess { chatLog ->
+                    _chatList.update { chatLog }
+                }.onFailure {
+                    it.printStackTrace()
+                }
             }
         }
     }
@@ -52,7 +65,7 @@ class ChatViewModel(
         }
         viewModelScope.launch(dispatcherProvider.io) {
             chatRepository.sendChat(
-                speaker = opponent,
+                speaker = checkNotNull(opponent),
                 message = message
             ).onSuccess { chat ->
                 _chatList.update { it.addFirst(chat) }
@@ -68,10 +81,10 @@ class ChatViewModel(
         /**
          * GlobalScope 내부에서 viewModel의 변수를 참조하면 메모리릭이 날 수도 있기에 얕은 복사를 한다.
          */
-        val logId = chatLogId.id
+        val logId = chatLogId ?: randomID
         val chatList = chatList.value.toList()
         GlobalScope.launch(dispatcherProvider.io) {
-            chatRepository.saveChatList(logId = logId, list = chatList).onFailure {
+            chatRepository.saveChatLog(logId = logId, list = chatList).onFailure {
                 it.printStackTrace()
             }
         }

@@ -9,6 +9,7 @@ data class ChatLogEntity(
     @PrimaryKey
     val id: String,
     val name: String,
+    val profileId: String,
     val thumbnail: String,
     val previewMessage: String
 )
@@ -16,6 +17,7 @@ data class ChatLogEntity(
 fun ChatLogEntity.toDomain() = ChatLog(
     id = id,
     name = name,
+    profileId = profileId,
     thumbnail = thumbnail,
     previewMessage = previewMessage
 )

@@ -4,6 +4,7 @@ import androidx.room.withTransaction
 import com.bso112.data.local.AppDataBase
 import com.bso112.data.local.entity.ChatEntity
 import com.bso112.data.local.entity.ChatLogEntity
+import com.bso112.data.local.entity.toChatLog
 
 class ChatLocalDataSource(
     private val db: AppDataBase
@@ -17,9 +18,11 @@ class ChatLocalDataSource(
         }
     }
 
-    suspend fun saveChatList(list: List<ChatEntity>) {
+    suspend fun saveChatList(list: List<ChatEntity>, logId: String) {
+        val chatLog = list.toChatLog(logId) ?: error("chat list cannot be empty")
         db.withTransaction {
             chatDao.insertAll(list)
+            chatLogDao.insert(chatLog)
         }
     }
 

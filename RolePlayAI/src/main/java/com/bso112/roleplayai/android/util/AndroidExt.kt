@@ -16,6 +16,6 @@ fun <T> ViewModel.stateIn(
 
 fun <T> ViewModel.stateIn(
     flow: Flow<T>,
-    initialValue: T,
+    initialValue: T? = null,
     sharingStarted: SharingStarted = SharingStarted.WhileSubscribed(5000L)
 ) = flow.stateIn(viewModelScope, sharingStarted, initialValue)

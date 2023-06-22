@@ -9,10 +9,20 @@ import kotlinx.coroutines.flow.flow
 import java.util.UUID
 
 class ProfileRepositoryImpl : ProfileRepository {
+    override fun getProfile(profileId: String): Flow<Profile> = flow {
+        emit(fakeProfile.toDomain())
+    }
+
     override fun getProfiles(): Flow<List<Profile>> = flow {
         emit(fakeProfileList.map(ProfileEntity::toDomain))
     }
 }
+
+val fakeProfile = ProfileEntity(
+    id = UUID.randomUUID().toString(),
+    name = "Bot",
+    thumbnail = ""
+)
 
 val fakeProfileList = List(size = 20) {
     ProfileEntity(

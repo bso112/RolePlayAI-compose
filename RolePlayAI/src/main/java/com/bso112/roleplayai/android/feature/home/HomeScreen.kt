@@ -1,5 +1,6 @@
 package com.bso112.roleplayai.android.feature.home
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,6 +27,8 @@ import coil.compose.AsyncImage
 import com.bso112.domain.Profile
 import com.bso112.roleplayai.android.app.RolePlayAppState
 import com.bso112.roleplayai.android.app.placeHolder
+import com.bso112.roleplayai.android.data.toId
+import com.bso112.roleplayai.android.feature.chat.navigateChat
 import com.bso112.roleplayai.android.util.DefaultPreview
 import com.bso112.roleplayai.android.util.randomID
 import org.koin.androidx.compose.koinViewModel
@@ -48,18 +51,21 @@ private fun HomeScreen(
     Column {
         LazyColumn {
             items(characterList) {
-                CharacterItem(profile = it)
+                ProfileItem(profile = it) { profile ->
+                    navController.navigateChat(profileId = profile.id.toId())
+                }
             }
         }
     }
 }
 
 @Composable
-private fun CharacterItem(profile: Profile) {
+private fun ProfileItem(profile: Profile, onProfileClick: (Profile) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 10.dp, vertical = 5.dp),
+            .padding(horizontal = 10.dp, vertical = 5.dp)
+            .clickable { onProfileClick(profile) },
         verticalAlignment = Alignment.CenterVertically
     ) {
         AsyncImage(

@@ -33,11 +33,11 @@ class ChatRepositoryImpl(
         chatLocalDataSource.getAllChat(logId).map(ChatEntity::toDomain)
     }
 
-    override suspend fun saveChatList(
+    override suspend fun saveChatLog(
         logId: String,
         list: List<Chat>
     ): Result<Unit> = result {
-        chatLocalDataSource.saveChatList(list.map { it.toEntity(logId) })
+        chatLocalDataSource.saveChatList(list.map { it.toEntity(logId) }, logId)
     }
 
     override fun getChatLog(): Flow<List<ChatLog>> = flow {

@@ -1,6 +1,7 @@
 package com.bso112.roleplayai.android.app
 
 import android.app.Application
+import androidx.lifecycle.SavedStateHandle
 import com.bso112.data.local.createDataBase
 import com.bso112.data.local.datasource.ChatLocalDataSource
 import com.bso112.data.remote.datasource.ChatRemoteDataSource
@@ -30,7 +31,7 @@ class RolePlayAIApplication : Application() {
         single<DispatcherProvider> { DispatcherProviderImpl }
         viewModel { HomeViewModel(get()) }
         viewModel { ChatHistoryViewModel(get()) }
-        viewModel { ChatViewModel(get(), get(), get()) }
+        viewModel { (state: SavedStateHandle) -> ChatViewModel(get(), get(), get(), state) }
     }
 
     override fun onCreate() {

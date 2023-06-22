@@ -26,3 +26,15 @@ fun Chat.toEntity(logId: String) = ChatEntity(
     thumbnail = thumbnail,
     message = message
 )
+
+fun List<ChatEntity>.toChatLog(logId: String): ChatLogEntity? {
+    if (isEmpty()) return null
+    val lastChat = last()
+    return ChatLogEntity(
+        id = logId,
+        name = lastChat.name,
+        thumbnail = lastChat.thumbnail,
+        previewMessage = lastChat.message,
+        profileId = lastChat.profileId
+    )
+}

@@ -25,6 +25,7 @@ import coil.compose.AsyncImage
 import com.bso112.domain.ChatLog
 import com.bso112.roleplayai.android.app.RolePlayAppState
 import com.bso112.roleplayai.android.app.placeHolder
+import com.bso112.roleplayai.android.data.toId
 import com.bso112.roleplayai.android.feature.chat.navigateChat
 import com.bso112.roleplayai.android.util.DefaultPreview
 import com.bso112.roleplayai.android.util.randomID
@@ -47,30 +48,35 @@ private fun ChatHistoryScreen(
     chatList: List<ChatLog>
 ) {
     LazyColumn {
-        items(chatList) {
-            ChatHistoryItem(chat = it) { navController.navigateChat() }
+        items(chatList) { chatLog ->
+            ChatHistoryItem(chatLog = chatLog) {
+                navController.navigateChat(
+                    profileId = chatLog.profileId.toId(),
+                    chatLogId = chatLog.id.toId()
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun ChatHistoryItem(chat: ChatLog, onClickChatHistory: (ChatLog) -> Unit) {
+private fun ChatHistoryItem(chatLog: ChatLog, onClickChatHistory: (ChatLog) -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()
             .padding(15.dp)
-            .clickable { onClickChatHistory(chat) }
+            .clickable { onClickChatHistory(chatLog) }
     ) {
         AsyncImage(
             modifier = Modifier.size(50.dp),
-            model = chat.thumbnail,
+            model = chatLog.thumbnail,
             contentDescription = null,
             error = ColorPainter(MaterialTheme.colors.placeHolder),
             placeholder = ColorPainter(MaterialTheme.colors.placeHolder)
         )
         Column(modifier = Modifier.padding(start = 10.dp)) {
-            Text(chat.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Text(chat.previewMessage)
+            Text(chatLog.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(chatLog.previewMessage)
         }
     }
 }
@@ -85,6 +91,14 @@ private fun ChatHistoryPreview() {
 
 private val fakeChatLog = buildList {
     repeat(20) {
-        add(ChatLog(name = "상대", thumbnail = "", previewMessage = "$it", id = randomID))
+        add(
+            ChatLog(
+                name = "상대",
+                thumbnail = "",
+                previewMessage = "$it",
+                id = randomID,
+                profileId = randomID
+            )
+        )
     }
 }
