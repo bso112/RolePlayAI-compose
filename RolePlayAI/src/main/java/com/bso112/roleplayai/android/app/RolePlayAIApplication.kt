@@ -29,7 +29,7 @@ class RolePlayAIApplication : Application() {
         single<ProfileRepository> { ProfileRepositoryImpl() }
         single<DispatcherProvider> { DispatcherProviderImpl }
         viewModel { HomeViewModel(get()) }
-        viewModel { ChatHistoryViewModel() }
+        viewModel { ChatHistoryViewModel(get()) }
         viewModel { ChatViewModel(get(), get(), get()) }
     }
 

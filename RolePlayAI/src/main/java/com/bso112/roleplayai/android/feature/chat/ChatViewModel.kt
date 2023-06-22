@@ -7,6 +7,7 @@ import com.bso112.domain.ChatRepository
 import com.bso112.domain.Profile
 import com.bso112.domain.ProfileRepository
 import com.bso112.domain.createChat
+import com.bso112.roleplayai.android.data.ChatLogId
 import com.bso112.roleplayai.android.util.DispatcherProvider
 import com.bso112.roleplayai.android.util.Empty
 import com.bso112.roleplayai.android.util.addFirst
@@ -18,13 +19,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.UUID
 
-
-@JvmInline
-value class ChatLogId(val id: String) {
-    constructor() : this(UUID.randomUUID().toString())
-}
 
 class ChatViewModel(
     private val chatRepository: ChatRepository,
@@ -34,7 +29,7 @@ class ChatViewModel(
 
     private val user = Profile(name = "유저", thumbnail = "", id = randomID)
     private val opponent = Profile(name = "상대", thumbnail = "", id = randomID)
-    private val chatLogId = ChatLogId("0")
+    private val chatLogId = ChatLogId()
 
     private val _chatList: MutableStateFlow<List<Chat>> = MutableStateFlow(emptyList())
     val chatList: StateFlow<List<Chat>> = _chatList.asStateFlow()

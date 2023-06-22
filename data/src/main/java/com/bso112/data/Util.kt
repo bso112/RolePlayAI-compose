@@ -8,3 +8,9 @@ suspend fun <T> result(block: suspend () -> T): Result<T> {
         Result.failure(e)
     }
 }
+
+suspend fun <T> T.alsoSuspend(block: suspend (T) -> Unit): T {
+    return also {
+        block(this)
+    }
+}

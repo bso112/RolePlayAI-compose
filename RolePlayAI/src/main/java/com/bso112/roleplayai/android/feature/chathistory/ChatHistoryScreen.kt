@@ -22,12 +22,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
-import com.bso112.domain.Chat
+import com.bso112.domain.ChatLog
 import com.bso112.roleplayai.android.app.RolePlayAppState
 import com.bso112.roleplayai.android.app.placeHolder
-import com.bso112.roleplayai.android.feature.chat.fakeChatData
 import com.bso112.roleplayai.android.feature.chat.navigateChat
 import com.bso112.roleplayai.android.util.DefaultPreview
+import com.bso112.roleplayai.android.util.randomID
 import org.koin.androidx.compose.koinViewModel
 
 
@@ -44,7 +44,7 @@ fun ChatHistoryRoute(
 @Composable
 private fun ChatHistoryScreen(
     navController: NavController,
-    chatList: List<Chat>
+    chatList: List<ChatLog>
 ) {
     LazyColumn {
         items(chatList) {
@@ -54,7 +54,7 @@ private fun ChatHistoryScreen(
 }
 
 @Composable
-private fun ChatHistoryItem(chat: Chat, onClickChatHistory: (Chat) -> Unit) {
+private fun ChatHistoryItem(chat: ChatLog, onClickChatHistory: (ChatLog) -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()
@@ -70,7 +70,7 @@ private fun ChatHistoryItem(chat: Chat, onClickChatHistory: (Chat) -> Unit) {
         )
         Column(modifier = Modifier.padding(start = 10.dp)) {
             Text(chat.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Text(chat.message)
+            Text(chat.previewMessage)
         }
     }
 }
@@ -79,6 +79,12 @@ private fun ChatHistoryItem(chat: Chat, onClickChatHistory: (Chat) -> Unit) {
 @Composable
 private fun ChatHistoryPreview() {
     DefaultPreview {
-        ChatHistoryScreen(navController = rememberNavController(), chatList = fakeChatData)
+        ChatHistoryScreen(navController = rememberNavController(), chatList = fakeChatLog)
+    }
+}
+
+private val fakeChatLog = buildList {
+    repeat(20) {
+        add(ChatLog(name = "상대", thumbnail = "", previewMessage = "$it", id = randomID))
     }
 }
