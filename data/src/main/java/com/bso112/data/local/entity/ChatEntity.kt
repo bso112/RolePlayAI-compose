@@ -29,7 +29,7 @@ fun Chat.toEntity(logId: String) = ChatEntity(
 
 fun List<ChatEntity>.toChatLog(logId: String): ChatLogEntity? {
     if (isEmpty()) return null
-    val lastChat = last()
+    val lastChat = first()
     return ChatLogEntity(
         id = logId,
         name = lastChat.name,

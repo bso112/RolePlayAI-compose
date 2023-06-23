@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.SavedStateHandle
 import com.bso112.data.local.createDataBase
 import com.bso112.data.local.datasource.ChatLocalDataSource
+import com.bso112.data.local.datasource.ProfileLocalDataSource
 import com.bso112.data.remote.datasource.ChatRemoteDataSource
 import com.bso112.data.repository.ChatRepositoryImpl
 import com.bso112.data.repository.ProfileRepositoryImpl
@@ -12,6 +13,7 @@ import com.bso112.domain.ProfileRepository
 import com.bso112.roleplayai.android.feature.chat.ChatViewModel
 import com.bso112.roleplayai.android.feature.chathistory.ChatHistoryViewModel
 import com.bso112.roleplayai.android.feature.home.HomeViewModel
+import com.bso112.roleplayai.android.feature.profile.CreateProfileViewModel
 import com.bso112.roleplayai.android.util.DispatcherProvider
 import com.bso112.roleplayai.android.util.DispatcherProviderImpl
 import org.koin.android.ext.koin.androidContext
@@ -26,12 +28,14 @@ class RolePlayAIApplication : Application() {
         single { createDataBase(this@RolePlayAIApplication) }
         single { ChatRemoteDataSource() }
         single { ChatLocalDataSource(get()) }
+        single { ProfileLocalDataSource(get()) }
         single<ChatRepository> { ChatRepositoryImpl(get(), get()) }
-        single<ProfileRepository> { ProfileRepositoryImpl() }
+        single<ProfileRepository> { ProfileRepositoryImpl(get()) }
         single<DispatcherProvider> { DispatcherProviderImpl }
         viewModel { HomeViewModel(get()) }
         viewModel { ChatHistoryViewModel(get()) }
         viewModel { (state: SavedStateHandle) -> ChatViewModel(get(), get(), get(), state) }
+        viewModel { CreateProfileViewModel(get(), get()) }
     }
 
     override fun onCreate() {

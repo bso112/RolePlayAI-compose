@@ -9,7 +9,12 @@ data class ProfileEntity(
     @PrimaryKey
     val id: String,
     val name: String,
-    val thumbnail: String
+    val thumbnail: String,
+    val description: String
 )
 
-fun ProfileEntity.toDomain() = Profile(id = id, name = name, thumbnail = thumbnail)
+fun ProfileEntity.toDomain() =
+    Profile(id = id, name = name, thumbnail = thumbnail, description = description)
+
+fun Profile.toEntity() =
+    ProfileEntity(id = id, name = name, thumbnail = thumbnail, description = description)

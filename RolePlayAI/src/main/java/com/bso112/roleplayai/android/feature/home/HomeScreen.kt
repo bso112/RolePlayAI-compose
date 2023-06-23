@@ -10,8 +10,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -29,32 +33,40 @@ import com.bso112.roleplayai.android.app.RolePlayAppState
 import com.bso112.roleplayai.android.app.placeHolder
 import com.bso112.roleplayai.android.data.toId
 import com.bso112.roleplayai.android.feature.chat.navigateChat
+import com.bso112.roleplayai.android.feature.profile.navigateCreateProfile
 import com.bso112.roleplayai.android.util.DefaultPreview
 import com.bso112.roleplayai.android.util.randomID
 import org.koin.androidx.compose.koinViewModel
+
+val userProfile = Profile(name = "유저", thumbnail = "", id = randomID, description = "")
 
 @Composable
 fun HomeScreenRoute(
     appState: RolePlayAppState,
     viewModel: HomeViewModel = koinViewModel()
 ) {
-    val characterList by viewModel.characterList.collectAsStateWithLifecycle()
+    val profileList by viewModel.profileList.collectAsStateWithLifecycle()
 
-    HomeScreen(characterList, appState.navController)
+    HomeScreen(profileList, appState.navController)
 }
 
 @Composable
 private fun HomeScreen(
-    characterList: List<Profile>,
+    profileList: List<Profile>,
     navController: NavController
 ) {
     Column {
         LazyColumn {
-            items(characterList) {
+            items(profileList) {
                 ProfileItem(profile = it) { profile ->
                     navController.navigateChat(profileId = profile.id.toId())
                 }
             }
+        }
+        FloatingActionButton(onClick = {
+            navController.navigateCreateProfile()
+        }) {
+            Icon(Icons.Filled.Add, contentDescription = "Add Profile")
         }
     }
 }
@@ -93,5 +105,5 @@ private fun HomeScreenPreview() {
 
 
 private val fakeProfileList = List(20) {
-    Profile(id = randomID, thumbnail = "", name = "Bot $it")
+    Profile(id = randomID, thumbnail = "", name = "Bot $it", description = "")
 }

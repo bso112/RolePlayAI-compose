@@ -13,6 +13,7 @@ import com.bso112.roleplayai.android.feature.chat.chatScreen
 import com.bso112.roleplayai.android.feature.chathistory.chatHistory
 import com.bso112.roleplayai.android.feature.home.HOME_ROUTE
 import com.bso112.roleplayai.android.feature.home.homeScreen
+import com.bso112.roleplayai.android.feature.profile.createProfile
 
 @Composable
 fun RolePlayAIApp(
@@ -51,6 +52,7 @@ fun RolePlayAINavHost(
         homeScreen(appState)
         chatHistory(appState)
         chatScreen(appState)
+        createProfile(appState)
     }
 
 }

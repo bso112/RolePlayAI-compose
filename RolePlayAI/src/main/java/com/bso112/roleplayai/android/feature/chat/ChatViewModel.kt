@@ -8,6 +8,7 @@ import com.bso112.domain.ChatRepository
 import com.bso112.domain.Profile
 import com.bso112.domain.ProfileRepository
 import com.bso112.domain.createChat
+import com.bso112.roleplayai.android.feature.home.userProfile
 import com.bso112.roleplayai.android.util.DispatcherProvider
 import com.bso112.roleplayai.android.util.Empty
 import com.bso112.roleplayai.android.util.addFirst
@@ -28,7 +29,6 @@ class ChatViewModel(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val user = Profile(name = "유저", thumbnail = "", id = randomID)
     private var opponent: Profile? = null
 
     private val chatLogId: String? = savedStateHandle.get<String>(ARG_CHAT_LOG_ID)
@@ -61,7 +61,7 @@ class ChatViewModel(
 
     fun sendChat(message: String) {
         _chatList.update {
-            it.addFirst(user.createChat(message))
+            it.addFirst(userProfile.createChat(message))
         }
         viewModelScope.launch(dispatcherProvider.io) {
             chatRepository.sendChat(

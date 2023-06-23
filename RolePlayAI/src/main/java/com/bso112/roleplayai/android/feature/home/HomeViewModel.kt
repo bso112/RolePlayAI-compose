@@ -10,7 +10,7 @@ class HomeViewModel(
     private val profileRepository: ProfileRepository
 ) : ViewModel() {
 
-    val characterList: StateFlow<List<Profile>> =
+    val profileList: StateFlow<List<Profile>> =
         stateIn(profileRepository.getProfiles())
 }
 
