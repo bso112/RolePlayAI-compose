@@ -30,5 +30,5 @@ data class Usage(
 )
 
 
-fun ChatApiModel.toDomain(speaker: Profile) =
-    speaker.createChat(message = choices.firstOrNull()?.message?.content.orEmpty())
+fun ChatApiModel.toDomain(speaker: Profile, logId : String) =
+    speaker.createChat(message = choices.firstOrNull()?.message?.content.orEmpty(), logId = logId)

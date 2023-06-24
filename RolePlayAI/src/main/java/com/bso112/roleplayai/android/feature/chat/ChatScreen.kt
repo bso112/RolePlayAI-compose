@@ -19,7 +19,6 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.ColorPainter
@@ -46,12 +45,6 @@ fun ChatScreenRoute(
 ) {
     val chatList by viewModel.chatList.collectAsStateWithLifecycle()
     val userChat by viewModel.userInput.collectAsStateWithLifecycle()
-
-    DisposableEffect(Unit) {
-        onDispose {
-            viewModel.saveChatList()
-        }
-    }
 
     ChatScreen(
         chatList = chatList,
@@ -139,6 +132,15 @@ fun ChatScreenPreView() {
 
 val fakeChatData = buildList {
     repeat(20) {
-        add(Chat(name = "상대", thumbnail = "", id = randomID, message = "$it", profileId = randomID))
+        add(
+            Chat(
+                name = "상대",
+                thumbnail = "",
+                id = randomID,
+                message = "$it",
+                profileId = randomID,
+                logId = randomID
+            )
+        )
     }
 }.reversed()

@@ -32,9 +32,8 @@ import coil.compose.AsyncImage
 import com.bso112.domain.Profile
 import com.bso112.roleplayai.android.app.RolePlayAppState
 import com.bso112.roleplayai.android.app.placeHolder
-import com.bso112.roleplayai.android.data.toId
 import com.bso112.roleplayai.android.feature.chat.navigateChat
-import com.bso112.roleplayai.android.feature.profile.navigateCreateProfile
+import com.bso112.roleplayai.android.feature.profile.create.navigateCreateProfile
 import com.bso112.roleplayai.android.util.DefaultPreview
 import com.bso112.roleplayai.android.util.randomID
 import org.koin.androidx.compose.koinViewModel
@@ -58,7 +57,7 @@ private fun HomeScreen(
         LazyColumn {
             items(profileList) {
                 ProfileItem(profile = it) { profile ->
-                    navController.navigateChat(profileId = profile.id.toId())
+                    navController.navigateChat(profileId = profile.id)
                 }
             }
         }

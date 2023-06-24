@@ -1,4 +1,4 @@
-package com.bso112.roleplayai.android.feature.profile
+package com.bso112.roleplayai.android.feature.profile.create
 
 import androidx.lifecycle.ViewModel
 import com.bso112.domain.Profile

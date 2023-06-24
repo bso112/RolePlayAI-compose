@@ -1,4 +1,4 @@
-package com.bso112.roleplayai.android.feature.profile
+package com.bso112.roleplayai.android.feature.profile.create
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column

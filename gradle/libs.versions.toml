@@ -6,6 +6,7 @@ kotlinx-serialization = "1.5.0"
 room = "2.5.1"
 ksp = "1.8.22-1.0.11"
 datastore = "1.0.0"
+gson = "2.10.1"
 
 [libraries]
 ktor-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
@@ -26,6 +27,8 @@ room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 
 datastore = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
 
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson"}
+
 [bundles]
 ktor = ["ktor-core", "ktor-cio", "ktor-logging", "ktor-negotiation", "ktor-serialization"]
 koin = ["koin-android", "koin-compose"]
@@ -35,4 +38,3 @@ room = ["room-runtime", "room-paging", "room-ktx"]
 [plugins]
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinx-serialization" }
-

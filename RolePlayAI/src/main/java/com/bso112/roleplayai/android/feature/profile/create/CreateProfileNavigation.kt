@@ -1,4 +1,4 @@
-package com.bso112.roleplayai.android.feature.profile
+package com.bso112.roleplayai.android.feature.profile.create
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -7,7 +7,7 @@ import androidx.navigation.compose.composable
 import com.bso112.roleplayai.android.app.RolePlayAppState
 
 
-const val CREATE_PROFILE_ROUTE = "CREATE_PROFILE_ROUTE"
+private const val CREATE_PROFILE_ROUTE = "CREATE_PROFILE_ROUTE"
 
 fun NavController.navigateCreateProfile(navOptions: NavOptions? = null) {
     navigate(CREATE_PROFILE_ROUTE, navOptions)

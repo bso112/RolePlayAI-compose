@@ -14,7 +14,7 @@ import com.bso112.domain.ProfileRepository
 import com.bso112.roleplayai.android.feature.chat.ChatViewModel
 import com.bso112.roleplayai.android.feature.chathistory.ChatHistoryViewModel
 import com.bso112.roleplayai.android.feature.home.HomeViewModel
-import com.bso112.roleplayai.android.feature.profile.CreateProfileViewModel
+import com.bso112.roleplayai.android.feature.profile.create.CreateProfileViewModel
 import com.bso112.roleplayai.android.util.DispatcherProvider
 import com.bso112.roleplayai.android.util.DispatcherProviderImpl
 import org.koin.android.ext.koin.androidContext

@@ -21,3 +21,11 @@ fun ChatLogEntity.toDomain() = ChatLog(
     thumbnail = thumbnail,
     previewMessage = previewMessage
 )
+
+fun ChatLog.toEntity() = ChatLogEntity(
+    id = id,
+    name = name,
+    profileId = profileId,
+    thumbnail = thumbnail,
+    previewMessage = previewMessage
+)

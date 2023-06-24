@@ -16,9 +16,16 @@ data class ChatEntity(
 )
 
 fun ChatEntity.toDomain() =
-    Chat(id = id, profileId = profileId, thumbnail = thumbnail, name = name, message = message)
+    Chat(
+        id = id,
+        profileId = profileId,
+        thumbnail = thumbnail,
+        name = name,
+        message = message,
+        logId = logId
+    )
 
-fun Chat.toEntity(logId: String) = ChatEntity(
+fun Chat.toEntity() = ChatEntity(
     id = id,
     logId = logId,
     profileId = profileId,
@@ -27,14 +34,12 @@ fun Chat.toEntity(logId: String) = ChatEntity(
     message = message
 )
 
-fun List<ChatEntity>.toChatLog(logId: String): ChatLogEntity? {
-    if (isEmpty()) return null
-    val lastChat = first()
+fun ChatEntity.toChatLog(): ChatLogEntity {
     return ChatLogEntity(
         id = logId,
-        name = lastChat.name,
-        thumbnail = lastChat.thumbnail,
-        previewMessage = lastChat.message,
-        profileId = lastChat.profileId
+        name = name,
+        thumbnail = thumbnail,
+        previewMessage = message,
+        profileId = profileId
     )
 }

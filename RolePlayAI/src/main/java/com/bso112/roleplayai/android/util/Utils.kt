@@ -1,5 +1,6 @@
 package com.bso112.roleplayai.android.util
 
+import android.os.Build
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -43,4 +44,14 @@ fun ProfileRepository.getUser(): Flow<Profile> {
     return getUser(defaultUser)
 }
 
+fun requireSdk(version: Int) = Build.VERSION.SDK_INT >= version
+
 val randomID get() = UUID.randomUUID().toString()
+
+
+val fakeUser = Profile(
+    id = UUID.randomUUID().toString(),
+    thumbnail = "",
+    name = "유저",
+    description = ""
+)

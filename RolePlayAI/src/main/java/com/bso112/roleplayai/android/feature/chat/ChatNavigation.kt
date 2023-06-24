@@ -1,32 +1,50 @@
 package com.bso112.roleplayai.android.feature.chat
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
-import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.bso112.roleplayai.android.app.RolePlayAppState
-import com.bso112.roleplayai.android.data.Id
+import com.bso112.roleplayai.android.util.RouteBuilder
 
 const val CHAT_ROUTE = "chat"
-const val ARG_PROFILE_ID = "KEY_PROFILE_ID"
-const val ARG_CHAT_LOG_ID = "KEY_CHAT_LOG_ID"
+private const val ARG_PROFILE_ID = "KEY_PROFILE_ID"
+private const val ARG_CHAT_LOG_ID = "KEY_CHAT_LOG_ID"
+
+private val routeBuilder = RouteBuilder(
+    path = CHAT_ROUTE,
+    arguments = listOf(
+        navArgument(ARG_PROFILE_ID) {
+            nullable = false
+        },
+        navArgument(ARG_CHAT_LOG_ID) {
+            nullable = true
+        }
+    )
+)
 
 fun NavController.navigateChat(
-    profileId: Id,
-    chatLogId: Id? = null,
+    profileId: String,
+    chatLogId: String? = null,
     navOptions: NavOptions? = null
 ) {
-    navigate("$CHAT_ROUTE?$ARG_PROFILE_ID=${profileId.id}&$ARG_CHAT_LOG_ID=${chatLogId?.id}", navOptions)
+    navigate(routeBuilder.buildRoute(listOf(profileId, chatLogId)), navOptions)
 }
 
 fun NavGraphBuilder.chatScreen(appState: RolePlayAppState) {
-    composable(
-        "$CHAT_ROUTE?$ARG_PROFILE_ID={$ARG_PROFILE_ID}&$ARG_CHAT_LOG_ID={$ARG_CHAT_LOG_ID}",
-        arguments = listOf(
-            navArgument(ARG_PROFILE_ID) { nullable = false },
-            navArgument(ARG_CHAT_LOG_ID) { nullable = true })
-    ) {
-        ChatScreenRoute(appState)
+    with(routeBuilder) {
+        buildComposable {
+            ChatScreenRoute(appState)
+        }
     }
+}
+
+internal class ChatScreenArg(val profileId: String, val chatLogId: String?) {
+    constructor(
+        savedStateHandle: SavedStateHandle
+    ) : this(
+        checkNotNull(savedStateHandle.get<String>(ARG_PROFILE_ID)),
+        savedStateHandle.get<String>(ARG_CHAT_LOG_ID)
+    )
 }

@@ -25,7 +25,6 @@ import coil.compose.AsyncImage
 import com.bso112.domain.ChatLog
 import com.bso112.roleplayai.android.app.RolePlayAppState
 import com.bso112.roleplayai.android.app.placeHolder
-import com.bso112.roleplayai.android.data.toId
 import com.bso112.roleplayai.android.feature.chat.navigateChat
 import com.bso112.roleplayai.android.util.DefaultPreview
 import com.bso112.roleplayai.android.util.randomID
@@ -51,8 +50,8 @@ private fun ChatHistoryScreen(
         items(chatList) { chatLog ->
             ChatHistoryItem(chatLog = chatLog) {
                 navController.navigateChat(
-                    profileId = chatLog.profileId.toId(),
-                    chatLogId = chatLog.id.toId()
+                    profileId = chatLog.profileId,
+                    chatLogId = chatLog.id
                 )
             }
         }

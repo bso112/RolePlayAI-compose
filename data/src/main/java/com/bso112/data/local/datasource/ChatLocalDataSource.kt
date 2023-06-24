@@ -18,11 +18,10 @@ class ChatLocalDataSource(
         }
     }
 
-    suspend fun saveChatList(list: List<ChatEntity>, logId: String) {
-        val chatLog = list.toChatLog(logId) ?: error("chat list cannot be empty")
+    suspend fun saveChat(chat: ChatEntity) {
         db.withTransaction {
-            chatDao.insertAll(list)
-            chatLogDao.insert(chatLog)
+            chatDao.insertAll(listOf(chat))
+            chatLogDao.insert(chat.toChatLog())
         }
     }
 
