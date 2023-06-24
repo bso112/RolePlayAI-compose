@@ -1,9 +1,10 @@
 package com.bso112.roleplayai.android.feature.home
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -53,7 +54,7 @@ private fun HomeScreen(
     profileList: List<Profile>,
     navController: NavController
 ) {
-    Column {
+    Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn {
             items(profileList) {
                 ProfileItem(profile = it) { profile ->
@@ -61,9 +62,13 @@ private fun HomeScreen(
                 }
             }
         }
-        FloatingActionButton(onClick = {
-            navController.navigateCreateProfile()
-        }) {
+        FloatingActionButton(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(30.dp),
+            onClick = {
+                navController.navigateCreateProfile()
+            }) {
             Icon(Icons.Filled.Add, contentDescription = "Add Profile")
         }
     }
