@@ -1,5 +1,9 @@
 package com.bso112.data
 
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 
 suspend fun <T> result(block: suspend () -> T): Result<T> {
     return try {
@@ -14,3 +18,7 @@ suspend fun <T> T.alsoSuspend(block: suspend (T) -> Unit): T {
         block(this)
     }
 }
+
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+
+val String.Companion.Empty inline get() = ""

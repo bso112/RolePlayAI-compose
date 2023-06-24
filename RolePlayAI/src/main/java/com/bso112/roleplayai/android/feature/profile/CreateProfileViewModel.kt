@@ -6,9 +6,6 @@ import com.bso112.domain.ProfileRepository
 import com.bso112.roleplayai.android.util.DispatcherProvider
 import com.bso112.roleplayai.android.util.randomID
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOn
 
 class CreateProfileViewModel(
     private val profileRepository: ProfileRepository,
@@ -19,7 +16,7 @@ class CreateProfileViewModel(
     val description = MutableStateFlow("")
 
 
-    suspend fun createProfile(onError: (Throwable) -> Unit) {
+    suspend fun createProfile() {
         val profile = Profile(
             id = randomID,
             thumbnail = "",
@@ -27,8 +24,5 @@ class CreateProfileViewModel(
             description = description.value
         )
         profileRepository.saveProfile(profile)
-            .catch { onError(it) }
-            .flowOn(dispatcherProvider.io)
-            .first()
     }
 }

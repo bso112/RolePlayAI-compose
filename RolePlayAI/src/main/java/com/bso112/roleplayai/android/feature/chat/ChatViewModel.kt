@@ -8,11 +8,12 @@ import com.bso112.domain.ChatRepository
 import com.bso112.domain.Profile
 import com.bso112.domain.ProfileRepository
 import com.bso112.domain.createChat
-import com.bso112.roleplayai.android.feature.home.userProfile
 import com.bso112.roleplayai.android.util.DispatcherProvider
 import com.bso112.roleplayai.android.util.Empty
 import com.bso112.roleplayai.android.util.addFirst
+import com.bso112.roleplayai.android.util.getUser
 import com.bso112.roleplayai.android.util.randomID
+import com.bso112.roleplayai.android.util.stateIn
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,6 +30,7 @@ class ChatViewModel(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
+    private val user = stateIn(profileRepository.getUser())
     private var opponent: Profile? = null
 
     private val chatLogId: String? = savedStateHandle.get<String>(ARG_CHAT_LOG_ID)
@@ -61,7 +63,7 @@ class ChatViewModel(
 
     fun sendChat(message: String) {
         _chatList.update {
-            it.addFirst(userProfile.createChat(message))
+            it.addFirst(checkNotNull(user.value).createChat(message))
         }
         viewModelScope.launch(dispatcherProvider.io) {
             chatRepository.sendChat(

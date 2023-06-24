@@ -2,6 +2,7 @@ package com.bso112.roleplayai.android.app
 
 import android.app.Application
 import androidx.lifecycle.SavedStateHandle
+import com.bso112.data.local.AppPreference
 import com.bso112.data.local.createDataBase
 import com.bso112.data.local.datasource.ChatLocalDataSource
 import com.bso112.data.local.datasource.ProfileLocalDataSource
@@ -27,10 +28,11 @@ class RolePlayAIApplication : Application() {
     private val appModule = module {
         single { createDataBase(this@RolePlayAIApplication) }
         single { ChatRemoteDataSource() }
+        single { AppPreference(this@RolePlayAIApplication) }
         single { ChatLocalDataSource(get()) }
         single { ProfileLocalDataSource(get()) }
         single<ChatRepository> { ChatRepositoryImpl(get(), get()) }
-        single<ProfileRepository> { ProfileRepositoryImpl(get()) }
+        single<ProfileRepository> { ProfileRepositoryImpl(get(), get()) }
         single<DispatcherProvider> { DispatcherProviderImpl }
         viewModel { HomeViewModel(get()) }
         viewModel { ChatHistoryViewModel(get()) }

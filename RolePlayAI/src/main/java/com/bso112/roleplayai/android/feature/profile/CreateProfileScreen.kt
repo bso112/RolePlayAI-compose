@@ -19,6 +19,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.bso112.roleplayai.android.app.RolePlayAppState
 import com.bso112.roleplayai.android.util.DefaultPreview
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -33,17 +34,18 @@ fun CreateProfileScreenRoute(
 
     val lifecycleScope = LocalLifecycleOwner.current.lifecycleScope
 
+    val exceptionHandler = CoroutineExceptionHandler { _ , t : Throwable ->
+        t.printStackTrace()
+    }
+
     CreateProfileScreen(
         name = name,
         description = description,
         onNameChanged = viewModel.name::value::set,
         onDescriptionChanged = viewModel.description::value::set,
         onClickCreateProfile = {
-            lifecycleScope.launch {
-                viewModel.createProfile(onError = {
-                    it.printStackTrace()
-                    //TODO
-                })
+            lifecycleScope.launch(exceptionHandler) {
+                viewModel.createProfile()
                 appState.navController.popBackStack()
             }
         })

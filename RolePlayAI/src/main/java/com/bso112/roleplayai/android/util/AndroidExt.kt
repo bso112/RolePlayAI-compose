@@ -10,12 +10,12 @@ import kotlinx.coroutines.flow.stateIn
 fun <T> ViewModel.stateIn(
     flow: Flow<List<T>>,
     initialValue: List<T> = emptyList(),
-    sharingStarted: SharingStarted = SharingStarted.WhileSubscribed(5000L)
+    sharingStarted: SharingStarted = SharingStarted.Eagerly
 ) = flow.stateIn(viewModelScope, sharingStarted, initialValue)
 
 
 fun <T> ViewModel.stateIn(
     flow: Flow<T>,
     initialValue: T? = null,
-    sharingStarted: SharingStarted = SharingStarted.WhileSubscribed(5000L)
+    sharingStarted: SharingStarted = SharingStarted.Eagerly
 ) = flow.stateIn(viewModelScope, sharingStarted, initialValue)

@@ -38,8 +38,6 @@ import com.bso112.roleplayai.android.util.DefaultPreview
 import com.bso112.roleplayai.android.util.randomID
 import org.koin.androidx.compose.koinViewModel
 
-val userProfile = Profile(name = "유저", thumbnail = "", id = randomID, description = "")
-
 @Composable
 fun HomeScreenRoute(
     appState: RolePlayAppState,
