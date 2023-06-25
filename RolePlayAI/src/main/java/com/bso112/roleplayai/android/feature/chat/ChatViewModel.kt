@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bso112.domain.Chat
 import com.bso112.domain.ChatRepository
+import com.bso112.domain.Profile
 import com.bso112.domain.ProfileRepository
 import com.bso112.domain.Role
 import com.bso112.domain.createChat
@@ -30,8 +31,8 @@ class ChatViewModel(
 ) : ViewModel() {
 
     private val argument = ChatScreenArg(savedStateHandle)
-    private val user = stateIn(profileRepository.getUser())
-    private var opponent = stateIn(profileRepository.getProfile(argument.profileId))
+    private val user : StateFlow<Profile> = stateIn(profileRepository.getUser(), Profile.Empty)
+    val opponent : StateFlow<Profile> = stateIn(profileRepository.getProfile(argument.profileId), Profile.Empty)
 
     private val logId: String = (argument.chatLogId ?: randomID)
 

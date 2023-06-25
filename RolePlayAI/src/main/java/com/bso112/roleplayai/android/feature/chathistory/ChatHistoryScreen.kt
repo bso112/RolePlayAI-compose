@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -73,9 +74,9 @@ private fun ChatHistoryItem(chatLog: ChatLog, onClickChatHistory: (ChatLog) -> U
             error = ColorPainter(MaterialTheme.colors.placeHolder),
             placeholder = ColorPainter(MaterialTheme.colors.placeHolder)
         )
-        Column(modifier = Modifier.padding(start = 10.dp)) {
+        Column(modifier = Modifier.padding(start = 10.dp, end = 20.dp)) {
             Text(chatLog.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Text(chatLog.previewMessage)
+            Text(chatLog.previewMessage, maxLines = 2, overflow = TextOverflow.Ellipsis)
         }
     }
 }
@@ -94,7 +95,7 @@ private val fakeChatLog = buildList {
             ChatLog(
                 name = "상대",
                 thumbnail = "",
-                previewMessage = "$it",
+                previewMessage = "$it adaskd jaskldjas dasjdak lsdja klsjd asdkl jalsj dklajskldaklsdklaskldaklsdasdasd",
                 id = randomID,
                 profileId = randomID
             )

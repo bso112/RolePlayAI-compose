@@ -10,7 +10,16 @@ data class Profile(
     val thumbnail: String,
     val name: String,
     val description: String
-) : Parcelable
+) : Parcelable {
+    companion object {
+        val Empty = Profile(
+            id = UUID.randomUUID().toString(),
+            thumbnail = "",
+            name = "",
+            description = ""
+        )
+    }
+}
 
 /**
  * Chat에 Profile을 포함하려 했으나, ChatEntity -> Chat 객체를 만들때가 문제다.
