@@ -31,12 +31,14 @@ class ChatRepositoryImpl(
         _dataChangedEvent.asSharedFlow()
 
     object ChatListChanged : DataChangedEvent<Chat>
+    object ChatLogChanged : DataChangedEvent<ChatLog>
 
     override suspend fun saveChat(
         chat: Chat
     ) {
         chatLocalDataSource.saveChat(chat.toEntity())
         _dataChangedEvent.emit(ChatListChanged)
+        _dataChangedEvent.emit(ChatLogChanged)
     }
 
     override fun sendChat(
@@ -54,8 +56,8 @@ class ChatRepositoryImpl(
         chatLocalDataSource.getAllChat(logId).map(ChatEntity::toDomain)
     }
 
-    override fun getChatLog(): Flow<List<ChatLog>> = flow {
-        chatLocalDataSource.getChatLog().map(ChatLogEntity::toDomain).alsoSuspend(::emit)
+    override fun getChatLog(): Flow<List<ChatLog>> = autoRefreshFlow {
+        chatLocalDataSource.getChatLog().map(ChatLogEntity::toDomain)
     }
 }
 
