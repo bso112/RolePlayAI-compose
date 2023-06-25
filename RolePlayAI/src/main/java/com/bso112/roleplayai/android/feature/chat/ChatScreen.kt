@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Icon
@@ -19,6 +20,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.ColorPainter
@@ -69,13 +71,19 @@ fun ChatScreen(
     onUserSubmitChat: (String) -> Unit = {}
 ) {
     val focusManager = LocalFocusManager.current
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(chatList) {
+        listState.scrollToItem(chatList.lastIndex.coerceAtLeast(0))
+    }
+
     Column {
         TopAppBar {
             IconButton(onClick = onClickBackButton) {
                 Icon(Icons.Filled.ArrowBack, contentDescription = "go back")
             }
         }
-        LazyColumn(modifier = Modifier.weight(1f), reverseLayout = true) {
+        LazyColumn(state = listState, modifier = Modifier.weight(1f)) {
             items(chatList.size) {
                 ChatItem(chat = chatList[it])
             }
