@@ -7,9 +7,11 @@ import com.bso112.data.local.entity.ChatLogEntity
 import com.bso112.data.local.entity.toDomain
 import com.bso112.data.local.entity.toEntity
 import com.bso112.data.remote.datasource.ChatRemoteDataSource
-import com.bso112.data.remote.model.toDomain
+import com.bso112.data.remote.response.toDomain
+import com.bso112.data.remote.toApiModel
 import com.bso112.domain.Chat
 import com.bso112.domain.ChatLog
+import com.bso112.domain.ChatMessage
 import com.bso112.domain.ChatRepository
 import com.bso112.domain.DataChangedEvent
 import com.bso112.domain.Profile
@@ -39,10 +41,11 @@ class ChatRepositoryImpl(
 
     override fun sendChat(
         speaker: Profile,
-        message: String,
+        messages: List<ChatMessage>,
         logId: String
     ): Flow<Chat> = flow {
-        chatRemoteDataSource.sendChat(message).toDomain(speaker, logId).alsoSuspend(::emit)
+        chatRemoteDataSource.sendChat(messages.map(ChatMessage::toApiModel))
+            .toDomain(speaker, logId).alsoSuspend(::emit)
     }
 
     override fun getAllChat(

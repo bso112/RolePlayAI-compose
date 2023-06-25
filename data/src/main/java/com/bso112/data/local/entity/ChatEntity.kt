@@ -3,6 +3,7 @@ package com.bso112.data.local.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.bso112.domain.Chat
+import com.bso112.domain.Role
 
 @Entity
 data class ChatEntity(
@@ -12,7 +13,8 @@ data class ChatEntity(
     val profileId: String,
     val name: String,
     val thumbnail: String,
-    val message: String
+    val message: String,
+    val role: String
 )
 
 fun ChatEntity.toDomain() =
@@ -22,7 +24,8 @@ fun ChatEntity.toDomain() =
         thumbnail = thumbnail,
         name = name,
         message = message,
-        logId = logId
+        logId = logId,
+        role = Role.fromAlias(role)
     )
 
 fun Chat.toEntity() = ChatEntity(
@@ -31,7 +34,8 @@ fun Chat.toEntity() = ChatEntity(
     profileId = profileId,
     name = name,
     thumbnail = thumbnail,
-    message = message
+    message = message,
+    role = role.alias
 )
 
 fun ChatEntity.toChatLog(): ChatLogEntity {

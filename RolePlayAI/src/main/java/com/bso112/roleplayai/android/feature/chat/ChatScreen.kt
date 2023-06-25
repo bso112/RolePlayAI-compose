@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.bso112.domain.Chat
+import com.bso112.domain.Role
 import com.bso112.roleplayai.android.app.RolePlayAITheme
 import com.bso112.roleplayai.android.app.RolePlayAppState
 import com.bso112.roleplayai.android.app.placeHolder
@@ -147,7 +148,8 @@ val fakeChatData = buildList {
                 id = randomID,
                 message = "$it",
                 profileId = randomID,
-                logId = randomID
+                logId = randomID,
+                role = Role.Assistant
             )
         )
     }

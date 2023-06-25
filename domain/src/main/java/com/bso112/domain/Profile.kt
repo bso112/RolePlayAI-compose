@@ -17,11 +17,12 @@ data class Profile(
  * ChatEntity에는 Profile에 대한 모든 정보를 담지 않기에 Profile 객체를 만들 수 업다.
  * 따라서 Chat은 Profile의 일부 속성만 가지고 있다.
  */
-fun Profile.createChat(message: String, logId: String) = Chat(
+fun Profile.createChat(message: String, logId: String, role : Role) = Chat(
     id = UUID.randomUUID().toString(),
     logId = logId,
     profileId = id,
     thumbnail = thumbnail,
     name = name,
-    message = message
+    message = message,
+    role = role
 )

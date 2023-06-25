@@ -6,7 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.bso112.domain.Chat
 import com.bso112.domain.ChatRepository
 import com.bso112.domain.ProfileRepository
+import com.bso112.domain.Role
 import com.bso112.domain.createChat
+import com.bso112.domain.toMessage
 import com.bso112.roleplayai.android.util.DispatcherProvider
 import com.bso112.roleplayai.android.util.Empty
 import com.bso112.roleplayai.android.util.getUser
@@ -43,13 +45,15 @@ class ChatViewModel(
 
     fun sendChat(message: String) {
         viewModelScope.launch(coroutineContext) {
-            chatRepository.saveChat(
-                chat = checkNotNull(user.value).createChat(message, logId)
-            )
+            val userChat = checkNotNull(user.value).createChat(message, logId, Role.User)
+            chatRepository.saveChat(userChat)
+
+            //TODO 맥시멈 토큰으로 짜르기
+            val requestChatList = chatList.value + userChat
 
             val chat = chatRepository.sendChat(
                 speaker = checkNotNull(opponent.value),
-                message = message,
+                messages = requestChatList.map(Chat::toMessage),
                 logId = logId
             ).first()
 
