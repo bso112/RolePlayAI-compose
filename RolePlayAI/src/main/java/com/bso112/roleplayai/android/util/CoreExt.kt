@@ -12,3 +12,7 @@ suspend fun <T> T.alsoSuspend(block: suspend (T) -> Unit): T {
         block(this)
     }
 }
+
+inline fun <reified T : Any> Any.ifIs(block: (T) -> Unit) {
+    (this as? T)?.let(block)
+}
