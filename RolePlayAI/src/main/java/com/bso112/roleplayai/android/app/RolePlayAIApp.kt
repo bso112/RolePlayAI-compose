@@ -28,7 +28,9 @@ fun RolePlayAIApp(
             modifier = Modifier
                 .fillMaxSize(),
             bottomBar = {
-                if (navBackStackEntry?.destination?.route.orEmpty() !in excludeBottomBarRoute) {
+                if (excludeBottomBarRoute.none { route ->
+                        navBackStackEntry?.destination?.route.orEmpty().contains(route)
+                    }) {
                     RolePlayBottomNavigation(appState.navController)
                 }
             }
