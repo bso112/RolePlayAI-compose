@@ -1,6 +1,5 @@
 package com.bso112.roleplayai.android.util
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
@@ -43,8 +42,8 @@ class RouteBuilder(
     }
 
     private fun validateParams(params: List<Any?>) {
-        Log.d("test", params.filterNotNull().map { it::class.simpleName }.toString())
-        Log.d("test", arguments.map { it.argument.type.name }.toString())
+        logD(params.filterNotNull().map { it::class.simpleName }.toString())
+        logD(arguments.map { it.argument.type.name }.toString())
         require(params.size == arguments.size)
     }
 

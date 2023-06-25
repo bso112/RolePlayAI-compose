@@ -1,6 +1,6 @@
 package com.bso112.data.remote
 
-import android.util.Log
+import com.bso112.data.logD
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.HttpTimeout
@@ -31,7 +31,7 @@ object KtorClient {
         install(Logging) {
             logger = object : Logger {
                 override fun log(message: String) {
-                    Log.d("test", "api log: $message")
+                    logD("api log: $message")
                 }
             }
             level = LogLevel.ALL

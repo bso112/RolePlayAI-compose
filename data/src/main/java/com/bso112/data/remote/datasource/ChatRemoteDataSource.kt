@@ -1,10 +1,10 @@
 package com.bso112.data.remote.datasource
 
 import com.bso112.data.BuildConfig
+import com.bso112.data.Model
 import com.bso112.data.remote.KtorClient
 import com.bso112.data.remote.MessageApiModel
 import com.bso112.data.remote.request.ChatRequest
-import com.bso112.data.remote.request.Model
 import com.bso112.data.remote.response.ChatApiModel
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body

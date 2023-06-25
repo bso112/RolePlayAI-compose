@@ -7,6 +7,7 @@ room = "2.5.1"
 ksp = "1.8.22-1.0.11"
 datastore = "1.0.0"
 gson = "2.10.1"
+jtokkit = "0.5.0"
 
 [libraries]
 ktor-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
@@ -18,16 +19,16 @@ ktor-serialization = { group = "io.ktor", name = "ktor-serialization-kotlinx-jso
 koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
 koin-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
 
-lifecycle-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycle-compose" }
-
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-paging = { group = "androidx.room", name = "room-paging", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 
+lifecycle-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycle-compose" }
 datastore = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+jtokkit = { group = "com.knuddels", name = "jtokkit", version.ref = "jtokkit" }
 
-gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson"}
 
 [bundles]
 ktor = ["ktor-core", "ktor-cio", "ktor-logging", "ktor-negotiation", "ktor-serialization"]
