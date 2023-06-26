@@ -1,10 +1,5 @@
 package com.bso112.domain
 
-data class ChatMessage(
-    val role: Role,
-    val content: String
-)
-
 
 enum class Role(val alias: String) {
     System("system"),

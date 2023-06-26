@@ -12,7 +12,6 @@ import com.bso112.domain.autoRefreshFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 
 class ProfileRepositoryImpl(
@@ -28,18 +27,18 @@ class ProfileRepositoryImpl(
 
     override suspend fun saveUser(profile: Profile) {
         saveProfile(profile)
-        appPreference.saveUserId(profile.id)
+        appPreference.userId.setValue(profile.id)
         _dataChangedEvent.emit(UserChanged)
     }
 
     override fun getUser(defaultUser: Profile): Flow<Profile> = autoRefreshFlow {
-        val userId = appPreference.userId.first()
+        val userId = appPreference.userId.getValue().orEmpty()
         return@autoRefreshFlow if (userId.isEmpty()) {
             //do not call ProfileRepositoryImpl.saveUser().
             //it cause recursive function call because it emit DataChangedEvent event
             defaultUser.also {
                 saveProfile(it)
-                appPreference.saveUserId(it.id)
+                appPreference.userId.setValue(it.id)
             }
         } else {
             localDataSource.getProfileById(userId).toDomain()

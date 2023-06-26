@@ -1,7 +1,7 @@
 package com.bso112.data.remote.datasource
 
 import com.bso112.data.BuildConfig
-import com.bso112.data.Model
+import com.bso112.data.local.AppPreference
 import com.bso112.data.remote.KtorClient
 import com.bso112.data.remote.MessageApiModel
 import com.bso112.data.remote.request.ChatRequest
@@ -17,16 +17,17 @@ import io.ktor.http.contentType
 
 
 class ChatRemoteDataSource(
-    private val client: HttpClient = KtorClient.httpClient
+    private val client: HttpClient = KtorClient.httpClient,
+    private val appPreference: AppPreference
 ) {
 
     suspend fun sendChat(messages: List<MessageApiModel>): ChatApiModel {
         val url = "https://api.openai.com/v1/chat/completions"
         val apiKey = BuildConfig.CHAT_GPT_API_KEY
         val body = ChatRequest(
-            model = Model.GPT_3_5.alias,
+            model = appPreference.languageModel.getValue(),
             messages = messages,
-            temperature = 0.8f
+            temperature = appPreference.temperature.getValue()
         )
 
         return client.post(url) {

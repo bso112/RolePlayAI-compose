@@ -1,6 +1,6 @@
 package com.bso112.data.remote
 
-import com.bso112.domain.ChatMessage
+import com.bso112.domain.Chat
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -9,9 +9,9 @@ data class MessageApiModel(
     val content: String
 )
 
-fun ChatMessage.toApiModel() = MessageApiModel(
+fun Chat.toApiModel() = MessageApiModel(
     role = role.alias,
-    content = content
+    content = message
 )
 
 

@@ -27,8 +27,8 @@ class RolePlayAIApplication : Application() {
 
     private val appModule = module {
         single { createDataBase(this@RolePlayAIApplication) }
-        single { ChatRemoteDataSource() }
         single { AppPreference(this@RolePlayAIApplication) }
+        single { ChatRemoteDataSource(appPreference = get()) }
         single { ChatLocalDataSource(get()) }
         single { ProfileLocalDataSource(get()) }
         single<ChatRepository> { ChatRepositoryImpl(get(), get()) }
@@ -36,7 +36,7 @@ class RolePlayAIApplication : Application() {
         single<DispatcherProvider> { DispatcherProviderImpl }
         viewModel { HomeViewModel(get()) }
         viewModel { ChatHistoryViewModel(get()) }
-        viewModel { (state: SavedStateHandle) -> ChatViewModel(get(), get(), get(), state) }
+        viewModel { (state: SavedStateHandle) -> ChatViewModel(get(), get(), get(), get(), state) }
         viewModel { CreateProfileViewModel(get(), get()) }
     }
 

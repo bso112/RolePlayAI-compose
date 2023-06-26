@@ -1,4 +1,4 @@
-package com.bso112.data
+package com.bso112.domain
 
 enum class Model(val alias: String, val maxTokenSize: Int) {
     GPT_3_5("gpt-3.5-turbo", 4096)
