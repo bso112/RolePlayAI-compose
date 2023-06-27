@@ -33,7 +33,7 @@ class ChatViewModel(
 ) : ViewModel() {
 
     private val argument = ChatScreenArg(savedStateHandle)
-    private val user: StateFlow<Profile> = stateIn(profileRepository.getUser(), Profile.Empty)
+    val user: StateFlow<Profile> = stateIn(profileRepository.getUser(), Profile.Empty)
     val opponent: StateFlow<Profile> =
         stateIn(profileRepository.getProfile(argument.profileId), Profile.Empty)
 

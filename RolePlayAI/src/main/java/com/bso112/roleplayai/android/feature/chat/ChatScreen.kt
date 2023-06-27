@@ -3,6 +3,7 @@ package com.bso112.roleplayai.android.feature.chat
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -34,7 +36,10 @@ import androidx.compose.material.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,8 +60,8 @@ import com.bso112.roleplayai.android.app.RolePlayAITheme
 import com.bso112.roleplayai.android.app.RolePlayAppState
 import com.bso112.roleplayai.android.app.placeHolder
 import com.bso112.roleplayai.android.util.DefaultPreview
+import com.bso112.roleplayai.android.util.fakeUser
 import com.bso112.roleplayai.android.util.randomID
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -69,11 +74,13 @@ fun ChatScreenRoute(
 ) {
     val chatList by viewModel.chatList.collectAsStateWithLifecycle()
     val userChat by viewModel.userInput.collectAsStateWithLifecycle()
+    val user by viewModel.user.collectAsStateWithLifecycle()
     val opponent by viewModel.opponent.collectAsStateWithLifecycle()
 
     ChatScreen(
         chatList = chatList,
         userChat = userChat,
+        user = user,
         opponent = opponent,
         onClickBackButton = {
             appState.navController.popBackStack()
@@ -89,6 +96,7 @@ fun ChatScreenRoute(
 @Composable
 fun ChatScreen(
     chatList: List<Chat>,
+    user: Profile,
     opponent: Profile,
     userChat: String,
     onClickBackButton: () -> Unit = {},
@@ -98,31 +106,39 @@ fun ChatScreen(
     val focusManager = LocalFocusManager.current
     val listState = rememberLazyListState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    var selectedProfile: Profile by remember { mutableStateOf(Profile.Empty) }
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(chatList) {
-        listState.scrollToItem(chatList.lastIndex.coerceAtLeast(0))
+        listState.animateScrollToItem(chatList.lastIndex.coerceAtLeast(0))
     }
 
     ChatDrawer(
-        opponent = opponent,
+        profile = selectedProfile,
         drawerState = drawerState,
-        coroutineScope = coroutineScope
     ) {
         Column {
             TopAppBar {
                 IconButton(onClick = onClickBackButton) {
                     Icon(Icons.Filled.ArrowBack, contentDescription = "go back")
                 }
-                Text(opponent.name.orEmpty(), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(opponent.name, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.weight(1f))
                 IconButton(onClick = { coroutineScope.launch { drawerState.open() } }) {
                     Icon(Icons.Filled.Menu, contentDescription = "go back")
                 }
             }
             LazyColumn(state = listState, modifier = Modifier.weight(1f)) {
-                items(chatList.size) {
-                    ChatItem(chat = chatList[it])
+                items(chatList) { chat ->
+                    ChatItem(
+                        chat = chat,
+                        onClickThumbnail = {
+                            coroutineScope.launch {
+                                val isUser = chat.profileId == user.id
+                                selectedProfile = if (isUser) user else opponent
+                                drawerState.open()
+                            }
+                        })
                 }
             }
             TextField(
@@ -141,14 +157,19 @@ fun ChatScreen(
 }
 
 @Composable
-fun ChatItem(chat: Chat) {
+fun ChatItem(
+    chat: Chat,
+    onClickThumbnail: () -> Unit
+) {
     Row(
         Modifier
             .fillMaxWidth()
             .padding(15.dp)
     ) {
         AsyncImage(
-            modifier = Modifier.size(50.dp),
+            modifier = Modifier
+                .size(50.dp)
+                .clickable { onClickThumbnail() },
             model = chat.thumbnail,
             contentDescription = null,
             error = ColorPainter(MaterialTheme.colors.placeHolder),
@@ -163,9 +184,8 @@ fun ChatItem(chat: Chat) {
 
 @Composable
 fun ChatDrawer(
-    opponent: Profile,
+    profile: Profile,
     drawerState: DrawerState,
-    coroutineScope: CoroutineScope,
     content: @Composable () -> Unit
 ) {
     ModalDrawer(
@@ -186,14 +206,14 @@ fun ChatDrawer(
                             modifier = Modifier
                                 .size(60.dp)
                                 .clip(RoundedCornerShape(15.dp)),
-                            model = opponent.thumbnail,
+                            model = profile.thumbnail,
                             contentDescription = "thumbnail",
                             error = ColorPainter(Color.LightGray),
                             placeholder = ColorPainter(Color.LightGray)
                         )
                         Text(
                             modifier = Modifier.padding(start = 10.dp),
-                            text = opponent.name,
+                            text = profile.name,
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp
                         )
@@ -207,7 +227,7 @@ fun ChatDrawer(
                             .defaultMinSize(minHeight = 100.dp)
                             .border(BorderStroke(width = 1.dp, color = Color.LightGray))
                             .padding(10.dp),
-                        text = opponent.description,
+                        text = profile.description,
                     )
                     Spacer(modifier = Modifier.size(20.dp))
                 }
@@ -236,6 +256,7 @@ private fun ChatScreenPreView() {
         ) {
             ChatScreen(
                 chatList = fakeChatData,
+                user = fakeUser,
                 opponent = fakeOpponent,
                 userChat = ""
             )
@@ -249,9 +270,8 @@ private fun DrawerPreView() {
     DefaultPreview {
         ChatDrawer(
             drawerState = rememberDrawerState(initialValue = DrawerValue.Open),
-            coroutineScope = rememberCoroutineScope(),
             content = {},
-            opponent = fakeOpponent
+            profile = fakeOpponent
         )
     }
 }
