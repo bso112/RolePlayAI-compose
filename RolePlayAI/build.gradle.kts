@@ -45,6 +45,7 @@ dependencies {
     implementation(project(":data"))
     implementation(project(":domain"))
 
+    implementation(libs.activity.ktx)
     implementation(libs.bundles.koin)
     implementation(libs.bundles.ktor)
     implementation(libs.lifecycle.compose)

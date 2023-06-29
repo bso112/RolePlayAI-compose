@@ -1,6 +1,9 @@
-package com.bso112.roleplayai.android.feature.profile.create
+package com.bso112.roleplayai.android.feature.profile
 
-import androidx.compose.foundation.Image
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
@@ -9,14 +12,21 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import coil.compose.AsyncImage
+import com.bso112.roleplayai.android.R
 import com.bso112.roleplayai.android.app.RolePlayAppState
 import com.bso112.roleplayai.android.util.DefaultPreview
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -34,7 +44,7 @@ fun CreateProfileScreenRoute(
 
     val lifecycleScope = LocalLifecycleOwner.current.lifecycleScope
 
-    val exceptionHandler = CoroutineExceptionHandler { _ , t : Throwable ->
+    val exceptionHandler = CoroutineExceptionHandler { _, t: Throwable ->
         t.printStackTrace()
     }
 
@@ -59,11 +69,24 @@ private fun CreateProfileScreen(
     onDescriptionChanged: (String) -> Unit = {},
     onClickCreateProfile: () -> Unit = {}
 ) {
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+
+    val getContent =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            imageUri = uri
+        }
+
+
     Column {
         Row {
-            Image(
-                modifier = Modifier.size(100.dp),
-                painter = ColorPainter(Color.LightGray),
+            AsyncImage(
+                modifier = Modifier
+                    .size(100.dp)
+                    .clickable { getContent.launch("image/*") },
+                model = imageUri,
+                placeholder = painterResource(id = R.drawable.saber),
+                contentScale = ContentScale.Crop,
+                error = ColorPainter(Color.LightGray),
                 contentDescription = "portrait"
             )
             Column {

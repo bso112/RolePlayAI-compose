@@ -1,26 +1,31 @@
 package com.bso112.roleplayai.android.util
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDeepLink
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.google.gson.Gson
 
 class RouteBuilder(
     private val path: String,
     private val arguments: List<NamedNavArgument> = emptyList(),
     private val deepLinks: List<NavDeepLink> = emptyList(),
 ) {
+
+    private val gson = Gson()
     fun buildRoute(params: List<Any?>) = buildString {
         append(path)
         append("?")
 
         validateParams(params)
-
         arguments.zip(params).forEach { pair ->
-            val param = pair.second
-            append("${pair.first.name}=$param")
+            val key = pair.first.name
+            val value = Uri.decode(gson.toJson(pair.second).trimQuotes())
+            logD("${key}=${value}")
+            append("${key}=${value}")
             append("&")
         }
         if (last() == '&') {
@@ -56,6 +61,15 @@ class RouteBuilder(
             arguments = arguments,
             content = content
         )
+    }
+
+    private fun String.trimQuotes(): String {
+        if (isEmpty()) return this
+        return if (first() == '\"' && last() == '\"') {
+            drop(1).dropLast(1)
+        } else {
+            this
+        }
     }
 }
 

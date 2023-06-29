@@ -1,4 +1,4 @@
-package com.bso112.roleplayai.android.feature.profile.detail
+package com.bso112.roleplayai.android.feature.profile
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavController
@@ -11,31 +11,29 @@ import com.bso112.roleplayai.android.util.RouteBuilder
 import com.bso112.roleplayai.android.util.createNavType
 
 
-private const val PROFILE_DETAIL_ROUTE = "CREATE_PROFILE_ROUTE"
+private const val CREATE_PROFILE_ROUTE = "CREATE_PROFILE_ROUTE"
 private const val ARGS_PROFILE = "ARGS_PROFILE"
 
 private val routeBuilder = RouteBuilder(
-    path = PROFILE_DETAIL_ROUTE,
+    path = CREATE_PROFILE_ROUTE,
     arguments = listOf(navArgument(ARGS_PROFILE) {
-        nullable = false
-        type = createNavType<Profile>(false)
+        nullable = true
+        type = createNavType<Profile>(true)
     })
 )
 
-fun NavController.navigateProfileDetail(profile: Profile, navOptions: NavOptions? = null) {
+fun NavController.navigateCreateProfile(profile: Profile? = null, navOptions: NavOptions? = null) {
     navigate(routeBuilder.buildRoute(listOf(profile)), navOptions)
 }
 
-fun NavGraphBuilder.profileDetail(appState: RolePlayAppState) {
+fun NavGraphBuilder.createProfile(appState: RolePlayAppState) {
     with(routeBuilder) {
         buildComposable {
-            ProfileDetailRoute(appState = appState)
+            CreateProfileScreenRoute(appState = appState)
         }
     }
 }
 
-internal class ProfileDetailArg(val profile: Profile) {
-    constructor(
-        savedStateHandle: SavedStateHandle
-    ) : this(checkNotNull(savedStateHandle.get<Profile>(ARGS_PROFILE)))
+class CreateProfileArg(val profile: Profile?) {
+    constructor(savedStateHandle: SavedStateHandle) : this(savedStateHandle[ARGS_PROFILE])
 }

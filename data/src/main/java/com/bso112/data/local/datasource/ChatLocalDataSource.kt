@@ -30,4 +30,10 @@ class ChatLocalDataSource(
             chatLogDao.getAll()
         }
     }
+
+    suspend fun deleteByProfileId(profileId : String){
+        return db.withTransaction {
+            chatLogDao.deleteByProfileId(profileId)
+        }
+    }
 }

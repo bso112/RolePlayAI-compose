@@ -1,3 +1,5 @@
 <resources>
     <string name="delete">삭제하기</string>
+    <string name="edit">수정하기</string>
+    <string name="chat">대화하기</string>
 </resources>

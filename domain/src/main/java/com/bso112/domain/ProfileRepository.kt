@@ -8,4 +8,5 @@ interface ProfileRepository : DataChangeNotifier {
     suspend fun saveProfile(profile: Profile)
     fun getProfile(profileId: String): Flow<Profile>
     fun getProfiles(): Flow<List<Profile>>
+    suspend fun deleteProfile(profile: Profile)
 }

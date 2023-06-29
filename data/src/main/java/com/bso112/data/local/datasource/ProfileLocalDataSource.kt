@@ -16,7 +16,7 @@ class ProfileLocalDataSource(
         }
     }
 
-    suspend fun getProfileById(profileId: String): ProfileEntity {
+    suspend fun getProfileById(profileId: String): ProfileEntity? {
         return db.withTransaction {
             profileDao.getProfileById(profileId)
         }
@@ -25,6 +25,12 @@ class ProfileLocalDataSource(
     suspend fun saveProfile(profile: ProfileEntity) {
         db.withTransaction {
             profileDao.saveProfile(profile)
+        }
+    }
+
+    suspend fun deleteProfile(profile : ProfileEntity) {
+        db.withTransaction {
+            profileDao.deleteProfile(profile)
         }
     }
 }

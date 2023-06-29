@@ -1,5 +1,6 @@
 package com.bso112.data.repository
 
+import com.bso112.data.alsoSuspend
 import com.bso112.data.local.AppPreference
 import com.bso112.data.local.datasource.ProfileLocalDataSource
 import com.bso112.data.local.entity.ProfileEntity
@@ -33,16 +34,7 @@ class ProfileRepositoryImpl(
 
     override fun getUser(defaultUser: Profile): Flow<Profile> = autoRefreshFlow {
         val userId = appPreference.userId.getValue().orEmpty()
-        return@autoRefreshFlow if (userId.isEmpty()) {
-            //do not call ProfileRepositoryImpl.saveUser().
-            //it cause recursive function call because it emit DataChangedEvent event
-            defaultUser.also {
-                saveProfile(it)
-                appPreference.userId.setValue(it.id)
-            }
-        } else {
-            localDataSource.getProfileById(userId).toDomain()
-        }
+        localDataSource.getProfileById(userId)?.toDomain() ?: defaultUser
     }
 
     override suspend fun saveProfile(profile: Profile) {
@@ -51,11 +43,16 @@ class ProfileRepositoryImpl(
     }
 
     override fun getProfile(profileId: String): Flow<Profile> = flow {
-        emit(localDataSource.getProfileById(profileId).toDomain())
+        localDataSource.getProfileById(profileId)?.toDomain()?.alsoSuspend(::emit)
     }
 
     override fun getProfiles(): Flow<List<Profile>> = autoRefreshFlow {
         localDataSource.getAllProfile().map(ProfileEntity::toDomain)
+    }
+
+    override suspend fun deleteProfile(profile: Profile) {
+        localDataSource.deleteProfile(profile.toEntity())
+        _dataChangedEvent.emit(ProfileListChanged)
     }
 }
 

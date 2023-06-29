@@ -10,8 +10,11 @@ import com.bso112.data.local.entity.ChatLogEntity
 interface ChatLogDao {
 
     @Query("select * from ChatLogEntity limit 10")
-    suspend fun getAll() : List<ChatLogEntity>
+    suspend fun getAll(): List<ChatLogEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(chatLog : ChatLogEntity)
+    suspend fun insert(chatLog: ChatLogEntity)
+
+    @Query("delete from ChatLogEntity where profileId = :profileId")
+    suspend fun deleteByProfileId(profileId: String)
 }

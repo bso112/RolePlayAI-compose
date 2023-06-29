@@ -1,5 +1,6 @@
-package com.bso112.roleplayai.android.feature.profile.create
+package com.bso112.roleplayai.android.feature.profile
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.bso112.domain.Profile
 import com.bso112.domain.ProfileRepository
@@ -9,11 +10,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 class CreateProfileViewModel(
     private val profileRepository: ProfileRepository,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    val name = MutableStateFlow("")
-    val description = MutableStateFlow("")
+    //프로필 수정인 경우의 프로필
+    val profile: Profile? = CreateProfileArg(savedStateHandle).profile
+    val name = MutableStateFlow(profile?.name.orEmpty())
+    val description = MutableStateFlow(profile?.description.orEmpty())
 
 
     suspend fun createProfile() {
