@@ -1,5 +1,7 @@
 package com.bso112.roleplayai.android.feature.home
 
+import android.content.Intent
+import android.net.Uri
 import androidx.annotation.StringRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -31,6 +33,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.ColorPainter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -65,11 +69,20 @@ fun HomeScreenRoute(
     viewModel: HomeViewModel = koinViewModel()
 ) {
     val profileList by viewModel.profileList.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     HomeScreen(
         profileList,
         appState.navController,
-        onDeleteProfile = { viewModel.deleteProfile(it) })
+        onDeleteProfile = {
+            viewModel.deleteProfile(it)
+            if (it.thumbnail.isNotEmpty()) {
+                context.contentResolver.releasePersistableUriPermission(
+                    Uri.parse(it.thumbnail),
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            }
+        })
 }
 
 @Composable
@@ -84,10 +97,10 @@ private fun HomeScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn {
-            items(profileList) {profile ->
+            items(profileList) { profile ->
                 ProfileItem(
                     profile = profile,
-                    onProfileClick = {  },
+                    onProfileClick = { },
                     onProfileLongClick = {
                         profileActionDialogState = ProfileActionDialogState.Open(profile)
                     }
@@ -150,6 +163,7 @@ private fun ProfileItem(
                 .size(50.dp)
                 .clip(RoundedCornerShape(15.dp)),
             model = profile.thumbnail,
+            contentScale = ContentScale.Crop,
             contentDescription = null,
             error = ColorPainter(MaterialTheme.colors.placeHolder),
             placeholder = ColorPainter(MaterialTheme.colors.placeHolder)

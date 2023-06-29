@@ -12,13 +12,11 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,6 +27,8 @@ import coil.compose.AsyncImage
 import com.bso112.roleplayai.android.R
 import com.bso112.roleplayai.android.app.RolePlayAppState
 import com.bso112.roleplayai.android.util.DefaultPreview
+import com.bso112.roleplayai.android.util.copyToFileDir
+import com.bso112.roleplayai.android.util.randomID
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -41,18 +41,23 @@ fun CreateProfileScreenRoute(
 ) {
     val name: String by viewModel.name.collectAsStateWithLifecycle()
     val description: String by viewModel.description.collectAsStateWithLifecycle()
+    val profileImage: String by viewModel.profileImage.collectAsStateWithLifecycle()
 
+    val context = LocalContext.current
     val lifecycleScope = LocalLifecycleOwner.current.lifecycleScope
 
     val exceptionHandler = CoroutineExceptionHandler { _, t: Throwable ->
         t.printStackTrace()
     }
 
+
     CreateProfileScreen(
+        profileImage = profileImage,
         name = name,
         description = description,
         onNameChanged = viewModel.name::value::set,
         onDescriptionChanged = viewModel.description::value::set,
+        onProfileImageChanged = viewModel.profileImage::value::set,
         onClickCreateProfile = {
             lifecycleScope.launch(exceptionHandler) {
                 viewModel.createProfile()
@@ -63,17 +68,24 @@ fun CreateProfileScreenRoute(
 
 @Composable
 private fun CreateProfileScreen(
+    profileImage: String,
     name: String,
     description: String,
     onNameChanged: (String) -> Unit = {},
     onDescriptionChanged: (String) -> Unit = {},
+    onProfileImageChanged: (String) -> Unit = {},
     onClickCreateProfile: () -> Unit = {}
 ) {
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
+
+    val context = LocalContext.current
 
     val getContent =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-            imageUri = uri
+            uri?.let {
+                val fileName = profileImage.ifEmpty { "$randomID.jpg" }
+                val file = it.copyToFileDir(context, fileName)
+                onProfileImageChanged(file.path)
+            }
         }
 
 
@@ -83,10 +95,10 @@ private fun CreateProfileScreen(
                 modifier = Modifier
                     .size(100.dp)
                     .clickable { getContent.launch("image/*") },
-                model = imageUri,
+                model = profileImage,
                 placeholder = painterResource(id = R.drawable.saber),
                 contentScale = ContentScale.Crop,
-                error = ColorPainter(Color.LightGray),
+                error = ColorPainter(Color.Red),
                 contentDescription = "portrait"
             )
             Column {
@@ -110,6 +122,7 @@ private fun CreateProfileScreen(
 private fun CreateProfileScreenPreView() {
     DefaultPreview {
         CreateProfileScreen(
+            profileImage = "",
             name = "세이버",
             description = "영국의 기사왕"
         )

@@ -18,12 +18,13 @@ class CreateProfileViewModel(
     val profile: Profile? = CreateProfileArg(savedStateHandle).profile
     val name = MutableStateFlow(profile?.name.orEmpty())
     val description = MutableStateFlow(profile?.description.orEmpty())
+    val profileImage = MutableStateFlow(profile?.thumbnail.orEmpty())
 
 
     suspend fun createProfile() {
         val profile = Profile(
-            id = randomID,
-            thumbnail = "",
+            id = profile?.id ?: randomID,
+            thumbnail = profileImage.value,
             name = name.value,
             description = description.value
         )

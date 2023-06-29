@@ -2,6 +2,9 @@ package com.bso112.roleplayai.android.app
 
 import android.app.Application
 import androidx.lifecycle.SavedStateHandle
+import coil.ImageLoader
+import coil.ImageLoaderFactory
+import coil.util.DebugLogger
 import com.bso112.data.local.AppPreference
 import com.bso112.data.local.createDataBase
 import com.bso112.data.local.datasource.ChatLocalDataSource
@@ -23,7 +26,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.GlobalContext.startKoin
 import org.koin.dsl.module
 
-class RolePlayAIApplication : Application() {
+class RolePlayAIApplication : Application(), ImageLoaderFactory {
 
     private val appModule = module {
         single { createDataBase(this@RolePlayAIApplication) }
@@ -48,5 +51,11 @@ class RolePlayAIApplication : Application() {
             androidContext(this@RolePlayAIApplication)
             modules(appModule)
         }
+    }
+
+    override fun newImageLoader(): ImageLoader {
+        return ImageLoader.Builder(this)
+            .logger(DebugLogger())
+            .build()
     }
 }
