@@ -1,7 +1,5 @@
 package com.bso112.roleplayai.android.feature.home
 
-import android.content.Intent
-import android.net.Uri
 import androidx.annotation.StringRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -53,6 +51,7 @@ import com.bso112.roleplayai.android.util.DefaultPreview
 import com.bso112.roleplayai.android.util.ifIs
 import com.bso112.roleplayai.android.util.randomID
 import org.koin.androidx.compose.koinViewModel
+import java.io.File
 
 private enum class ProfileLongClickAction(@StringRes val titleRes: Int) {
     CHAT(R.string.chat), EDIT(R.string.edit), DELETE(R.string.delete)
@@ -74,14 +73,9 @@ fun HomeScreenRoute(
     HomeScreen(
         profileList,
         appState.navController,
-        onDeleteProfile = {
-            viewModel.deleteProfile(it)
-            if (it.thumbnail.isNotEmpty()) {
-                context.contentResolver.releasePersistableUriPermission(
-                    Uri.parse(it.thumbnail),
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION
-                )
-            }
+        onDeleteProfile = { profile ->
+            viewModel.deleteProfile(profile)
+            profile.thumbnail.takeIf { it.isNotEmpty() }?.let(::File)?.delete()
         })
 }
 

@@ -27,8 +27,6 @@ import coil.compose.AsyncImage
 import com.bso112.roleplayai.android.R
 import com.bso112.roleplayai.android.app.RolePlayAppState
 import com.bso112.roleplayai.android.util.DefaultPreview
-import com.bso112.roleplayai.android.util.copyToFileDir
-import com.bso112.roleplayai.android.util.randomID
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -41,7 +39,7 @@ fun CreateProfileScreenRoute(
 ) {
     val name: String by viewModel.name.collectAsStateWithLifecycle()
     val description: String by viewModel.description.collectAsStateWithLifecycle()
-    val profileImage: String by viewModel.profileImage.collectAsStateWithLifecycle()
+    val profileImage: String by viewModel.profileImage.collectAsStateWithLifecycle(initialValue = viewModel.argument.profile?.thumbnail.orEmpty())
 
     val context = LocalContext.current
     val lifecycleScope = LocalLifecycleOwner.current.lifecycleScope
@@ -60,7 +58,7 @@ fun CreateProfileScreenRoute(
         onProfileImageChanged = viewModel.profileImage::value::set,
         onClickCreateProfile = {
             lifecycleScope.launch(exceptionHandler) {
-                viewModel.createProfile()
+                viewModel.createProfile(context)
                 appState.navController.popBackStack()
             }
         })
@@ -81,10 +79,8 @@ private fun CreateProfileScreen(
 
     val getContent =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-            uri?.let {
-                val fileName = profileImage.ifEmpty { "$randomID.jpg" }
-                val file = it.copyToFileDir(context, fileName)
-                onProfileImageChanged(file.path)
+            uri?.toString()?.let {
+                onProfileImageChanged(it)
             }
         }
 

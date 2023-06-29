@@ -30,13 +30,15 @@ fun <T> ViewModel.stateIn(
  * create file if file of [fileName] is not exist.
  * @return file of [fileName]
  */
-fun Uri.copyToFileDir(context: Context, fileName: String): File {
-    val directory = context.filesDir
-    val file = File(directory, fileName).also {
-        if (!it.exists()) {
-            it.createNewFile()
-            logD("create File!")
+fun Uri.copyToFile(context: Context, file : File): File {
+    logD(file.toString())
+    kotlin.runCatching {
+        if(!file.exists()){
+            file.parentFile?.mkdirs()
+            file.createNewFile()
         }
+    }.getOrElse {
+        logE("file $file errpr: $it")
     }
 
     context.contentResolver.openInputStream(this)?.use { input ->
