@@ -11,7 +11,7 @@ import com.bso112.roleplayai.android.util.RouteBuilder
 import com.bso112.roleplayai.android.util.createNavType
 
 
-private const val CREATE_PROFILE_ROUTE = "CREATE_PROFILE_ROUTE"
+const val CREATE_PROFILE_ROUTE = "CREATE_PROFILE_ROUTE"
 private const val ARGS_PROFILE = "ARGS_PROFILE"
 
 private val routeBuilder = RouteBuilder(

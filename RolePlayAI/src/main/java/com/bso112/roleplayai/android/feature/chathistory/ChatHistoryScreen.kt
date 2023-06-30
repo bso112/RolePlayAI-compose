@@ -3,6 +3,7 @@ package com.bso112.roleplayai.android.feature.chathistory
 import androidx.annotation.StringRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -57,13 +58,19 @@ fun ChatHistoryRoute(
 ) {
     val chatList by viewModel.chatList.collectAsStateWithLifecycle()
 
-    ChatHistoryScreen(navController = appState.navController, chatList = chatList)
+    ChatHistoryScreen(
+        navController = appState.navController,
+        chatList = chatList,
+        onDeleteChatLog = {
+            viewModel.deleteChatLog(it)
+        })
 }
 
 @Composable
 private fun ChatHistoryScreen(
     navController: NavController,
-    chatList: List<ChatLog>
+    chatList: List<ChatLog>,
+    onDeleteChatLog: (ChatLog) -> Unit = {}
 ) {
     var dialogState: EditOptionDialogState by remember { mutableStateOf(EditOptionDialogState.Close) }
 
@@ -91,6 +98,11 @@ private fun ChatHistoryScreen(
                 dialogState = EditOptionDialogState.Close
             },
             onClickOption = {
+                when (it) {
+                    ChatHistoryEditOption.DELETE -> {
+                        onDeleteChatLog(state.chatLog)
+                    }
+                }
                 dialogState = EditOptionDialogState.Close
             }
         )
@@ -106,26 +118,29 @@ private fun ChatHistoryItem(
     onClickChatHistory: (ChatLog) -> Unit,
     onLongClickChatHistory: (ChatLog) -> Unit
 ) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(15.dp)
-            .combinedClickable(
-                onClick = { onClickChatHistory(chatLog) },
-                onLongClick = { onLongClickChatHistory(chatLog) }
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .combinedClickable(
+            onClick = { onClickChatHistory(chatLog) },
+            onLongClick = { onLongClickChatHistory(chatLog) }
+        ))
+    {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(15.dp)
+        ) {
+            AsyncImage(
+                modifier = Modifier.size(50.dp),
+                model = chatLog.thumbnail,
+                contentDescription = null,
+                error = ColorPainter(MaterialTheme.colors.placeHolder),
+                placeholder = ColorPainter(MaterialTheme.colors.placeHolder)
             )
-
-    ) {
-        AsyncImage(
-            modifier = Modifier.size(50.dp),
-            model = chatLog.thumbnail,
-            contentDescription = null,
-            error = ColorPainter(MaterialTheme.colors.placeHolder),
-            placeholder = ColorPainter(MaterialTheme.colors.placeHolder)
-        )
-        Column(modifier = Modifier.padding(start = 10.dp, end = 20.dp)) {
-            Text(chatLog.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Text(chatLog.previewMessage, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Column(modifier = Modifier.padding(start = 10.dp, end = 20.dp)) {
+                Text(chatLog.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(chatLog.previewMessage, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            }
         }
     }
 }

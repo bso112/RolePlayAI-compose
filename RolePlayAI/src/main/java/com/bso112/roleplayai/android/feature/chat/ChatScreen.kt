@@ -16,9 +16,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.DrawerState
 import androidx.compose.material.DrawerValue
 import androidx.compose.material.Icon
@@ -140,20 +142,18 @@ fun ChatScreen(
                             }
                         })
                 }
-                item {
-                    TextField(
-                        value = userChat,
-                        onValueChange = onUserTextChanged,
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                        keyboardActions = KeyboardActions(onDone = {
-                            onUserSubmitChat(userChat)
-                            focusManager.clearFocus()
-                        })
-                    )
-                }
             }
+            TextField(
+                value = userChat,
+                onValueChange = onUserTextChanged,
+                modifier = Modifier
+                    .fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = {
+                    onUserSubmitChat(userChat)
+                    focusManager.clearFocus()
+                })
+            )
         }
     }
 }
@@ -226,6 +226,7 @@ fun ChatDrawer(
                     Text(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .verticalScroll(rememberScrollState())
                             .defaultMinSize(minHeight = 100.dp)
                             .border(BorderStroke(width = 1.dp, color = Color.LightGray))
                             .padding(10.dp),

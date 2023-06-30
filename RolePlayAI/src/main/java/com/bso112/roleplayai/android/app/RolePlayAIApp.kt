@@ -13,6 +13,7 @@ import com.bso112.roleplayai.android.feature.chat.chatScreen
 import com.bso112.roleplayai.android.feature.chathistory.chatHistory
 import com.bso112.roleplayai.android.feature.home.HOME_ROUTE
 import com.bso112.roleplayai.android.feature.home.homeScreen
+import com.bso112.roleplayai.android.feature.profile.CREATE_PROFILE_ROUTE
 import com.bso112.roleplayai.android.feature.profile.createProfile
 
 @Composable
@@ -21,7 +22,7 @@ fun RolePlayAIApp(
 ) {
     val navBackStackEntry by appState.navController.currentBackStackEntryAsState()
 
-    val excludeBottomBarRoute = listOf(CHAT_ROUTE)
+    val excludeBottomBarRoute = listOf(CHAT_ROUTE, CREATE_PROFILE_ROUTE)
 
     RolePlayAITheme {
         Scaffold(

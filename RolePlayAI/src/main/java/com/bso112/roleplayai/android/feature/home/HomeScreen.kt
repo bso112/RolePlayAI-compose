@@ -142,28 +142,32 @@ private fun ProfileItem(
     onProfileClick: () -> Unit,
     onProfileLongClick: () -> Unit
 ) {
-    Row(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 10.dp, vertical = 5.dp)
             .combinedClickable(
                 onLongClick = { onProfileLongClick() },
                 onClick = { onProfileClick() }
-            ),
-        verticalAlignment = Alignment.CenterVertically
+            )
     ) {
-        AsyncImage(
+        Row(
             modifier = Modifier
-                .size(50.dp)
-                .clip(RoundedCornerShape(15.dp)),
-            model = profile.thumbnail,
-            contentScale = ContentScale.Crop,
-            contentDescription = null,
-            error = ColorPainter(MaterialTheme.colors.placeHolder),
-            placeholder = ColorPainter(MaterialTheme.colors.placeHolder)
-        )
-        Spacer(modifier = Modifier.size(10.dp))
-        Text(profile.name)
+                .padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            AsyncImage(
+                modifier = Modifier
+                    .size(50.dp)
+                    .clip(RoundedCornerShape(15.dp)),
+                model = profile.thumbnail,
+                contentScale = ContentScale.Crop,
+                contentDescription = null,
+                error = ColorPainter(MaterialTheme.colors.placeHolder),
+                placeholder = ColorPainter(MaterialTheme.colors.placeHolder)
+            )
+            Spacer(modifier = Modifier.size(10.dp))
+            Text(profile.name)
+        }
     }
 }
 
