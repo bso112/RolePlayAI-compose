@@ -140,18 +140,20 @@ fun ChatScreen(
                             }
                         })
                 }
+                item {
+                    TextField(
+                        value = userChat,
+                        onValueChange = onUserTextChanged,
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(onDone = {
+                            onUserSubmitChat(userChat)
+                            focusManager.clearFocus()
+                        })
+                    )
+                }
             }
-            TextField(
-                value = userChat,
-                onValueChange = onUserTextChanged,
-                modifier = Modifier
-                    .fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(onDone = {
-                    onUserSubmitChat(userChat)
-                    focusManager.clearFocus()
-                })
-            )
         }
     }
 }
