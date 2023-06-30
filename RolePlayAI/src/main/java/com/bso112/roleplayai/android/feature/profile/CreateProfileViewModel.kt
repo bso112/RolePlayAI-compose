@@ -4,17 +4,17 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.bso112.domain.Profile
 import com.bso112.domain.ProfileRepository
 import com.bso112.roleplayai.android.util.DispatcherProvider
+import com.bso112.roleplayai.android.util.copyToFile
 import com.bso112.roleplayai.android.util.logD
-import com.bso112.roleplayai.android.util.logE
 import com.bso112.roleplayai.android.util.randomID
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.withContext
-import java.io.File
-import java.io.FileOutputStream
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 
 class CreateProfileViewModel(
     private val profileRepository: ProfileRepository,
@@ -30,40 +30,37 @@ class CreateProfileViewModel(
     val description = MutableStateFlow(profile?.description.orEmpty())
     val profileImage = MutableStateFlow(profile?.thumbnail.orEmpty())
 
+    private val _error = MutableSharedFlow<Throwable>()
+    val error = _error.asSharedFlow()
 
-    suspend fun createProfile(context: Context) {
-        val thumbnailUri = if (profileImage.value.isNotEmpty()) {
-            val uri = Uri.parse(profileImage.value)
-            val imageFile = File(context.filesDir, profile?.id ?: randomID)
-            if (uri == Uri.fromFile(imageFile)) {
-                profileImage.value
-            } else {
-                withContext(Dispatchers.IO) {
-                    imageFile.createNewFile()
-                }
-                try {
-                    context.contentResolver.openInputStream(uri)?.use { input ->
-                        FileOutputStream(imageFile).use { output ->
-                            input.copyTo(output)
-                        }
-                    }
-                } catch (e: Exception) {
-                    logE("uri: $uri, imageFile: $imageFile, exception $e")
-                }
-                Uri.fromFile(imageFile).toString()
-            }
+
+    suspend fun createProfile(context: Context) = kotlin.runCatching {
+        val profileId = profile?.id ?: randomID
+        val currentImageUri = Uri.parse(profileImage.value)
+        //content 스킴의 권한 문제 때문에 content 스킴이면 내부저장소에 카피한다.
+        val thumbnailUri = if (currentImageUri.scheme == "content") {
+            currentImageUri.copyToFile(context, fileName = profileId)
+                .getOrNull()
+                //file 스킴을 추가해준다.
+                ?.let(Uri::fromFile)
+                ?.toString()
+                .orEmpty()
         } else {
-            ""
+            profileImage.value
         }
 
         logD("thumbnailUri $thumbnailUri")
 
         val profile = Profile(
-            id = profile?.id ?: randomID,
+            id = profileId,
             thumbnail = thumbnailUri,
             name = name.value,
             description = description.value
         )
         profileRepository.saveProfile(profile)
+    }.onFailure { t ->
+        viewModelScope.launch {
+            _error.emit(t)
+        }
     }
 }
