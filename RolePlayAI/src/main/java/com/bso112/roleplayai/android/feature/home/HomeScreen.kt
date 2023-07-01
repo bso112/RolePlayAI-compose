@@ -32,7 +32,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -68,11 +67,10 @@ fun HomeScreenRoute(
     viewModel: HomeViewModel = koinViewModel()
 ) {
     val profileList by viewModel.profileList.collectAsStateWithLifecycle()
-    val context = LocalContext.current
-
     HomeScreen(
-        profileList,
-        appState.navController,
+        profileList = profileList,
+        navController = appState.navController,
+        isUser = { it.id == appState.userId.value },
         onDeleteProfile = { profile ->
             viewModel.deleteProfile(profile)
             profile.thumbnail.takeIf { it.isNotEmpty() }?.let(::File)?.delete()
@@ -82,6 +80,7 @@ fun HomeScreenRoute(
 @Composable
 private fun HomeScreen(
     profileList: List<Profile>,
+    isUser: (Profile) -> Boolean = { false },
     navController: NavController,
     onDeleteProfile: (Profile) -> Unit = {}
 ) {
@@ -111,9 +110,13 @@ private fun HomeScreen(
             Icon(Icons.Filled.Add, contentDescription = "Add Profile")
         }
     }
-
     profileActionDialogState.ifIs<ProfileActionDialogState.Open> { state ->
         ProfileActionDialog(
+            profileActions = if (isUser(state.profile)) {
+                arrayOf(ProfileLongClickAction.EDIT)
+            } else {
+                ProfileLongClickAction.values()
+            },
             profile = state.profile,
             onClickOption = { action ->
                 when (action) {
@@ -173,6 +176,7 @@ private fun ProfileItem(
 
 @Composable
 private fun ProfileActionDialog(
+    profileActions: Array<ProfileLongClickAction>,
     profile: Profile,
     onClickOption: (ProfileLongClickAction) -> Unit,
     onDismiss: () -> Unit
@@ -182,7 +186,7 @@ private fun ProfileActionDialog(
         title = { Text(profile.name, fontWeight = FontWeight.Bold) },
         text = {
             Column {
-                ProfileLongClickAction.values().forEach { option ->
+                profileActions.forEach { option ->
                     TextButton(onClick = {
                         onClickOption(option)
                     }) {
@@ -200,7 +204,12 @@ private fun ProfileActionDialog(
 @Composable
 private fun HomeScreenPreview() {
     DefaultPreview {
-        HomeScreen(fakeProfileList, rememberNavController())
+        HomeScreen(
+            profileList = fakeProfileList,
+            navController = rememberNavController(),
+            isUser = { false },
+            onDeleteProfile = {}
+        )
     }
 }
 

@@ -34,7 +34,7 @@ fun createDataBase(applicationContext: Context, appPreference: AppPreference): A
             CoroutineScope(Dispatchers.IO).launch {
                 if (appPreference.userId.getValue() == null) {
                     val userId = UUID.randomUUID().toString()
-                    val sql = "INSERT INTO ProfileEntity (id, name, thumbnail, description) VALUES ('${UUID.randomUUID()}', '유저', '', '')"
+                    val sql = "INSERT INTO ProfileEntity (id, name, thumbnail, description) VALUES ('${userId}', '유저', '', '')"
                     db.execSQL(sql)
                     logD(sql)
                     appPreference.userId.setValue(userId)

@@ -9,10 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.bso112.domain.Profile
-import com.bso112.domain.ProfileRepository
 import com.bso112.roleplayai.android.app.RolePlayAITheme
-import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 
 
@@ -38,12 +35,4 @@ fun currentRoute(navController: NavController): String? {
 fun requireSdk(version: Int) = Build.VERSION.SDK_INT >= version
 
 val randomID get() = UUID.randomUUID().toString()
-
-
-val fakeUser = Profile(
-    id = UUID.randomUUID().toString(),
-    thumbnail = "",
-    name = "유저",
-    description = ""
-)
 

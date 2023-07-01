@@ -18,7 +18,7 @@ import com.bso112.roleplayai.android.feature.profile.createProfile
 
 @Composable
 fun RolePlayAIApp(
-    appState: RolePlayAppState = rememberRolePlayAIAppState()
+    appState: RolePlayAppState,
 ) {
     val navBackStackEntry by appState.navController.currentBackStackEntryAsState()
 

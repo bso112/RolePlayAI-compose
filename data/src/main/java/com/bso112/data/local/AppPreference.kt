@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.bso112.data.dataStore
 import com.bso112.domain.Model
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
@@ -45,6 +46,10 @@ class PreferenceAccessor<T>(
 
     suspend fun getValue(): T? {
         return dataStore.data.map { it[key] }.first()
+    }
+
+    fun asFlow(): Flow<T?> {
+        return dataStore.data.map { it[key] }
     }
 
     suspend fun getValueOrElse(defaultValue: T): T {
