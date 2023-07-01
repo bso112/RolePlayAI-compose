@@ -35,7 +35,4 @@ class RolePlayAppState(
     val userId: StateFlow<String?> =
         appPreference.userId.asFlow().stateIn(stateRetainedScope, SharingStarted.Eagerly, null)
 
-    fun navigateToTopLevelDestination(destination: TopLevelDestination) {
-        navController.navigate(destination.route, destination.navOptions)
-    }
 }

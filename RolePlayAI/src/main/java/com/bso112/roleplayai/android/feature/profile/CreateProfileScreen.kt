@@ -35,6 +35,12 @@ import coil.compose.AsyncImage
 import com.bso112.roleplayai.android.R
 import com.bso112.roleplayai.android.app.RolePlayAppState
 import com.bso112.roleplayai.android.util.DefaultPreview
+import com.bso112.roleplayai.android.util.logD
+import com.bso112.roleplayai.android.util.logE
+import com.canhub.cropper.CropImageContract
+import com.canhub.cropper.CropImageContractOptions
+import com.canhub.cropper.CropImageOptions
+import com.canhub.cropper.CropImageView
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -90,10 +96,32 @@ private fun CreateProfileScreen(
 
     val context = LocalContext.current
 
+
+    val imageChopper =
+        rememberLauncherForActivityResult(CropImageContract()) { result ->
+            if (result.isSuccessful) {
+                logD(result.uriContent.toString())
+                onProfileImageChanged(result.uriContent.toString())
+            } else {
+                logE(result.error?.stackTraceToString().orEmpty())
+            }
+        }
+
+
     val getContent =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-            uri?.toString()?.let {
-                onProfileImageChanged(it)
+            uri?.let {
+                imageChopper.launch(
+                    CropImageContractOptions(
+                        uri = it, cropImageOptions = CropImageOptions(
+                            guidelines = CropImageView.Guidelines.ON,
+                            fixAspectRatio = true,
+                            maxZoom = 2,
+                            aspectRatioX = 1,
+                            aspectRatioY = 1,
+                        )
+                    )
+                )
             }
         }
 

@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.bundles.ktor)
     implementation(libs.lifecycle.compose)
     implementation(libs.gson)
+    implementation(libs.imagechopper)
     implementation("androidx.compose.ui:ui:1.4.3")
     implementation("androidx.compose.ui:ui-tooling:1.4.3")
     implementation("androidx.compose.ui:ui-tooling-preview:1.4.3")

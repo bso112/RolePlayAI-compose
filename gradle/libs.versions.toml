@@ -9,6 +9,7 @@ datastore = "1.0.0"
 gson = "2.10.1"
 jtokkit = "0.5.0"
 activity-ktx = "1.6.1"
+imagechopper = "4.5.0"
 
 [libraries]
 ktor-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
@@ -30,7 +31,7 @@ datastore = { group = "androidx.datastore", name = "datastore-preferences", vers
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 jtokkit = { group = "com.knuddels", name = "jtokkit", version.ref = "jtokkit" }
 activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activity-ktx"}
-
+imagechopper = { group = "com.vanniktech", name = "android-image-cropper", version.ref = "imagechopper" }
 
 [bundles]
 ktor = ["ktor-core", "ktor-cio", "ktor-logging", "ktor-negotiation", "ktor-serialization"]

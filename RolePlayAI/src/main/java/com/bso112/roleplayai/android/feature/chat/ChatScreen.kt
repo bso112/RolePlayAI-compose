@@ -47,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -171,8 +172,10 @@ fun ChatItem(
         AsyncImage(
             modifier = Modifier
                 .size(50.dp)
+                .clip(RoundedCornerShape(15.dp))
                 .clickable { onClickThumbnail() },
             model = chat.thumbnail,
+            contentScale = ContentScale.Crop,
             contentDescription = null,
             error = ColorPainter(MaterialTheme.colors.placeHolder),
             placeholder = ColorPainter(MaterialTheme.colors.placeHolder)
