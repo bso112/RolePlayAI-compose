@@ -38,12 +38,12 @@ fun Chat.toEntity() = ChatEntity(
     role = role.alias
 )
 
-fun ChatEntity.toChatLog(): ChatLogEntity {
+fun ChatEntity.toChatLog(opponentId : String): ChatLogEntity {
     return ChatLogEntity(
         id = logId,
         name = name,
         thumbnail = thumbnail,
         previewMessage = message,
-        profileId = profileId
+        opponentId = opponentId
     )
 }

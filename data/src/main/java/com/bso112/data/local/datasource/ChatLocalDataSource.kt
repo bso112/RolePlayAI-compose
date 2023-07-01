@@ -4,7 +4,6 @@ import androidx.room.withTransaction
 import com.bso112.data.local.AppDataBase
 import com.bso112.data.local.entity.ChatEntity
 import com.bso112.data.local.entity.ChatLogEntity
-import com.bso112.data.local.entity.toChatLog
 
 class ChatLocalDataSource(
     private val db: AppDataBase
@@ -21,7 +20,12 @@ class ChatLocalDataSource(
     suspend fun saveChat(chat: ChatEntity) {
         db.withTransaction {
             chatDao.insertAll(listOf(chat))
-            chatLogDao.insert(chat.toChatLog())
+        }
+    }
+
+    suspend fun saveChatLog(chatLog: ChatLogEntity) {
+        db.withTransaction {
+            chatLogDao.insert(chatLog)
         }
     }
 

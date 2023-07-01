@@ -80,7 +80,7 @@ private fun ChatHistoryScreen(
                 chatLog = chatLog,
                 onClickChatHistory = {
                     navController.navigateChat(
-                        profileId = chatLog.profileId,
+                        profileId = chatLog.opponentId,
                         chatLogId = chatLog.id
                     )
                 },
@@ -185,7 +185,7 @@ private val fakeChatLog = buildList {
                 thumbnail = "",
                 previewMessage = "$it adaskd jaskldjas dasjdak lsdja klsjd asdkl jalsj dklajskldaklsdklaskldaklsdasdasd",
                 id = randomID,
-                profileId = randomID
+                opponentId = randomID
             )
         )
     }

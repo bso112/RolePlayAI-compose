@@ -19,6 +19,7 @@ class AppPreference(
 
     val userId = accessor(stringPreferencesKey("userProfileIdKey"))
     val mainPrompt = notNullAccessor(stringPreferencesKey("mainPromptKey"), DEFAULT_MAIN_PROMPT)
+    val characterPrompt = notNullAccessor(stringPreferencesKey("characterPromptKey"), DEFAULT_CHARACTER_PROMPT)
     val temperature = notNullAccessor(floatPreferencesKey("temperature"), 0.8f)
     val languageModel =
         notNullAccessor(stringPreferencesKey("languageModelKey"), Model.GPT_3_5.alias)
@@ -96,3 +97,6 @@ private const val DEFAULT_MAIN_PROMPT =
             "10. Review previous exchanges for context. Ensure you understand all information. Refer to these instructions when crafting responses. Develop and revisit themes. Explore different interaction aspects to cover all elements. Always maintain a craftsmanlike spirit.\n" +
             "\n" +
             "read these guidelines three times, create an unforgettable roleplay experience that showcases your unique talents and transports {{user}} into the captivating world you've crafted."
+
+private const val DEFAULT_CHARACTER_PROMPT =
+    "your name is {{char}}. read this description and play a role."

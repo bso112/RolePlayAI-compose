@@ -21,7 +21,6 @@ fun RolePlayAIApp(
     appState: RolePlayAppState,
 ) {
     val navBackStackEntry by appState.navController.currentBackStackEntryAsState()
-
     val excludeBottomBarRoute = listOf(CHAT_ROUTE, CREATE_PROFILE_ROUTE)
 
     RolePlayAITheme {

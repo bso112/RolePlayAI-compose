@@ -37,6 +37,10 @@ class ChatRepositoryImpl(
     ) {
         chatLocalDataSource.saveChat(chat.toEntity())
         _dataChangedEvent.emit(ChatListChanged)
+    }
+
+    override suspend fun saveChatLog(chatLog: ChatLog) {
+        chatLocalDataSource.saveChatLog(chatLog.toEntity())
         _dataChangedEvent.emit(ChatLogChanged)
     }
 

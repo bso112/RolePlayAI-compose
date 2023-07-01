@@ -9,12 +9,12 @@ import com.bso112.roleplayai.android.app.RolePlayAppState
 
 const val HOME_ROUTE = "home"
 
-fun NavController.navigateHome(navOptions: NavOptions? = null){
+fun NavController.navigateHome(navOptions: NavOptions? = null) {
     navigate(HOME_ROUTE, navOptions)
 }
 
-fun NavGraphBuilder.homeScreen(appState: RolePlayAppState){
-    composable(HOME_ROUTE){
+fun NavGraphBuilder.homeScreen(appState: RolePlayAppState) {
+    composable(HOME_ROUTE) {
         HomeScreenRoute(appState = appState)
     }
 }

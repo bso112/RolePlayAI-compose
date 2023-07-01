@@ -10,6 +10,7 @@ import com.bso112.domain.Profile
 import com.bso112.domain.ProfileRepository
 import com.bso112.domain.Role
 import com.bso112.domain.createChat
+import com.bso112.domain.toChatLog
 import com.bso112.domain.toSystemChat
 import com.bso112.roleplayai.android.util.DispatcherProvider
 import com.bso112.roleplayai.android.util.Empty
@@ -49,6 +50,7 @@ class ChatViewModel(
         viewModelScope.launch(coroutineContext) {
             val userChat = checkNotNull(user.value).createChat(message, logId, Role.User)
             chatRepository.saveChat(userChat)
+            chatRepository.saveChatLog(userChat.toChatLog(opponentId = opponent.value.id))
 
             val requestChatList: List<Chat> = buildList {
                 appPreference.mainPrompt.getValue().toSystemChat(
@@ -56,10 +58,11 @@ class ChatViewModel(
                     charName = opponent.value.name
                 ).also(::add)
 
-                opponent.value.description.toSystemChat(
-                    userName = user.value.name,
-                    charName = opponent.value.name
-                ).also(::add)
+                appPreference.characterPrompt.getValue().plus(opponent.value.description)
+                    .toSystemChat(
+                        userName = user.value.name,
+                        charName = opponent.value.name
+                    ).also(::add)
 
                 addAll(chatList.value)
             }
@@ -71,6 +74,7 @@ class ChatViewModel(
             ).first()
 
             chatRepository.saveChat(chat = chat)
+            chatRepository.saveChatLog(chat.toChatLog())
         }
         userInput.update { String.Empty }
     }
