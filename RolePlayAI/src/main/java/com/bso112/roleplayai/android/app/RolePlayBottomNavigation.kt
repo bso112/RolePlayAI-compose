@@ -10,6 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.bso112.roleplayai.android.util.currentRoute
 
 @Composable
@@ -33,7 +34,13 @@ fun RolePlayBottomNavigation(
                 },
                 onClick = {
                     selectedItemIndex = index
-                    navController.navigate(type.route, type.navOptions)
+                    navController.navigate(type.route) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
                 }
             )
         }
