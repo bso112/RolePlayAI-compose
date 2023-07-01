@@ -9,14 +9,16 @@ data class Profile(
     val id: String,
     val thumbnail: String,
     val name: String,
-    val description: String
+    val description: String,
+    val firstMessage : String,
 ) : Parcelable {
     companion object {
         val Empty = Profile(
             id = UUID.randomUUID().toString(),
             thumbnail = "",
             name = "",
-            description = ""
+            description = "",
+            firstMessage = ""
         )
     }
 }

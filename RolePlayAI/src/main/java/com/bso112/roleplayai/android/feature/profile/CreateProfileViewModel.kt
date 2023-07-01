@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bso112.data.local.AppPreference
 import com.bso112.domain.Profile
 import com.bso112.domain.ProfileRepository
 import com.bso112.roleplayai.android.util.DispatcherProvider
@@ -13,13 +14,17 @@ import com.bso112.roleplayai.android.util.logD
 import com.bso112.roleplayai.android.util.randomID
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class CreateProfileViewModel(
     private val profileRepository: ProfileRepository,
     private val dispatcherProvider: DispatcherProvider,
-    private val savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
+    private val appPreference: AppPreference
 ) : ViewModel() {
 
     val argument = CreateProfileArg(savedStateHandle)
@@ -29,6 +34,11 @@ class CreateProfileViewModel(
     val name = MutableStateFlow(profile?.name.orEmpty())
     val description = MutableStateFlow(profile?.description.orEmpty())
     val profileImage = MutableStateFlow(profile?.thumbnail.orEmpty())
+    val firstMessage = MutableStateFlow(profile?.firstMessage.orEmpty())
+
+    val isUser = appPreference.userId.asFlow().map {
+        profile?.id == it
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     private val _error = MutableSharedFlow<Throwable>()
     val error = _error.asSharedFlow()
@@ -55,7 +65,8 @@ class CreateProfileViewModel(
             id = profileId,
             thumbnail = thumbnailUri,
             name = name.value,
-            description = description.value
+            description = description.value,
+            firstMessage = firstMessage.value
         )
         profileRepository.saveProfile(profile)
     }.onFailure { t ->

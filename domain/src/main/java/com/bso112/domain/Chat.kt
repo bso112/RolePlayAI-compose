@@ -12,12 +12,12 @@ data class Chat(
     val role: Role
 )
 
-fun String.toSystemChat(userName: String, charName: String) = Chat(
+fun String.toChat(userName: String, charName: String, role : Role) = Chat(
     id = UUID.randomUUID().toString(),
     logId = UUID.randomUUID().toString(),
     profileId = UUID.randomUUID().toString(),
     thumbnail = "",
     name = "",
     message = this.replace("{{user}}", userName).replace("{{char}}", charName),
-    role = Role.System
+    role = role
 )

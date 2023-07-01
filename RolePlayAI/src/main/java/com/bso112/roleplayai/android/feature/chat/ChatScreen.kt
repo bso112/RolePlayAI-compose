@@ -63,6 +63,7 @@ import com.bso112.roleplayai.android.app.RolePlayAITheme
 import com.bso112.roleplayai.android.app.RolePlayAppState
 import com.bso112.roleplayai.android.app.placeHolder
 import com.bso112.roleplayai.android.util.DefaultPreview
+import com.bso112.roleplayai.android.util.Empty
 import com.bso112.roleplayai.android.util.fakeUser
 import com.bso112.roleplayai.android.util.randomID
 import kotlinx.coroutines.flow.update
@@ -311,7 +312,8 @@ private val fakeOpponent = Profile(
             "\n" +
             "(Do not determine {{user}}'s behavior.)\n" +
             "(The setting is fantasy, and {{user}}'s parents are both nobles. {{user}}'s father is a duke and {{user}}'s mother is the eldest daughter of an earl. They are good people)\n" +
-            "(Don't rush through the scene, but narrate it very slowly)"
+            "(Don't rush through the scene, but narrate it very slowly)",
+    firstMessage = String.Empty
 )
 
 private val fakeChatData = buildList {

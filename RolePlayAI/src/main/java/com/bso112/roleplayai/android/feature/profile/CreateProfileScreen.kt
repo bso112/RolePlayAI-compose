@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
@@ -54,6 +56,8 @@ fun CreateProfileScreenRoute(
     val name: String by viewModel.name.collectAsStateWithLifecycle()
     val description: String by viewModel.description.collectAsStateWithLifecycle()
     val profileImage: String by viewModel.profileImage.collectAsStateWithLifecycle(initialValue = viewModel.argument.profile?.thumbnail.orEmpty())
+    val firstMessage: String by viewModel.firstMessage.collectAsStateWithLifecycle()
+    val isUser: Boolean by viewModel.isUser.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
     val lifecycleScope = LocalLifecycleOwner.current.lifecycleScope
@@ -67,6 +71,8 @@ fun CreateProfileScreenRoute(
         profileImage = profileImage,
         name = name,
         description = description,
+        firstMessage = firstMessage,
+        isUser = isUser,
         onClickBackButton = {
             appState.navController.popBackStack()
         },
@@ -79,6 +85,7 @@ fun CreateProfileScreenRoute(
         onNameChanged = viewModel.name::value::set,
         onDescriptionChanged = viewModel.description::value::set,
         onProfileImageChanged = viewModel.profileImage::value::set,
+        onFirstMessageChanged = viewModel.firstMessage::value::set,
     )
 }
 
@@ -86,16 +93,16 @@ fun CreateProfileScreenRoute(
 private fun CreateProfileScreen(
     profileImage: String,
     name: String,
+    isUser: Boolean,
     description: String,
+    firstMessage: String,
     onClickBackButton: () -> Unit = {},
     onClickSubmit: () -> Unit = {},
     onNameChanged: (String) -> Unit = {},
     onDescriptionChanged: (String) -> Unit = {},
     onProfileImageChanged: (String) -> Unit = {},
+    onFirstMessageChanged: (String) -> Unit = {},
 ) {
-
-    val context = LocalContext.current
-
 
     val imageChopper =
         rememberLauncherForActivityResult(CropImageContract()) { result ->
@@ -126,7 +133,10 @@ private fun CreateProfileScreen(
         }
 
 
-    Column {
+    Column(
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+    ) {
         TopAppBar {
             IconButton(onClick = onClickBackButton) {
                 Icon(Icons.Filled.ArrowBack, contentDescription = "go back")
@@ -158,6 +168,13 @@ private fun CreateProfileScreen(
                     label = { Text("description") },
                     onValueChange = onDescriptionChanged
                 )
+                if (!isUser) {
+                    TextField(
+                        value = firstMessage,
+                        label = { Text("first Message") },
+                        onValueChange = onFirstMessageChanged,
+                    )
+                }
             }
         }
     }
@@ -169,9 +186,11 @@ private fun CreateProfileScreen(
 private fun CreateProfileScreenPreView() {
     DefaultPreview {
         CreateProfileScreen(
-            profileImage = "",
+            isUser = false,
+            firstMessage = "안녕하세요",
             name = "세이버",
-            description = "영국의 기사왕"
+            description = "영국의 기사왕",
+            profileImage = "그대가 나의 마스터인가?"
         )
     }
 }

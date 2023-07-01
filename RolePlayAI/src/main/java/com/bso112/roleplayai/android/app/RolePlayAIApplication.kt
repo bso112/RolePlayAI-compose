@@ -40,7 +40,7 @@ class RolePlayAIApplication : Application(), ImageLoaderFactory {
         viewModel { HomeViewModel(get(), get(), get()) }
         viewModel { ChatHistoryViewModel(get()) }
         viewModel { (state: SavedStateHandle) -> ChatViewModel(get(), get(), get(), get(), state) }
-        viewModel { (state: SavedStateHandle) -> CreateProfileViewModel(get(), get(), state) }
+        viewModel { (state: SavedStateHandle) -> CreateProfileViewModel(get(), get(), state, get()) }
     }
 
     override fun onCreate() {

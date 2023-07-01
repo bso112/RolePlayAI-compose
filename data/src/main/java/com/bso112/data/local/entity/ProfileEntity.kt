@@ -10,11 +10,24 @@ data class ProfileEntity(
     val id: String,
     val name: String,
     val thumbnail: String,
-    val description: String
+    val description: String,
+    val firstMessage: String,
 )
 
 fun ProfileEntity.toDomain() =
-    Profile(id = id, name = name, thumbnail = thumbnail, description = description)
+    Profile(
+        id = id,
+        name = name,
+        thumbnail = thumbnail,
+        description = description,
+        firstMessage = firstMessage
+    )
 
 fun Profile.toEntity() =
-    ProfileEntity(id = id, name = name, thumbnail = thumbnail, description = description)
+    ProfileEntity(
+        id = id,
+        name = name,
+        thumbnail = thumbnail,
+        description = description,
+        firstMessage = firstMessage
+    )

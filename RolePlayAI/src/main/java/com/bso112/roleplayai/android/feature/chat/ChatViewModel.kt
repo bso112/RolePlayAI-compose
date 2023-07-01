@@ -10,16 +10,19 @@ import com.bso112.domain.Profile
 import com.bso112.domain.ProfileRepository
 import com.bso112.domain.Role
 import com.bso112.domain.createChat
+import com.bso112.domain.toChat
 import com.bso112.domain.toChatLog
-import com.bso112.domain.toSystemChat
 import com.bso112.roleplayai.android.util.DispatcherProvider
 import com.bso112.roleplayai.android.util.Empty
 import com.bso112.roleplayai.android.util.randomID
 import com.bso112.roleplayai.android.util.stateIn
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -39,7 +42,13 @@ class ChatViewModel(
 
     private val logId: String = (argument.chatLogId ?: randomID)
 
-    val chatList: StateFlow<List<Chat>> = stateIn(chatRepository.getAllChat(logId))
+    val chatList: StateFlow<List<Chat>> =
+        opponent.combine(chatRepository.getAllChat(logId)) { opponent, chatList ->
+            buildList {
+                add(opponent.createChat(opponent.firstMessage, logId, Role.Assistant))
+                addAll(chatList)
+            }
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     val userInput = MutableStateFlow("")
 
@@ -53,16 +62,27 @@ class ChatViewModel(
             chatRepository.saveChatLog(userChat.toChatLog(opponentId = opponent.value.id))
 
             val requestChatList: List<Chat> = buildList {
-                appPreference.mainPrompt.getValue().toSystemChat(
+                appPreference.mainPrompt.getValue().toChat(
                     userName = user.value.name,
-                    charName = opponent.value.name
+                    charName = opponent.value.name,
+                    role = Role.System
                 ).also(::add)
 
-                appPreference.characterPrompt.getValue().plus(opponent.value.description)
-                    .toSystemChat(
+                CHARACTER_PROMPT.plus(opponent.value.description)
+                    .toChat(
                         userName = user.value.name,
-                        charName = opponent.value.name
+                        charName = opponent.value.name,
+                        role = Role.System
                     ).also(::add)
+
+
+                USER_PROMPT.plus(user.value.description)
+                    .toChat(
+                        userName = user.value.name,
+                        charName = opponent.value.name,
+                        role = Role.User
+                    ).also(::add)
+
 
                 addAll(chatList.value)
             }
@@ -77,5 +97,11 @@ class ChatViewModel(
             chatRepository.saveChatLog(chat.toChatLog())
         }
         userInput.update { String.Empty }
+    }
+
+    companion object {
+        private const val USER_PROMPT = "my name is {{user}}. here is my role: "
+        private const val CHARACTER_PROMPT =
+            "your name is {{char}}. here is your role: "
     }
 }

@@ -47,6 +47,7 @@ import com.bso112.roleplayai.android.app.placeHolder
 import com.bso112.roleplayai.android.feature.chat.navigateChat
 import com.bso112.roleplayai.android.feature.profile.navigateCreateProfile
 import com.bso112.roleplayai.android.util.DefaultPreview
+import com.bso112.roleplayai.android.util.Empty
 import com.bso112.roleplayai.android.util.ifIs
 import com.bso112.roleplayai.android.util.randomID
 import org.koin.androidx.compose.koinViewModel
@@ -215,5 +216,5 @@ private fun HomeScreenPreview() {
 
 
 private val fakeProfileList = List(20) {
-    Profile(id = randomID, thumbnail = "", name = "Bot $it", description = "")
+    Profile(id = randomID, thumbnail = "", name = "Bot $it", description = "", firstMessage = String.Empty)
 }

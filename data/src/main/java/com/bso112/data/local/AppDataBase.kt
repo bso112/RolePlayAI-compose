@@ -1,6 +1,8 @@
 package com.bso112.data.local
 
+import android.content.ContentValues
 import android.content.Context
+import android.database.sqlite.SQLiteDatabase.CONFLICT_IGNORE
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -11,7 +13,6 @@ import com.bso112.data.local.dao.ProfileDao
 import com.bso112.data.local.entity.ChatEntity
 import com.bso112.data.local.entity.ChatLogEntity
 import com.bso112.data.local.entity.ProfileEntity
-import com.bso112.data.logD
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -32,14 +33,15 @@ fun createDataBase(applicationContext: Context, appPreference: AppPreference): A
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
             CoroutineScope(Dispatchers.IO).launch {
-                if (appPreference.userId.getValue() == null) {
-                    val userId = UUID.randomUUID().toString()
-                    val sql =
-                        "INSERT INTO ProfileEntity (id, name, thumbnail, description) VALUES ('${userId}', '유저', '', '')"
-                    db.execSQL(sql)
-                    logD(sql)
-                    appPreference.userId.setValue(userId)
-                }
+                val userId = appPreference.userId.getValue() ?: UUID.randomUUID().toString()
+                db.insert("ProfileEntity", CONFLICT_IGNORE, ContentValues().apply {
+                    put("id", userId)
+                    put("name", "유저")
+                    put("thumbnail", "")
+                    put("description", "")
+                    put("firstMessage", "")
+                })
+                appPreference.userId.setValue(userId)
             }
         }
     }).build()

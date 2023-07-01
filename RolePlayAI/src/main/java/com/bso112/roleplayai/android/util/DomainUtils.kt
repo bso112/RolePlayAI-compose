@@ -7,6 +7,7 @@ val fakeUser = Profile(
     id = UUID.randomUUID().toString(),
     thumbnail = "",
     name = "유저",
-    description = ""
+    description = "",
+    firstMessage = ""
 )
 

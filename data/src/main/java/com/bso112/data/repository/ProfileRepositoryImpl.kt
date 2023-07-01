@@ -1,5 +1,6 @@
 package com.bso112.data.repository
 
+import com.bso112.data.Empty
 import com.bso112.data.alsoSuspend
 import com.bso112.data.local.AppPreference
 import com.bso112.data.local.datasource.ProfileLocalDataSource
@@ -28,7 +29,7 @@ class ProfileRepositoryImpl(
 
    override suspend fun changeUser(name: String, description: String, thumbnail: String) {
         val userId = appPreference.userId.getValue() ?: error("User not found")
-        saveProfile(Profile(userId, name, thumbnail, description))
+        saveProfile(Profile(userId, name, thumbnail, description, String.Empty))
         _dataChangedEvent.emit(UserChanged)
     }
 
