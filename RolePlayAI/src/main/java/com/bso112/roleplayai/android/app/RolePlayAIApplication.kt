@@ -29,8 +29,8 @@ import org.koin.dsl.module
 class RolePlayAIApplication : Application(), ImageLoaderFactory {
 
     private val appModule = module {
-        single { createDataBase(this@RolePlayAIApplication) }
         single { AppPreference(this@RolePlayAIApplication) }
+        single { createDataBase(this@RolePlayAIApplication, get()) }
         single { ChatRemoteDataSource(appPreference = get()) }
         single { ChatLocalDataSource(get()) }
         single { ProfileLocalDataSource(get()) }

@@ -34,15 +34,6 @@ fun currentRoute(navController: NavController): String? {
     return navBackStackEntry?.destination?.route
 }
 
-fun ProfileRepository.getUser(): Flow<Profile> {
-    val defaultUser = Profile(
-        id = UUID.randomUUID().toString(),
-        thumbnail = "",
-        name = "유저",
-        description = ""
-    )
-    return getUser(defaultUser)
-}
 
 fun requireSdk(version: Int) = Build.VERSION.SDK_INT >= version
 

@@ -13,7 +13,6 @@ import com.bso112.domain.createChat
 import com.bso112.domain.toSystemChat
 import com.bso112.roleplayai.android.util.DispatcherProvider
 import com.bso112.roleplayai.android.util.Empty
-import com.bso112.roleplayai.android.util.getUser
 import com.bso112.roleplayai.android.util.randomID
 import com.bso112.roleplayai.android.util.stateIn
 import kotlinx.coroutines.CoroutineExceptionHandler
