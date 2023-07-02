@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.bso112.data.local.AppPreference
 import com.bso112.domain.Chat
 import com.bso112.domain.ChatRepository
+import com.bso112.domain.LanguageCode
 import com.bso112.domain.Profile
 import com.bso112.domain.ProfileRepository
 import com.bso112.domain.Role
@@ -132,6 +133,14 @@ class ChatViewModel(
             )
             chatRepository.saveChat(chat)
             chatRepository.saveChatLog(chat.toChatLog(opponentId = opponent.value.id))
+        }
+    }
+
+    fun translateMessage(message: String) {
+        viewModelScope.launch(coroutineContext) {
+            //TODO 언어 자동인식 못하나?
+            chatRepository.translateMessage(message, LanguageCode.EN, LanguageCode.KR)
+
         }
     }
 

@@ -8,17 +8,26 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
     <queries>
-        <intent>
-            <action android:name="android.intent.action.PROCESS_TEXT" />
-            <data android:mimeType="text/plain" />
-        </intent>
+        <!--파파고-->
+        <package android:name="com.naver.labs.translator" />
     </queries>
+
 
     <application
         android:name=".app.RolePlayAIApplication"
         android:allowBackup="false"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity
+            android:name=".app.TranslationActivity"
+            android:exported="false"
+            android:label="@string/translate">
+            <intent-filter>
+                <action android:name="android.intent.action.PROCESS_TEXT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".app.MainActivity"
             android:exported="true"

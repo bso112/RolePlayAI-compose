@@ -6,5 +6,6 @@
 
     <string name="error_genetic">에러가 발생했습니다. 다시 시도해 주세요.</string>
 
+    <string name="translate">번역하기</string>
     <string name="name_system">시스템</string>
 </resources>

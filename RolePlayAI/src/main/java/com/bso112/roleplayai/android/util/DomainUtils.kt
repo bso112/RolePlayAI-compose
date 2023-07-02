@@ -11,3 +11,5 @@ val fakeUser = Profile(
     firstMessage = ""
 )
 
+const val MENU_ITEM_ID_GOOGLE =  16908353
+const val PAPAGO_PACKAGE_NAME = "com.naver.labs.translator"

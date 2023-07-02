@@ -1,5 +1,9 @@
 package com.bso112.roleplayai.android.feature.chat
 
+import android.content.Intent
+import android.view.Menu
+import android.view.MenuItem
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -60,6 +64,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import coil.compose.AsyncImage
@@ -72,8 +77,11 @@ import com.bso112.roleplayai.android.app.RolePlayAppState
 import com.bso112.roleplayai.android.app.placeHolder
 import com.bso112.roleplayai.android.util.DefaultPreview
 import com.bso112.roleplayai.android.util.Empty
+import com.bso112.roleplayai.android.util.MENU_ITEM_ID_GOOGLE
+import com.bso112.roleplayai.android.util.PAPAGO_PACKAGE_NAME
 import com.bso112.roleplayai.android.util.fakeUser
 import com.bso112.roleplayai.android.util.randomID
+import com.bso112.roleplayai.android.util.sliceSafe
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -238,10 +246,71 @@ fun ChatItem(
         SelectionContainer {
             Column(modifier = Modifier.padding(start = 10.dp)) {
                 Text(chat.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                Text(chat.message)
+                ChatContentText(chat = chat)
             }
         }
     }
+}
+
+@Composable
+fun ChatContentText(chat: Chat) {
+    AndroidView(
+        factory = { context ->
+            AppCompatTextView(context).apply {
+                setTextIsSelectable(true)
+                customSelectionActionModeCallback =
+                    object : android.view.ActionMode.Callback {
+                        override fun onCreateActionMode(
+                            mode: android.view.ActionMode,
+                            menu: Menu
+                        ): Boolean {
+                            mode.menuInflater.inflate(R.menu.menu_chat_content, menu)
+                            return true
+                        }
+
+                        override fun onPrepareActionMode(
+                            mode: android.view.ActionMode?,
+                            menu: Menu
+                        ): Boolean {
+                            //구글 번역, 구글 캘린더 추가 옵션을 제거한다.
+                            menu.removeItem(MENU_ITEM_ID_GOOGLE)
+                            return false
+                        }
+
+                        override fun onActionItemClicked(
+                            mode: android.view.ActionMode?,
+                            item: MenuItem
+                        ): Boolean {
+                            return when (item.itemId) {
+                                R.id.menu_translate -> {
+                                    val selectedString: String =
+                                        text.sliceSafe(selectionStart..selectionEnd).toString()
+
+                                    Intent().apply {
+                                        action = Intent.ACTION_SEND
+                                        `package` = PAPAGO_PACKAGE_NAME
+                                        putExtra(Intent.EXTRA_TEXT, selectedString)
+                                        type = "text/plain"
+                                    }.also {
+                                        context.startActivity(it)
+                                    }
+                                    mode?.finish()
+                                    true
+                                }
+
+                                else -> false
+                            }
+                        }
+
+                        override fun onDestroyActionMode(mode: android.view.ActionMode?) {}
+                    }
+            }
+        },
+        update = {
+            // Updates view
+            it.text = chat.message
+        },
+    )
 }
 
 @Composable
