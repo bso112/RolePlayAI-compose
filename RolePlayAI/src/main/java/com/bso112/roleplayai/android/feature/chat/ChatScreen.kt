@@ -20,6 +20,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.DrawerState
@@ -95,7 +96,10 @@ fun ChatScreenRoute(
 
     LaunchedEffect(viewModel.errorMessagesRes) {
         viewModel.errorMessagesRes.flowWithLifecycle(lifecycle).collectLatest {
-            viewModel.addSystemChat(name = context.getString(R.string.name_system), message = context.getString(it))
+            viewModel.addSystemChat(
+                name = context.getString(R.string.name_system),
+                message = context.getString(it)
+            )
         }
     }
 
@@ -231,9 +235,11 @@ fun ChatItem(
             error = ColorPainter(MaterialTheme.colors.placeHolder),
             placeholder = ColorPainter(MaterialTheme.colors.placeHolder)
         )
-        Column(modifier = Modifier.padding(start = 10.dp)) {
-            Text(chat.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Text(chat.message)
+        SelectionContainer {
+            Column(modifier = Modifier.padding(start = 10.dp)) {
+                Text(chat.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(chat.message)
+            }
         }
     }
 }

@@ -21,11 +21,24 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
 
+        val localProperties = gradleLocalProperties(rootDir)
+
         buildConfigField(
             "String",
             "CHAT_GPT_API_KEY",
-            gradleLocalProperties(rootDir)
-                .getProperty("CHAT_GPT_API_KEY", "")
+            localProperties.getProperty("CHAT_GPT_API_KEY", "")
+        )
+
+        buildConfigField(
+            "String",
+            "GOOGLE_CLOUD_PROJECT_ID",
+            localProperties.getProperty("GOOGLE_CLOUD_PROJECT_ID", "")
+        )
+
+        buildConfigField(
+            "String",
+            "GOOGLE_TRANSLATION_API_KEY",
+            localProperties.getProperty("GOOGLE_TRANSLATION_API_KEY", "")
         )
 
         //이거 필요한가?

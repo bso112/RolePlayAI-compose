@@ -13,6 +13,7 @@ import com.bso112.domain.Chat
 import com.bso112.domain.ChatLog
 import com.bso112.domain.ChatRepository
 import com.bso112.domain.DataChangedEvent
+import com.bso112.domain.LanguageCode
 import com.bso112.domain.Profile
 import com.bso112.domain.autoRefreshFlow
 import kotlinx.coroutines.flow.Flow
@@ -37,6 +38,21 @@ class ChatRepositoryImpl(
     ) {
         chatLocalDataSource.saveChat(chat.toEntity())
         _dataChangedEvent.emit(ChatListChanged)
+    }
+
+    override fun translateMessage(
+        message: String,
+        sourceLanguageCode: LanguageCode,
+        targetLanguageCode: LanguageCode
+    ): Flow<String> = flow {
+        chatRemoteDataSource.translateMessage(
+            listOf(message),
+            sourceLanguageCode.value,
+            targetLanguageCode.value
+        ).alsoSuspend {
+            if(it.translatedText.isEmpty()) return@alsoSuspend
+            emit(it.translatedText.first())
+        }
     }
 
     override suspend fun saveChatLog(chatLog: ChatLog) {

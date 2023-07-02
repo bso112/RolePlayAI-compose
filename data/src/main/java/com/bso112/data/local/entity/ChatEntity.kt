@@ -14,7 +14,8 @@ data class ChatEntity(
     val name: String,
     val thumbnail: String,
     val message: String,
-    val role: String
+    val role: String,
+    val onlyForUi: Boolean
 )
 
 fun ChatEntity.toDomain() =
@@ -35,10 +36,11 @@ fun Chat.toEntity() = ChatEntity(
     name = name,
     thumbnail = thumbnail,
     message = message,
-    role = role.alias
+    role = role.alias,
+    onlyForUi = onlyForUi
 )
 
-fun ChatEntity.toChatLog(opponentId : String): ChatLogEntity {
+fun ChatEntity.toChatLog(opponentId: String): ChatLogEntity {
     return ChatLogEntity(
         id = logId,
         name = name,
