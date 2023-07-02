@@ -21,19 +21,22 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.DrawerState
 import androidx.compose.material.DrawerValue
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalDrawer
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -48,13 +51,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
 import coil.compose.AsyncImage
 import com.bso112.domain.Chat
 import com.bso112.domain.Profile
@@ -66,6 +72,7 @@ import com.bso112.roleplayai.android.util.DefaultPreview
 import com.bso112.roleplayai.android.util.Empty
 import com.bso112.roleplayai.android.util.fakeUser
 import com.bso112.roleplayai.android.util.randomID
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -80,10 +87,21 @@ fun ChatScreenRoute(
     val userChat by viewModel.userInput.collectAsStateWithLifecycle()
     val user by viewModel.user.collectAsStateWithLifecycle()
     val opponent by viewModel.opponent.collectAsStateWithLifecycle()
+    val isSendingChat by viewModel.isSendingChat.collectAsStateWithLifecycle()
+
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    val context = LocalContext.current
+
+    LaunchedEffect(viewModel.errorMessagesRes) {
+        viewModel.errorMessagesRes.flowWithLifecycle(lifecycle).collectLatest {
+            appState.snackBarHostState.showSnackbar(context.getString(it))
+        }
+    }
 
     ChatScreen(
         chatList = chatList,
         userChat = userChat,
+        isSendingChat = isSendingChat,
         user = user,
         opponent = opponent,
         onClickBackButton = {
@@ -103,6 +121,7 @@ fun ChatScreen(
     user: Profile,
     opponent: Profile,
     userChat: String,
+    isSendingChat: Boolean,
     onClickBackButton: () -> Unit = {},
     onUserTextChanged: (String) -> Unit = {},
     onUserSubmitChat: (String) -> Unit = {}
@@ -145,17 +164,47 @@ fun ChatScreen(
                         })
                 }
             }
-            TextField(
-                value = userChat,
-                onValueChange = onUserTextChanged,
-                modifier = Modifier
-                    .fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(onDone = {
-                    onUserSubmitChat(userChat)
-                    focusManager.clearFocus()
-                })
-            )
+            Row(
+                Modifier
+                    .background(Color.LightGray),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                OutlinedTextField(
+                    value = userChat,
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = Color.Transparent,
+                    ),
+                    onValueChange = onUserTextChanged,
+                    enabled = !isSendingChat,
+                    modifier = Modifier
+                        .padding(start = 15.dp, top = 10.dp, end = 10.dp, bottom = 10.dp)
+                        .weight(1f),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = {
+                        onUserSubmitChat(userChat)
+                        focusManager.clearFocus()
+                    })
+                )
+                if (isSendingChat) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .padding(end = 15.dp)
+                            .size(24.dp)
+                    )
+                } else {
+                    IconButton(
+                        modifier = Modifier
+                            .padding(end = 15.dp)
+                            .size(24.dp),
+                        onClick = {
+                            onUserSubmitChat(userChat)
+                            focusManager.clearFocus()
+                        }) {
+                        Icon(Icons.Filled.Send, contentDescription = "send")
+                    }
+                }
+            }
+
         }
     }
 }
@@ -265,7 +314,8 @@ private fun ChatScreenPreView() {
                 chatList = fakeChatData,
                 user = fakeUser,
                 opponent = fakeOpponent,
-                userChat = ""
+                userChat = "",
+                isSendingChat = false
             )
         }
     }

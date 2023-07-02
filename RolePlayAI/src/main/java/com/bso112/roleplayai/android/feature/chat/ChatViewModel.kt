@@ -12,14 +12,19 @@ import com.bso112.domain.Role
 import com.bso112.domain.createChat
 import com.bso112.domain.toChat
 import com.bso112.domain.toChatLog
+import com.bso112.roleplayai.android.R
 import com.bso112.roleplayai.android.util.DispatcherProvider
 import com.bso112.roleplayai.android.util.Empty
 import com.bso112.roleplayai.android.util.randomID
 import com.bso112.roleplayai.android.util.stateIn
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
@@ -53,7 +58,19 @@ class ChatViewModel(
     val userInput = MutableStateFlow("")
 
     private val coroutineContext =
-        dispatcherProvider.io + CoroutineExceptionHandler { _, throwable -> throwable.printStackTrace() }
+        dispatcherProvider.io + CoroutineExceptionHandler { _, throwable ->
+            viewModelScope.launch {
+                _errorMessagesRes.emit(R.string.error_genetic)
+            }
+            _isSendingChat.update { false }
+            throwable.printStackTrace()
+        }
+
+    private val _isSendingChat = MutableStateFlow(false)
+    val isSendingChat = _isSendingChat.asStateFlow()
+
+    private val _errorMessagesRes = MutableSharedFlow<Int>()
+    val errorMessagesRes = _errorMessagesRes.asSharedFlow()
 
     fun sendChat(message: String) {
         viewModelScope.launch(coroutineContext) {
@@ -87,11 +104,18 @@ class ChatViewModel(
                 addAll(chatList.value)
             }
 
+            _isSendingChat.update { true }
             val chat = chatRepository.sendChat(
                 speaker = checkNotNull(opponent.value),
                 messages = requestChatList,
                 logId = logId
-            ).first()
+            ).catch {
+                _errorMessagesRes.emit(R.string.error_send_chat)
+                it.printStackTrace()
+                _isSendingChat.update { false }
+            }.first()
+
+            _isSendingChat.update { false }
 
             chatRepository.saveChat(chat = chat)
             chatRepository.saveChatLog(chat.toChatLog())

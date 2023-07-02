@@ -3,6 +3,7 @@ package com.bso112.roleplayai.android.app
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
+import androidx.compose.material.SnackbarHost
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -27,6 +28,7 @@ fun RolePlayAIApp(
         Scaffold(
             modifier = Modifier
                 .fillMaxSize(),
+            snackbarHost = { SnackbarHost(hostState = appState.snackBarHostState) },
             bottomBar = {
                 val isBottomBarVisible = excludeBottomBarRoute.none { route ->
                     navBackStackEntry?.destination?.route.orEmpty().contains(route)
