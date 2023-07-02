@@ -1,7 +1,8 @@
 package com.bso112.domain
 
-import java.util.UUID
-
+/**
+ * @param onlyForUi: if True, this chat is only for UI. It will not be send to server.
+ */
 data class Chat(
     val id: String,
     val logId: String,
@@ -9,15 +10,9 @@ data class Chat(
     val thumbnail: String,
     val name: String,
     val message: String,
-    val role: Role
+    val role: Role,
+    val onlyForUi: Boolean = false
 )
 
-fun String.toChat(userName: String, charName: String, role : Role) = Chat(
-    id = UUID.randomUUID().toString(),
-    logId = UUID.randomUUID().toString(),
-    profileId = UUID.randomUUID().toString(),
-    thumbnail = "",
-    name = "",
-    message = this.replace("{{user}}", userName).replace("{{char}}", charName),
-    role = role
-)
+fun String.asPrompt(userName: String, charName: String) =
+    replace("{{user}}", userName).replace("{{char}}", charName)

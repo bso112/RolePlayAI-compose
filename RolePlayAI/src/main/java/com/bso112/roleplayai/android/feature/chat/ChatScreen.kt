@@ -65,6 +65,7 @@ import coil.compose.AsyncImage
 import com.bso112.domain.Chat
 import com.bso112.domain.Profile
 import com.bso112.domain.Role
+import com.bso112.roleplayai.android.R
 import com.bso112.roleplayai.android.app.RolePlayAITheme
 import com.bso112.roleplayai.android.app.RolePlayAppState
 import com.bso112.roleplayai.android.app.placeHolder
@@ -94,7 +95,7 @@ fun ChatScreenRoute(
 
     LaunchedEffect(viewModel.errorMessagesRes) {
         viewModel.errorMessagesRes.flowWithLifecycle(lifecycle).collectLatest {
-            appState.snackBarHostState.showSnackbar(context.getString(it))
+            viewModel.addSystemChat(name = context.getString(R.string.name_system), message = context.getString(it))
         }
     }
 

@@ -9,8 +9,8 @@ import com.bso112.domain.ChatRepository
 import com.bso112.domain.Profile
 import com.bso112.domain.ProfileRepository
 import com.bso112.domain.Role
+import com.bso112.domain.asPrompt
 import com.bso112.domain.createChat
-import com.bso112.domain.toChat
 import com.bso112.domain.toChatLog
 import com.bso112.roleplayai.android.R
 import com.bso112.roleplayai.android.util.DispatcherProvider
@@ -24,12 +24,12 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 
 class ChatViewModel(
@@ -79,29 +79,14 @@ class ChatViewModel(
             chatRepository.saveChatLog(userChat.toChatLog(opponentId = opponent.value.id))
 
             val requestChatList: List<Chat> = buildList {
-                appPreference.mainPrompt.getValue().toChat(
-                    userName = user.value.name,
-                    charName = opponent.value.name,
-                    role = Role.System
-                ).also(::add)
+                appPreference.mainPrompt.getValue().toPromptChat(role = Role.System).also(::add)
 
-                CHARACTER_PROMPT.plus(opponent.value.description)
-                    .toChat(
-                        userName = user.value.name,
-                        charName = opponent.value.name,
-                        role = Role.System
-                    ).also(::add)
+                CHARACTER_PROMPT.plus(opponent.value.description).toPromptChat(role = Role.System)
+                    .also(::add)
 
+                USER_PROMPT.plus(user.value.description).toPromptChat(role = Role.User).also(::add)
 
-                USER_PROMPT.plus(user.value.description)
-                    .toChat(
-                        userName = user.value.name,
-                        charName = opponent.value.name,
-                        role = Role.User
-                    ).also(::add)
-
-
-                addAll(chatList.value)
+                addAll(chatList.value.filterNot { it.onlyForUi })
             }
 
             _isSendingChat.update { true }
@@ -109,18 +94,45 @@ class ChatViewModel(
                 speaker = checkNotNull(opponent.value),
                 messages = requestChatList,
                 logId = logId
-            ).catch {
-                _errorMessagesRes.emit(R.string.error_send_chat)
-                it.printStackTrace()
-                _isSendingChat.update { false }
-            }.first()
+            ).first()
+
+            chatRepository.saveChat(chat)
+            chatRepository.saveChatLog(chat.toChatLog(opponentId = opponent.value.id))
 
             _isSendingChat.update { false }
 
-            chatRepository.saveChat(chat = chat)
-            chatRepository.saveChatLog(chat.toChatLog())
         }
         userInput.update { String.Empty }
+    }
+
+    private fun String.toPromptChat(role: Role) = Chat(
+        id = UUID.randomUUID().toString(),
+        logId = UUID.randomUUID().toString(),
+        profileId = UUID.randomUUID().toString(),
+        thumbnail = "",
+        name = "",
+        message = this.asPrompt(
+            userName = user.value.name,
+            charName = opponent.value.name,
+        ),
+        role = role
+    )
+
+    fun addSystemChat(name: String, message: String) {
+        viewModelScope.launch(coroutineContext) {
+            val chat = Chat(
+                id = UUID.randomUUID().toString(),
+                logId = logId,
+                profileId = UUID.randomUUID().toString(),
+                thumbnail = "",
+                name = name,
+                message = message,
+                role = Role.System,
+                onlyForUi = true
+            )
+            chatRepository.saveChat(chat)
+            chatRepository.saveChatLog(chat.toChatLog(opponentId = opponent.value.id))
+        }
     }
 
     companion object {
