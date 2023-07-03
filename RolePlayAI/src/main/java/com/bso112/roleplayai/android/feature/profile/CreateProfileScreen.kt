@@ -12,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
@@ -132,6 +133,7 @@ private fun CreateProfileScreen(
             }
         }
 
+    val themeColors = MaterialTheme.colors
 
     Column(
         modifier = Modifier
@@ -144,8 +146,9 @@ private fun CreateProfileScreen(
             Spacer(Modifier.weight(1f))
             TextButton(onClick = onClickSubmit) {
                 Text(
-                    stringResource(id = R.string.submit),
-                    fontSize = 16.sp
+                    text = stringResource(id = R.string.submit),
+                    fontSize = 16.sp,
+                    color = themeColors.onPrimary
                 )
             }
         }

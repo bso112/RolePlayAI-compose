@@ -1,5 +1,6 @@
 package com.bso112.roleplayai.android.util
 
+import android.content.Context
 import android.os.Build
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
@@ -35,4 +36,8 @@ fun currentRoute(navController: NavController): String? {
 fun requireSdk(version: Int) = Build.VERSION.SDK_INT >= version
 
 val randomID get() = UUID.randomUUID().toString()
+
+fun Float.dpToPx(context: Context): Float {
+    return (this * context.resources.displayMetrics.density)
+}
 

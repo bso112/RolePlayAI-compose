@@ -1,6 +1,5 @@
 package com.bso112.roleplayai.android.feature.chat
 
-import android.content.Intent
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.widget.AppCompatTextView
@@ -40,7 +39,6 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -55,6 +53,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -78,8 +77,8 @@ import com.bso112.roleplayai.android.app.placeHolder
 import com.bso112.roleplayai.android.util.DefaultPreview
 import com.bso112.roleplayai.android.util.Empty
 import com.bso112.roleplayai.android.util.MENU_ITEM_ID_GOOGLE
-import com.bso112.roleplayai.android.util.PAPAGO_PACKAGE_NAME
 import com.bso112.roleplayai.android.util.fakeUser
+import com.bso112.roleplayai.android.util.openPapagoMini
 import com.bso112.roleplayai.android.util.randomID
 import com.bso112.roleplayai.android.util.sliceSafe
 import kotlinx.coroutines.flow.collectLatest
@@ -160,9 +159,9 @@ fun ChatScreen(
                 }
                 Text(opponent.name, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.weight(1f))
-                IconButton(onClick = { coroutineScope.launch { drawerState.open() } }) {
-                    Icon(Icons.Filled.Menu, contentDescription = "go back")
-                }
+//                IconButton(onClick = { coroutineScope.launch { drawerState.open() } }) {
+//                    Icon(Icons.Filled.Menu, contentDescription = "menu")
+//                }
             }
             LazyColumn(state = listState, modifier = Modifier.weight(1f)) {
                 items(chatList) { chat ->
@@ -254,9 +253,12 @@ fun ChatItem(
 
 @Composable
 fun ChatContentText(chat: Chat) {
+    val theme = MaterialTheme.colors
     AndroidView(
         factory = { context ->
             AppCompatTextView(context).apply {
+                textSize = 16f
+                setTextColor(theme.onSurface.toArgb())
                 setTextIsSelectable(true)
                 customSelectionActionModeCallback =
                     object : android.view.ActionMode.Callback {
@@ -285,15 +287,7 @@ fun ChatContentText(chat: Chat) {
                                 R.id.menu_translate -> {
                                     val selectedString: String =
                                         text.sliceSafe(selectionStart..selectionEnd).toString()
-
-                                    Intent().apply {
-                                        action = Intent.ACTION_SEND
-                                        `package` = PAPAGO_PACKAGE_NAME
-                                        putExtra(Intent.EXTRA_TEXT, selectedString)
-                                        type = "text/plain"
-                                    }.also {
-                                        context.startActivity(it)
-                                    }
+                                    context.openPapagoMini(selectedString)
                                     mode?.finish()
                                     true
                                 }
@@ -390,7 +384,7 @@ private fun ChatScreenPreView() {
                 chatList = fakeChatData,
                 user = fakeUser,
                 opponent = fakeOpponent,
-                userChat = "",
+                userChat = "hello world",
                 isSendingChat = false
             )
         }
@@ -449,7 +443,7 @@ private val fakeChatData = buildList {
                 name = "상대",
                 thumbnail = "",
                 id = randomID,
-                message = "$it",
+                message = "lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
                 profileId = randomID,
                 logId = randomID,
                 role = Role.Assistant

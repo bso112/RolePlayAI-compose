@@ -1,7 +1,12 @@
 package com.bso112.roleplayai.android.util
 
+import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
@@ -57,4 +62,52 @@ suspend fun Uri.copyToFile(context: Context, fileName: String): Result<File> = k
     }
 
     newFile
+}
+
+fun Context.isAppInstalled(packageName: String): Boolean {
+    val packageManager = packageManager
+    return try {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            packageManager.getPackageInfo(
+                packageName,
+                PackageManager.PackageInfoFlags.of(0)
+            )
+        } else {
+            packageManager.getPackageInfo(packageName, 0)
+        }
+        true
+    } catch (e: PackageManager.NameNotFoundException) {
+        false
+    }
+}
+
+fun Context.getPackageInfo(packageName: String): PackageInfo? {
+    val packageManager = packageManager
+    return kotlin.runCatching {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            packageManager.getPackageInfo(
+                packageName,
+                PackageManager.PackageInfoFlags.of(PackageManager.GET_ACTIVITIES.toLong())
+            )
+        } else {
+            packageManager.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES)
+        }
+    }.getOrNull()
+}
+
+fun Context.openPapagoMini(message: String) {
+    if (this.isAppInstalled(PAPAGO_PACKAGE_NAME)) {
+        Intent().apply {
+            action = Intent.ACTION_SEND
+            `package` = PAPAGO_PACKAGE_NAME
+            component = ComponentName(
+                PAPAGO_PACKAGE_NAME,
+                PAPAGO_MINI_ACTIVITY_NAME
+            )
+            putExtra(Intent.EXTRA_TEXT, message)
+            type = "text/plain"
+        }.also {
+            startActivity(it)
+        }
+    }
 }
