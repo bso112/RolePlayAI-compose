@@ -39,6 +39,7 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -77,10 +78,14 @@ import com.bso112.roleplayai.android.app.placeHolder
 import com.bso112.roleplayai.android.util.DefaultPreview
 import com.bso112.roleplayai.android.util.Empty
 import com.bso112.roleplayai.android.util.MENU_ITEM_ID_GOOGLE
+import com.bso112.roleplayai.android.util.MENU_ITEM_ID_PAPAGO
+import com.bso112.roleplayai.android.util.PAPAGO_PACKAGE_NAME
 import com.bso112.roleplayai.android.util.fakeUser
-import com.bso112.roleplayai.android.util.openPapagoMini
+import com.bso112.roleplayai.android.util.isAppInstalled
 import com.bso112.roleplayai.android.util.randomID
 import com.bso112.roleplayai.android.util.sliceSafe
+import com.bso112.roleplayai.android.util.toast
+import com.bso112.roleplayai.android.util.tryOpenPapagoMini
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -124,7 +129,11 @@ fun ChatScreenRoute(
         },
         onUserSubmitChat = {
             viewModel.sendChat(it)
-        })
+        },
+        onClickTranslate = {
+            viewModel.translateChat(it)
+        }
+    )
 }
 
 @Composable
@@ -134,6 +143,7 @@ fun ChatScreen(
     opponent: Profile,
     userChat: String,
     isSendingChat: Boolean,
+    onClickTranslate: (Chat) -> Unit = {},
     onClickBackButton: () -> Unit = {},
     onUserTextChanged: (String) -> Unit = {},
     onUserSubmitChat: (String) -> Unit = {}
@@ -167,6 +177,7 @@ fun ChatScreen(
                 items(chatList) { chat ->
                     ChatItem(
                         chat = chat,
+                        onClickTranslate = onClickTranslate,
                         onClickThumbnail = {
                             coroutineScope.launch {
                                 val isUser = chat.profileId == user.id
@@ -224,7 +235,8 @@ fun ChatScreen(
 @Composable
 fun ChatItem(
     chat: Chat,
-    onClickThumbnail: () -> Unit
+    onClickTranslate: (Chat) -> Unit = {},
+    onClickThumbnail: () -> Unit = {}
 ) {
     Row(
         Modifier
@@ -244,7 +256,18 @@ fun ChatItem(
         )
         SelectionContainer {
             Column(modifier = Modifier.padding(start = 10.dp)) {
-                Text(chat.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(chat.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.weight(1f))
+                    IconButton(
+                        modifier = Modifier
+                            .padding(end = 15.dp)
+                            .size(20.dp),
+                        onClick = { onClickTranslate(chat) }) {
+                        Icon(Icons.Filled.Refresh, contentDescription = "translate")
+                    }
+
+                }
                 ChatContentText(chat = chat)
             }
         }
@@ -266,6 +289,14 @@ fun ChatContentText(chat: Chat) {
                             mode: android.view.ActionMode,
                             menu: Menu
                         ): Boolean {
+                            if (context.isAppInstalled(PAPAGO_PACKAGE_NAME)) {
+                                menu.add(
+                                    Menu.NONE,
+                                    MENU_ITEM_ID_PAPAGO,
+                                    Menu.NONE,
+                                    context.getString(R.string.menu_papago)
+                                )
+                            }
                             mode.menuInflater.inflate(R.menu.menu_chat_content, menu)
                             return true
                         }
@@ -283,11 +314,19 @@ fun ChatContentText(chat: Chat) {
                             mode: android.view.ActionMode?,
                             item: MenuItem
                         ): Boolean {
+                            val selectedString: String =
+                                text.sliceSafe(selectionStart..selectionEnd).toString()
                             return when (item.itemId) {
+                                MENU_ITEM_ID_PAPAGO -> {
+                                    if (!context.tryOpenPapagoMini(selectedString)) {
+                                        context.toast(context.getString(R.string.fail_open_app))
+                                    }
+                                    mode?.finish()
+                                    true
+                                }
+
                                 R.id.menu_translate -> {
-                                    val selectedString: String =
-                                        text.sliceSafe(selectionStart..selectionEnd).toString()
-                                    context.openPapagoMini(selectedString)
+
                                     mode?.finish()
                                     true
                                 }

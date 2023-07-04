@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.bso112.data.local.AppPreference
 import com.bso112.domain.Chat
 import com.bso112.domain.ChatRepository
-import com.bso112.domain.LanguageCode
 import com.bso112.domain.Profile
 import com.bso112.domain.ProfileRepository
 import com.bso112.domain.Role
@@ -136,11 +135,12 @@ class ChatViewModel(
         }
     }
 
-    fun translateMessage(message: String) {
+    fun translateChat(chat: Chat) {
         viewModelScope.launch(coroutineContext) {
-            //TODO 언어 자동인식 못하나?
-            chatRepository.translateMessage(message, LanguageCode.EN, LanguageCode.KR)
-
+            val translated =
+                chatRepository.translateWithGPT(chat.message).first()
+            val translatedChat = chat.copy(message = translated)
+            chatRepository.saveChat(translatedChat)
         }
     }
 

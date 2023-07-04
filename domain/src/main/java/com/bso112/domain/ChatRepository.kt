@@ -6,11 +6,15 @@ interface ChatRepository : DataChangeNotifier {
 
     suspend fun saveChat(chat: Chat)
 
-    fun translateMessage(
+    fun translateWithGoogle(
         message: String,
         sourceLanguageCode: LanguageCode,
         targetLanguageCode: LanguageCode,
     ): Flow<String>
+
+    fun translateWithGPT(
+        message : String
+    ) : Flow<String>
 
     suspend fun saveChatLog(chatLog: ChatLog)
     fun sendChat(speaker: Profile, messages: List<Chat>, logId: String): Flow<Chat>

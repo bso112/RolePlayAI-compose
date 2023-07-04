@@ -7,6 +7,7 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
@@ -95,19 +96,22 @@ fun Context.getPackageInfo(packageName: String): PackageInfo? {
     }.getOrNull()
 }
 
-fun Context.openPapagoMini(message: String) {
-    if (this.isAppInstalled(PAPAGO_PACKAGE_NAME)) {
-        Intent().apply {
-            action = Intent.ACTION_SEND
-            `package` = PAPAGO_PACKAGE_NAME
-            component = ComponentName(
-                PAPAGO_PACKAGE_NAME,
-                PAPAGO_MINI_ACTIVITY_NAME
-            )
-            putExtra(Intent.EXTRA_TEXT, message)
-            type = "text/plain"
-        }.also {
-            startActivity(it)
-        }
+fun Context.tryOpenPapagoMini(message: String): Boolean = kotlin.runCatching {
+    Intent().apply {
+        action = Intent.ACTION_SEND
+        `package` = PAPAGO_PACKAGE_NAME
+        component = ComponentName(
+            PAPAGO_PACKAGE_NAME,
+            PAPAGO_MINI_ACTIVITY_NAME
+        )
+        putExtra(Intent.EXTRA_TEXT, message)
+        type = "text/plain"
+    }.also {
+        startActivity(it)
     }
+    true
+}.getOrDefault(false)
+
+fun Context.toast(message: String) {
+    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 }

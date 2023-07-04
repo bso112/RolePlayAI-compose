@@ -8,4 +8,8 @@
 
     <string name="translate">번역하기</string>
     <string name="name_system">시스템</string>
+
+    <string name="menu_papago">파파고 번역</string>
+
+    <string name="fail_open_app">앱을 열 수 없습니다.</string>
 </resources>

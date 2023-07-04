@@ -15,7 +15,8 @@ data class ChatEntity(
     val thumbnail: String,
     val message: String,
     val role: String,
-    val onlyForUi: Boolean
+    val onlyForUi: Boolean,
+    val timeStamp : 
 )
 
 fun ChatEntity.toDomain() =

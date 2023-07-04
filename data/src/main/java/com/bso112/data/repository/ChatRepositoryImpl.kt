@@ -40,18 +40,25 @@ class ChatRepositoryImpl(
         _dataChangedEvent.emit(ChatListChanged)
     }
 
-    override fun translateMessage(
+    override fun translateWithGoogle(
         message: String,
         sourceLanguageCode: LanguageCode,
         targetLanguageCode: LanguageCode
     ): Flow<String> = flow {
-        chatRemoteDataSource.translateMessage(
+        chatRemoteDataSource.translateWithGoogle(
             listOf(message),
             sourceLanguageCode.value,
             targetLanguageCode.value
         ).alsoSuspend {
-            if(it.translatedText.isEmpty()) return@alsoSuspend
+            if (it.translatedText.isEmpty()) return@alsoSuspend
             emit(it.translatedText.first())
+        }
+    }
+
+    override fun translateWithGPT(message: String): Flow<String> = flow {
+        chatRemoteDataSource.translateWithGPT(message).alsoSuspend {
+            if (it.isNullOrEmpty()) return@alsoSuspend
+            emit(it)
         }
     }
 
