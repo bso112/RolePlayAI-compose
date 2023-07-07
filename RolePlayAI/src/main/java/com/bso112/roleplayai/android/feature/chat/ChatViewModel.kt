@@ -50,7 +50,9 @@ class ChatViewModel(
     val chatList: StateFlow<List<Chat>> =
         opponent.combine(chatRepository.getAllChat(logId)) { opponent, chatList ->
             buildList {
-                add(opponent.createChat(opponent.firstMessage, logId, Role.Assistant))
+                if (chatList.isEmpty()) {
+                    add(opponent.createChat(opponent.firstMessage, logId, Role.Assistant))
+                }
                 addAll(chatList)
             }
         }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
@@ -75,8 +77,7 @@ class ChatViewModel(
     fun sendChat(message: String) {
         viewModelScope.launch(coroutineContext) {
             val userChat = checkNotNull(user.value).createChat(message, logId, Role.User)
-            chatRepository.saveChat(userChat)
-            chatRepository.saveChatLog(userChat.toChatLog(opponentId = opponent.value.id))
+            chatRepository.saveChatList(chatList.value + userChat, opponent.value.id)
 
             val requestChatList: List<Chat> = buildList {
                 appPreference.mainPrompt.getValue().toPromptChat(role = Role.System).also(::add)
@@ -96,11 +97,9 @@ class ChatViewModel(
                 logId = logId
             ).first()
 
-            chatRepository.saveChat(chat)
-            chatRepository.saveChatLog(chat.toChatLog(opponentId = opponent.value.id))
+            chatRepository.saveChatList(chatList.value + chat, opponent.value.id)
 
             _isSendingChat.update { false }
-
         }
         userInput.update { String.Empty }
     }

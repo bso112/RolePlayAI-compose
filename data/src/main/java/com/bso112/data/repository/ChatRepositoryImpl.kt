@@ -16,6 +16,7 @@ import com.bso112.domain.DataChangedEvent
 import com.bso112.domain.LanguageCode
 import com.bso112.domain.Profile
 import com.bso112.domain.autoRefreshFlow
+import com.bso112.domain.toChatLog
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -36,7 +37,7 @@ class ChatRepositoryImpl(
     override suspend fun saveChat(
         chat: Chat
     ) {
-        chatLocalDataSource.saveChat(chat.toEntity())
+        chatLocalDataSource.saveChatList(listOf(chat.toEntity()))
         _dataChangedEvent.emit(ChatListChanged)
     }
 
@@ -64,6 +65,14 @@ class ChatRepositoryImpl(
 
     override suspend fun saveChatLog(chatLog: ChatLog) {
         chatLocalDataSource.saveChatLog(chatLog.toEntity())
+        _dataChangedEvent.emit(ChatLogChanged)
+    }
+
+    override suspend fun saveChatList(chatList: List<Chat>, opponentId : String) {
+        if (chatList.isEmpty()) return
+        chatLocalDataSource.saveChatList(chatList.map(Chat::toEntity))
+        chatLocalDataSource.saveChatLog(chatList.last().toChatLog(opponentId).toEntity())
+        _dataChangedEvent.emit(ChatListChanged)
         _dataChangedEvent.emit(ChatLogChanged)
     }
 

@@ -17,9 +17,9 @@ class ChatLocalDataSource(
         }
     }
 
-    suspend fun saveChat(chat: ChatEntity) {
+    suspend fun saveChatList(chat: List<ChatEntity>) {
         db.withTransaction {
-            chatDao.insertAll(listOf(chat))
+            chatDao.insertAll(chat)
         }
     }
 
