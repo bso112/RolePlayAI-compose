@@ -34,12 +34,6 @@ class ChatRepositoryImpl(
     object ChatListChanged : DataChangedEvent<Chat>
     object ChatLogChanged : DataChangedEvent<ChatLog>
 
-    override suspend fun saveChat(
-        chat: Chat
-    ) {
-        chatLocalDataSource.saveChatList(listOf(chat.toEntity()))
-        _dataChangedEvent.emit(ChatListChanged)
-    }
 
     override fun translateWithGoogle(
         message: String,
@@ -63,10 +57,6 @@ class ChatRepositoryImpl(
         }
     }
 
-    override suspend fun saveChatLog(chatLog: ChatLog) {
-        chatLocalDataSource.saveChatLog(chatLog.toEntity())
-        _dataChangedEvent.emit(ChatLogChanged)
-    }
 
     override suspend fun saveChatList(chatList: List<Chat>, opponentId : String) {
         if (chatList.isEmpty()) return

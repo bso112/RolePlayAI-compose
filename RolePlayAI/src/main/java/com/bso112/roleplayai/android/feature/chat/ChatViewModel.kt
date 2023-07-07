@@ -11,11 +11,11 @@ import com.bso112.domain.ProfileRepository
 import com.bso112.domain.Role
 import com.bso112.domain.asPrompt
 import com.bso112.domain.createChat
-import com.bso112.domain.toChatLog
 import com.bso112.roleplayai.android.R
 import com.bso112.roleplayai.android.util.DispatcherProvider
 import com.bso112.roleplayai.android.util.Empty
 import com.bso112.roleplayai.android.util.randomID
+import com.bso112.roleplayai.android.util.replace
 import com.bso112.roleplayai.android.util.stateIn
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -131,8 +131,7 @@ class ChatViewModel(
                 onlyForUi = true,
                 createdAt = System.currentTimeMillis(),
             )
-            chatRepository.saveChat(chat)
-            chatRepository.saveChatLog(chat.toChatLog(opponentId = opponent.value.id))
+            chatRepository.saveChatList(chatList.value + chat, opponent.value.id)
         }
     }
 
@@ -141,7 +140,10 @@ class ChatViewModel(
             val translated =
                 chatRepository.translateWithGPT(chat.message).first()
             val translatedChat = chat.copy(message = translated)
-            chatRepository.saveChat(translatedChat)
+            chatRepository.saveChatList(
+                chatList.value.replace(chat, translatedChat),
+                opponent.value.id
+            )
         }
     }
 

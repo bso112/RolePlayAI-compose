@@ -4,8 +4,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository : DataChangeNotifier {
 
-    suspend fun saveChat(chat: Chat)
-
     fun translateWithGoogle(
         message: String,
         sourceLanguageCode: LanguageCode,
@@ -16,7 +14,6 @@ interface ChatRepository : DataChangeNotifier {
         message : String
     ) : Flow<String>
 
-    suspend fun saveChatLog(chatLog: ChatLog)
 
     suspend fun saveChatList(chatList: List<Chat>,  opponentId : String)
     fun sendChat(speaker: Profile, messages: List<Chat>, logId: String): Flow<Chat>
