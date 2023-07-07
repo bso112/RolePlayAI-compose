@@ -61,14 +61,21 @@ class CreateProfileViewModel(
 
         logD("thumbnailUri $thumbnailUri")
 
-        val profile = Profile(
+        val newProfile = profile?.copy(
+            id = profileId,
+            thumbnail = thumbnailUri,
+            name = name.value,
+            description = description.value,
+            firstMessage = firstMessage.value
+        ) ?: Profile(
             id = profileId,
             thumbnail = thumbnailUri,
             name = name.value,
             description = description.value,
             firstMessage = firstMessage.value
         )
-        profileRepository.saveProfile(profile)
+
+        profileRepository.saveProfile(newProfile)
     }.onFailure { t ->
         viewModelScope.launch {
             _error.emit(t)

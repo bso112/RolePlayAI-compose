@@ -485,7 +485,8 @@ private val fakeChatData = buildList {
                 message = "lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
                 profileId = randomID,
                 logId = randomID,
-                role = Role.Assistant
+                role = Role.Assistant,
+                createdAt = System.currentTimeMillis()
             )
         )
     }

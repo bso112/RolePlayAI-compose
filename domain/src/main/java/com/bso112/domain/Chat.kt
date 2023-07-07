@@ -13,6 +13,7 @@ data class Chat(
     val name: String,
     val message: String,
     val role: Role,
+    val createdAt: Long,
     val onlyForUi: Boolean = false
 )
 

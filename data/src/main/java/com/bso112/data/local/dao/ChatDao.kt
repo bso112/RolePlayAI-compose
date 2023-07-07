@@ -8,7 +8,7 @@ import com.bso112.data.local.entity.ChatEntity
 
 @Dao
 interface ChatDao {
-    @Query("select * from ChatEntity where logId = :logId")
+    @Query("select * from ChatEntity where logId = :logId ORDER BY createdAt ASC")
     suspend fun getAllChatById(logId : String): List<ChatEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -16,7 +16,7 @@ data class ChatEntity(
     val message: String,
     val role: String,
     val onlyForUi: Boolean,
-    val timeStamp : 
+    val createdAt: Long
 )
 
 fun ChatEntity.toDomain() =
@@ -27,7 +27,8 @@ fun ChatEntity.toDomain() =
         name = name,
         message = message,
         logId = logId,
-        role = Role.fromAlias(role)
+        role = Role.fromAlias(role),
+        createdAt = createdAt,
     )
 
 fun Chat.toEntity() = ChatEntity(
@@ -38,6 +39,7 @@ fun Chat.toEntity() = ChatEntity(
     thumbnail = thumbnail,
     message = message,
     role = role.alias,
+    createdAt = createdAt,
     onlyForUi = onlyForUi
 )
 

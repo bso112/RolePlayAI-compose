@@ -115,7 +115,8 @@ class ChatViewModel(
             userName = user.value.name,
             charName = opponent.value.name,
         ),
-        role = role
+        role = role,
+        createdAt = System.currentTimeMillis(),
     )
 
     fun addSystemChat(name: String, message: String) {
@@ -128,7 +129,8 @@ class ChatViewModel(
                 name = name,
                 message = message,
                 role = Role.System,
-                onlyForUi = true
+                onlyForUi = true,
+                createdAt = System.currentTimeMillis(),
             )
             chatRepository.saveChat(chat)
             chatRepository.saveChatLog(chat.toChatLog(opponentId = opponent.value.id))

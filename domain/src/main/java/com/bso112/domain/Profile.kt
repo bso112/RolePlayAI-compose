@@ -35,5 +35,6 @@ fun Profile.createChat(message: String, logId: String, role : Role) = Chat(
     thumbnail = thumbnail,
     name = name,
     message = message,
-    role = role
+    role = role,
+    createdAt = System.currentTimeMillis()
 )
