@@ -1,7 +1,5 @@
 package com.bso112.data.repository
 
-import com.bso112.data.Empty
-import com.bso112.data.alsoSuspend
 import com.bso112.data.local.AppPreference
 import com.bso112.data.local.datasource.ProfileLocalDataSource
 import com.bso112.data.local.entity.ProfileEntity
@@ -11,6 +9,8 @@ import com.bso112.domain.DataChangedEvent
 import com.bso112.domain.Profile
 import com.bso112.domain.ProfileRepository
 import com.bso112.domain.autoRefreshFlow
+import com.bso112.util.Empty
+import com.bso112.util.alsoSuspend
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow

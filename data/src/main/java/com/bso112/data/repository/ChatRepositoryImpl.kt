@@ -1,6 +1,5 @@
 package com.bso112.data.repository
 
-import com.bso112.data.alsoSuspend
 import com.bso112.data.local.datasource.ChatLocalDataSource
 import com.bso112.data.local.entity.ChatEntity
 import com.bso112.data.local.entity.ChatLogEntity
@@ -17,6 +16,7 @@ import com.bso112.domain.LanguageCode
 import com.bso112.domain.Profile
 import com.bso112.domain.autoRefreshFlow
 import com.bso112.domain.toChatLog
+import com.bso112.util.alsoSuspend
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow

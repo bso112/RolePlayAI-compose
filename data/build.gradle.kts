@@ -74,6 +74,7 @@ android {
 
 dependencies {
     implementation(project(":domain"))
+    implementation(project(":util"))
     implementation(libs.bundles.ktor)
     implementation(libs.bundles.room)
     annotationProcessor(libs.room.compiler)

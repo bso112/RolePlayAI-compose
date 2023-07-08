@@ -44,6 +44,8 @@ dependencies {
     implementation(project(":shared"))
     implementation(project(":data"))
     implementation(project(":domain"))
+    implementation(project(":util"))
+
 
     implementation(libs.activity.ktx)
     implementation(libs.bundles.koin)
