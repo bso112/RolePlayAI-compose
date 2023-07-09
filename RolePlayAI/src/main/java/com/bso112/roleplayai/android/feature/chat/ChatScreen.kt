@@ -84,10 +84,10 @@ import com.bso112.roleplayai.android.util.MessageParser
 import com.bso112.roleplayai.android.util.PAPAGO_PACKAGE_NAME
 import com.bso112.roleplayai.android.util.fakeUser
 import com.bso112.roleplayai.android.util.isAppInstalled
-import com.bso112.roleplayai.android.util.randomID
 import com.bso112.roleplayai.android.util.sliceSafe
 import com.bso112.roleplayai.android.util.toast
 import com.bso112.roleplayai.android.util.tryOpenPapagoMini
+import com.bso112.util.randomID
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -107,6 +107,7 @@ fun ChatScreenRoute(
 
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val context = LocalContext.current
+
 
     LaunchedEffect(viewModel.errorMessagesRes) {
         viewModel.errorMessagesRes.flowWithLifecycle(lifecycle).collectLatest {

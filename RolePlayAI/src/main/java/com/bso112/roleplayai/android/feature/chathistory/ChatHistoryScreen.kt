@@ -42,7 +42,7 @@ import com.bso112.roleplayai.android.app.placeHolder
 import com.bso112.roleplayai.android.feature.chat.navigateChat
 import com.bso112.roleplayai.android.util.DefaultPreview
 import com.bso112.roleplayai.android.util.ifIs
-import com.bso112.roleplayai.android.util.randomID
+import com.bso112.util.randomID
 import org.koin.androidx.compose.koinViewModel
 
 private enum class ChatHistoryEditOption(@StringRes val titleRes: Int) {

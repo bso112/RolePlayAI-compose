@@ -4,6 +4,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.navigation.NavType
+import com.bso112.util.requireSdk
 import com.google.gson.Gson
 
 inline fun <reified T : Parcelable> createNavType(isNullableAllowed: Boolean): NavType<T?> =

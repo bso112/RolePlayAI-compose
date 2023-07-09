@@ -1,5 +1,9 @@
 package com.bso112.util
 
+import android.content.Context
+import android.os.Build
+import java.util.UUID
+
 
 val String.Companion.Empty inline get() = ""
 
@@ -66,3 +70,14 @@ fun <T> List<T>.update(selector: (T) -> Boolean, updater: (T) -> T): List<T> {
         }
     }
 }
+
+
+
+fun requireSdk(version: Int) = Build.VERSION.SDK_INT >= version
+
+val randomID get() = UUID.randomUUID().toString()
+
+fun Float.dpToPx(context: Context): Float {
+    return (this * context.resources.displayMetrics.density)
+}
+

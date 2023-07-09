@@ -31,12 +31,3 @@ fun currentRoute(navController: NavController): String? {
     return navBackStackEntry?.destination?.route
 }
 
-
-fun requireSdk(version: Int) = Build.VERSION.SDK_INT >= version
-
-val randomID get() = UUID.randomUUID().toString()
-
-fun Float.dpToPx(context: Context): Float {
-    return (this * context.resources.displayMetrics.density)
-}
-

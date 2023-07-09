@@ -14,10 +14,10 @@ import com.bso112.domain.createChat
 import com.bso112.roleplayai.android.R
 import com.bso112.roleplayai.android.util.DispatcherProvider
 import com.bso112.roleplayai.android.util.Empty
-import com.bso112.roleplayai.android.util.randomID
 import com.bso112.roleplayai.android.util.replace
 import com.bso112.roleplayai.android.util.stateIn
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -25,13 +25,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
 
-
+@OptIn(ExperimentalCoroutinesApi::class)
 class ChatViewModel(
     private val chatRepository: ChatRepository,
     private val profileRepository: ProfileRepository,
@@ -44,18 +45,23 @@ class ChatViewModel(
     val user: StateFlow<Profile> = stateIn(profileRepository.getUser(), Profile.Empty)
     val opponent: StateFlow<Profile> =
         stateIn(profileRepository.getProfile(argument.profileId), Profile.Empty)
+    private val logId: StateFlow<String> = stateIn(
+        appPreference.lastChatLogId.asFlow(argument.profileId),
+        String.Empty
+    )
 
-    private val logId: String = (argument.chatLogId ?: randomID)
 
     val chatList: StateFlow<List<Chat>> =
-        opponent.combine(chatRepository.getAllChat(logId)) { opponent, chatList ->
-            buildList {
-                if (chatList.isEmpty()) {
-                    add(opponent.createChat(opponent.firstMessage, logId, Role.Assistant))
+        opponent.filter { it != Profile.Empty }
+            .combine(logId.filter { it.isNotEmpty() }) { opponent: Profile, logId: String ->
+                val chatList = chatRepository.getAllChat(logId).first()
+                buildList {
+                    if (chatList.isEmpty()) {
+                        add(opponent.createChat(opponent.firstMessage, logId, Role.Assistant))
+                    }
+                    addAll(chatList)
                 }
-                addAll(chatList)
-            }
-        }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+            }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     val userInput = MutableStateFlow("")
 
@@ -76,7 +82,8 @@ class ChatViewModel(
 
     fun sendChat(message: String) {
         viewModelScope.launch(coroutineContext) {
-            val userChat = checkNotNull(user.value).createChat(message, logId, Role.User)
+            val userChat =
+                checkNotNull(user.value).createChat(message, logId.value, Role.User)
             chatRepository.saveChatList(chatList.value + userChat, opponent.value.id)
 
             val requestChatList: List<Chat> = buildList {
@@ -94,7 +101,7 @@ class ChatViewModel(
             val chat = chatRepository.sendChat(
                 speaker = checkNotNull(opponent.value),
                 messages = requestChatList,
-                logId = logId
+                logId = logId.value
             ).first()
 
             chatRepository.saveChatList(chatList.value + chat, opponent.value.id)
@@ -122,7 +129,7 @@ class ChatViewModel(
         viewModelScope.launch(coroutineContext) {
             val chat = Chat(
                 id = UUID.randomUUID().toString(),
-                logId = logId,
+                logId = logId.value,
                 profileId = UUID.randomUUID().toString(),
                 thumbnail = "",
                 name = name,
@@ -144,6 +151,12 @@ class ChatViewModel(
                 chatList.value.replace(chat, translatedChat),
                 opponent.value.id
             )
+        }
+    }
+
+    fun changeLogId(logId: String) {
+        viewModelScope.launch {
+            appPreference.lastChatLogId.setValue(opponent.value.id, logId)
         }
     }
 

@@ -7,17 +7,18 @@ import androidx.core.text.toSpannable
 
 object MessageParser {
 
-    private val boldRegex = "\\*([^*]*)\\*".toRegex()
-    private val italicRegex = "\"([^\"]*)\"".toRegex()
+    private val starRegex = "\\*([^*]*)\\*".toRegex()
+    private val doubleQuotesRegex = "\"([^\"]*)\"".toRegex()
+    private const val maxConsecutiveLineBreaks = 2
+    private val maxConsecutiveLineBreaksRegex = "\n{${maxConsecutiveLineBreaks + 1},}".toRegex()
 
     fun fromMessage(message: String): CharSequence {
         return message
-            .replace(italicRegex) { "\n\n${it.value}\n\n" }
+            .replace(doubleQuotesRegex) { "\n\n${it.value}\n\n" }
             .limitConsecutiveLineBreaks(2)
             .toSpannable().apply {
-                val italicMatches = italicRegex.findAll(this)
+                val italicMatches = starRegex.findAll(this)
                 val italicRanges = italicMatches.map { it.range }.toList()
-                logD("italicRanges: $italicRanges")
                 italicRanges.forEach { range ->
                     setSpan(
                         StyleSpan(Typeface.ITALIC),
@@ -26,25 +27,11 @@ object MessageParser {
                         SpannedString.SPAN_INCLUSIVE_INCLUSIVE
                     )
                 }
-
-                val boldMatches = boldRegex.findAll(this)
-                val boldRanges = boldMatches.map { it.range }.toList()
-                logD("boldRanges: $boldRanges")
-                boldRanges.forEach { range ->
-                    setSpan(
-                        StyleSpan(Typeface.BOLD),
-                        range.first,
-                        range.last,
-                        SpannedString.SPAN_INCLUSIVE_INCLUSIVE
-                    )
-                }
-            }
-            .removeSurrounding("*")
+            }.removeSurrounding("*")
     }
 
     private fun String.limitConsecutiveLineBreaks(maxConsecutiveLineBreaks: Int): String {
-        val regexPattern = "\n{${maxConsecutiveLineBreaks + 1},}"
-        return replace(Regex(regexPattern), "\n".repeat(maxConsecutiveLineBreaks))
+        return replace(maxConsecutiveLineBreaksRegex, "\n".repeat(maxConsecutiveLineBreaks))
     }
 
 }

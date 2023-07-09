@@ -11,7 +11,7 @@ import com.bso112.domain.ProfileRepository
 import com.bso112.roleplayai.android.util.DispatcherProvider
 import com.bso112.roleplayai.android.util.copyToFile
 import com.bso112.roleplayai.android.util.logD
-import com.bso112.roleplayai.android.util.randomID
+import com.bso112.util.randomID
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

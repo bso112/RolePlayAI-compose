@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.bso112.data.dataStore
 import com.bso112.domain.Model
+import com.bso112.util.randomID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -18,6 +19,7 @@ class AppPreference(
     private val dataStore = context.dataStore
 
     val userId = accessor(stringPreferencesKey("userProfileIdKey"))
+    val lastChatLogId = lazyKeyAccessor(defaultValue = randomID)
     val mainPrompt = notNullAccessor(stringPreferencesKey("mainPromptKey"), DEFAULT_MAIN_PROMPT)
     val temperature = notNullAccessor(floatPreferencesKey("temperature"), 0.8f)
     val languageModel =
@@ -27,12 +29,19 @@ class AppPreference(
         return PreferenceAccessor(dataStore, key)
     }
 
+    private fun lazyKeyAccessor(defaultValue: String): LazyKeyAccessor {
+        return LazyKeyAccessor(dataStore, defaultValue)
+    }
+
+
     private fun <T> notNullAccessor(
         key: Preferences.Key<T>,
         defaultValue: T
     ): NotNullAccessor<T> {
         return NotNullAccessor(dataStore, key, defaultValue)
     }
+
+
 }
 
 
@@ -68,6 +77,27 @@ class NotNullAccessor<T>(
 
     suspend fun getValue(): T {
         return dataStore.data.map { it[key] }.first() ?: defaultValue
+    }
+
+    fun asFlow(): Flow<T?> {
+        return dataStore.data.map { it[key] }
+    }
+}
+
+class LazyKeyAccessor(
+    private val dataStore: DataStore<Preferences>,
+    private val defaultValue: String
+) {
+    suspend fun setValue(key: String, value: String) {
+        dataStore.edit { it[stringPreferencesKey(key)] = value }
+    }
+
+    suspend fun getValue(key: String): String {
+        return dataStore.data.map { it[stringPreferencesKey(key)] }.first() ?: defaultValue
+    }
+
+    fun asFlow(key: String): Flow<String> {
+        return dataStore.data.map { it[stringPreferencesKey(key)] ?: defaultValue }
     }
 }
 
