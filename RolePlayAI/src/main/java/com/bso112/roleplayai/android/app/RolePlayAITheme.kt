@@ -56,3 +56,6 @@ fun RolePlayAITheme(
 }
 
 val Colors.placeHolder get() = Color.LightGray
+val Colors.chatBackground get() = Color(0xFFB2C7DA)
+val Colors.chatBubbleOther get() = Color.White
+val Colors.chatBubbleUser get() = Color(0xFFFFEB33)

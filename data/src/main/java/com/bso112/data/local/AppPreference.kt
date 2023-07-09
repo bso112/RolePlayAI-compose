@@ -96,4 +96,3 @@ private const val DEFAULT_MAIN_PROMPT =
             "10. Review previous exchanges for context. Ensure you understand all information. Refer to these instructions when crafting responses. Develop and revisit themes. Explore different interaction aspects to cover all elements. Always maintain a craftsmanlike spirit.\n" +
             "\n" +
             "read these guidelines three times, create an unforgettable roleplay experience that showcases your unique talents and transports {{user}} into the captivating world you've crafted."
-

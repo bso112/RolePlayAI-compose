@@ -31,7 +31,7 @@ class ChatRepositoryImpl(
     override val dataChangedEvent: SharedFlow<DataChangedEvent<*>> =
         _dataChangedEvent.asSharedFlow()
 
-    object ChatListChanged : DataChangedEvent<Chat>
+    object ChatListChanged : DataChangedEvent<List<Chat>>
     object ChatLogChanged : DataChangedEvent<ChatLog>
 
 

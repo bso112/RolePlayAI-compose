@@ -1,6 +1,7 @@
 package com.bso112.roleplayai.android.util
 
 
+val Char.Companion.Empty inline get() = ' '
 val String.Companion.Empty inline get() = ""
 
 fun <T> Collection<T>.filterIf(condition: Boolean, predicate: (T) -> Boolean): List<T> {

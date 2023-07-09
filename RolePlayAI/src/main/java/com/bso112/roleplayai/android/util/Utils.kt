@@ -2,7 +2,6 @@ package com.bso112.roleplayai.android.util
 
 import android.content.Context
 import android.os.Build
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
@@ -15,10 +14,10 @@ import java.util.UUID
 
 
 @Composable
-fun DefaultPreview(content: @Composable () -> Unit) {
+fun DefaultPreview(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     RolePlayAITheme {
         Surface(
-            modifier = Modifier.fillMaxSize(),
+            modifier = modifier,
             color = MaterialTheme.colors.background,
             content = content
         )

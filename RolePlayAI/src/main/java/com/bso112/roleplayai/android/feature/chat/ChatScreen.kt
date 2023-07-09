@@ -6,18 +6,21 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,14 +35,11 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalDrawer
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -55,7 +55,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -74,11 +73,14 @@ import com.bso112.domain.Role
 import com.bso112.roleplayai.android.R
 import com.bso112.roleplayai.android.app.RolePlayAITheme
 import com.bso112.roleplayai.android.app.RolePlayAppState
-import com.bso112.roleplayai.android.app.placeHolder
+import com.bso112.roleplayai.android.app.chatBackground
+import com.bso112.roleplayai.android.app.chatBubbleOther
+import com.bso112.roleplayai.android.app.chatBubbleUser
 import com.bso112.roleplayai.android.util.DefaultPreview
 import com.bso112.roleplayai.android.util.Empty
 import com.bso112.roleplayai.android.util.MENU_ITEM_ID_GOOGLE
 import com.bso112.roleplayai.android.util.MENU_ITEM_ID_PAPAGO
+import com.bso112.roleplayai.android.util.MessageParser
 import com.bso112.roleplayai.android.util.PAPAGO_PACKAGE_NAME
 import com.bso112.roleplayai.android.util.fakeUser
 import com.bso112.roleplayai.android.util.isAppInstalled
@@ -162,19 +164,21 @@ fun ChatScreen(
         profile = selectedProfile,
         drawerState = drawerState,
     ) {
-        Column {
-            TopAppBar {
-                IconButton(onClick = onClickBackButton) {
-                    Icon(Icons.Filled.ArrowBack, contentDescription = "go back")
-                }
-                Text(opponent.name, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                Spacer(Modifier.weight(1f))
-//                IconButton(onClick = { coroutineScope.launch { drawerState.open() } }) {
-//                    Icon(Icons.Filled.Menu, contentDescription = "menu")
+        Box {
+//            TopAppBar {
+//                IconButton(onClick = onClickBackButton) {
+//                    Icon(Icons.Filled.ArrowBack, contentDescription = "go back")
 //                }
-            }
-            LazyColumn(state = listState, modifier = Modifier.weight(1f)) {
-                items(chatList) { chat ->
+//                Text(opponent.name, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+//                Spacer(Modifier.weight(1f))
+//            }
+            LazyColumn(
+                state = listState,
+                modifier = Modifier
+                    .background(MaterialTheme.colors.chatBackground)
+                    .fillMaxSize()
+            ) {
+                itemsIndexed(chatList) { index, chat ->
                     ChatItem(
                         chat = chat,
                         onClickTranslate = onClickTranslate,
@@ -185,40 +189,53 @@ fun ChatScreen(
                                 drawerState.open()
                             }
                         })
+
+                    if (index != chatList.lastIndex) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                    } else {
+                        Spacer(modifier = Modifier.height(60.dp))
+                    }
                 }
             }
             Row(
                 Modifier
-                    .background(Color.LightGray),
+                    .height(52.dp)
+                    .align(Alignment.BottomCenter),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                OutlinedTextField(
+                TextField(
                     value = userChat,
                     colors = TextFieldDefaults.textFieldColors(
-                        backgroundColor = Color.Transparent,
+                        backgroundColor = Color.White,
+                        disabledTextColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        disabledIndicatorColor = Color.Transparent
                     ),
                     onValueChange = onUserTextChanged,
                     enabled = !isSendingChat,
                     modifier = Modifier
-                        .padding(start = 15.dp, top = 10.dp, end = 10.dp, bottom = 10.dp)
                         .weight(1f),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = {
                         onUserSubmitChat(userChat)
                         focusManager.clearFocus()
-                    })
+                    }),
+                    singleLine = true
                 )
                 if (isSendingChat) {
                     CircularProgressIndicator(
                         modifier = Modifier
-                            .padding(end = 15.dp)
-                            .size(24.dp)
+                            .aspectRatio(1f)
+                            .fillMaxSize()
+                            .padding(15.dp),
                     )
                 } else {
                     IconButton(
                         modifier = Modifier
-                            .padding(end = 15.dp)
-                            .size(24.dp),
+                            .background(MaterialTheme.colors.primary)
+                            .aspectRatio(1f)
+                            .fillMaxSize(),
                         onClick = {
                             onUserSubmitChat(userChat)
                             focusManager.clearFocus()
@@ -227,10 +244,10 @@ fun ChatScreen(
                     }
                 }
             }
-
         }
     }
 }
+
 
 @Composable
 fun ChatItem(
@@ -238,38 +255,35 @@ fun ChatItem(
     onClickTranslate: (Chat) -> Unit = {},
     onClickThumbnail: () -> Unit = {}
 ) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(15.dp)
-    ) {
-        AsyncImage(
-            modifier = Modifier
-                .size(50.dp)
-                .clip(RoundedCornerShape(15.dp))
-                .clickable { onClickThumbnail() },
-            model = chat.thumbnail,
-            contentScale = ContentScale.Crop,
-            contentDescription = null,
-            error = ColorPainter(MaterialTheme.colors.placeHolder),
-            placeholder = ColorPainter(MaterialTheme.colors.placeHolder)
-        )
-        SelectionContainer {
-            Column(modifier = Modifier.padding(start = 10.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(chat.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                    Spacer(Modifier.weight(1f))
-                    IconButton(
-                        modifier = Modifier
-                            .padding(end = 15.dp)
-                            .size(20.dp),
-                        onClick = { onClickTranslate(chat) }) {
-                        Icon(Icons.Filled.Refresh, contentDescription = "translate")
-                    }
+    val isNotUserChat = chat.role == Role.Assistant || chat.role == Role.System
+    val alignment = if (isNotUserChat) {
+        Alignment.CenterStart
+    } else {
+        Alignment.CenterEnd
+    }
 
-                }
-                ChatContentText(chat = chat)
-            }
+    val bubbleColor = if (isNotUserChat) {
+        MaterialTheme.colors.chatBubbleOther
+    } else {
+        MaterialTheme.colors.chatBubbleUser
+    }
+
+    val padding = if (isNotUserChat) {
+        PaddingValues(start = 5.dp)
+    } else {
+        PaddingValues(end = 5.dp)
+    }
+
+    Box(Modifier.fillMaxWidth()) {
+        SelectionContainer(
+            Modifier
+                .padding(padding)
+                .background(bubbleColor, RoundedCornerShape(15.dp))
+                .padding(vertical = 8.dp, horizontal = 13.dp)
+                .widthIn(max = 250.dp)
+                .align(alignment)
+        ) {
+            ChatContentText(chat = chat)
         }
     }
 }
@@ -280,7 +294,7 @@ fun ChatContentText(chat: Chat) {
     AndroidView(
         factory = { context ->
             AppCompatTextView(context).apply {
-                textSize = 16f
+                textSize = 15f
                 setTextColor(theme.onSurface.toArgb())
                 setTextIsSelectable(true)
                 customSelectionActionModeCallback =
@@ -326,7 +340,6 @@ fun ChatContentText(chat: Chat) {
                                 }
 
                                 R.id.menu_translate -> {
-
                                     mode?.finish()
                                     true
                                 }
@@ -341,7 +354,7 @@ fun ChatContentText(chat: Chat) {
         },
         update = {
             // Updates view
-            it.text = chat.message
+            it.text = MessageParser.fromMessage(chat.message)
         },
     )
 }
@@ -442,6 +455,18 @@ private fun DrawerPreView() {
     }
 }
 
+@Preview
+@Composable
+private fun ChatItemPreView() {
+    DefaultPreview {
+        ChatItem(
+            chat = fakeChatData[0],
+            onClickTranslate = {},
+            onClickThumbnail = {}
+        )
+    }
+}
+
 private val fakeOpponent = Profile(
     id = UUID.randomUUID().toString(),
     thumbnail = "",
@@ -476,7 +501,7 @@ private val fakeOpponent = Profile(
 )
 
 private val fakeChatData = buildList {
-    repeat(20) {
+    repeat(10) {
         add(
             Chat(
                 name = "상대",
@@ -486,6 +511,18 @@ private val fakeChatData = buildList {
                 profileId = randomID,
                 logId = randomID,
                 role = Role.Assistant,
+                createdAt = System.currentTimeMillis()
+            )
+        )
+        add(
+            Chat(
+                name = "유저",
+                thumbnail = "",
+                id = randomID,
+                message = "lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                profileId = randomID,
+                logId = randomID,
+                role = Role.User,
                 createdAt = System.currentTimeMillis()
             )
         )
