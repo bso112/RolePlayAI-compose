@@ -92,7 +92,12 @@ class ChatRepositoryImpl(
 
     override suspend fun deleteChatLog(chatLog: ChatLog) {
         chatLocalDataSource.deleteChatLog(chatLog.toEntity())
-        _dataChangedEvent.emit(ChatRepositoryImpl.ChatLogChanged)
+        _dataChangedEvent.emit(ChatLogChanged)
+    }
+
+    override suspend fun deleteChatLogList(chatLogList: List<ChatLog>) {
+        chatLocalDataSource.deleteChatLogList(chatLogList.map(ChatLog::toEntity))
+        _dataChangedEvent.emit(ChatLogChanged)
     }
 
     override suspend fun deleteChatLogByProfileId(profileId: String) {

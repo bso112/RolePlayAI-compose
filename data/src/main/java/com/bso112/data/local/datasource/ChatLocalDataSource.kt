@@ -47,6 +47,12 @@ class ChatLocalDataSource(
         }
     }
 
+    suspend fun deleteChatLogList(chatLogList : List<ChatLogEntity>){
+        return db.withTransaction {
+            chatLogDao.deleteList(chatLogList)
+        }
+    }
+
     suspend fun deleteByProfileId(profileId : String){
         return db.withTransaction {
             chatLogDao.deleteByProfileId(profileId)

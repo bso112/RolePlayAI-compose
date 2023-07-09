@@ -19,6 +19,9 @@ interface ChatLogDao {
     @Delete
     suspend fun delete(chatLog: ChatLogEntity)
 
+    @Delete
+    suspend fun deleteList(chatLogList : List<ChatLogEntity>)
+
     @Query("delete from ChatLogEntity where opponentId = :profileId")
     suspend fun deleteByProfileId(profileId: String)
 

@@ -163,6 +163,12 @@ class ChatViewModel(
         appPreference.lastChatLogId.setValue(opponent.value.id, logId)
     }
 
+    fun deleteChatLogList(chatLogList: List<ChatLog>){
+        viewModelScope.launch(coroutineContext) {
+            chatRepository.deleteChatLogList(chatLogList)
+        }
+    }
+
     companion object {
         private const val USER_PROMPT = "my name is {{user}}. here is my role: "
         private const val CHARACTER_PROMPT =

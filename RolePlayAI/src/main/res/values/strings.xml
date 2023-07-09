@@ -7,7 +7,7 @@
     <string name="confirm">확인</string>
     <string name="cancel">취소</string>
 
-    <string name="msg_start_new_chat">새로운 채팅을 시작하시겠습니까?</string>
+    <string name="msg_start_new_chat">새로운 채팅을 시작하시겠습니까? 현재 채팅은 저장됩니다.</string>
     <string name="chat_log_list">채팅목록</string>
 
 

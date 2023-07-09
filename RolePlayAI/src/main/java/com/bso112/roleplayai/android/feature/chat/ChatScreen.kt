@@ -3,9 +3,12 @@ package com.bso112.roleplayai.android.feature.chat
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -42,6 +45,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalDrawer
+import androidx.compose.material.RadioButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -51,6 +55,8 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.rememberDrawerState
@@ -182,6 +188,9 @@ fun ChatScreenRoute(
         ChatLogListDialog(
             chatLogList = chatLogList,
             onDismiss = { isShowChatLogDialog = false },
+            onDeleteChatLog = {
+                viewModel.deleteChatLogList(it)
+            },
             onSelectChatLog = {
                 lifecycle.coroutineScope.launch {
                     viewModel.changeLogId(it.id)
@@ -562,12 +571,18 @@ private fun NewChatAlertDialog(
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ChatLogListDialog(
     chatLogList: List<ChatLog>,
     onSelectChatLog: (ChatLog) -> Unit,
+    onDeleteChatLog: (List<ChatLog>) -> Unit,
     onDismiss: () -> Unit
 ) {
+
+    var isSelectionMode by remember { mutableStateOf(false) }
+    var selectedChatLog by remember { mutableStateOf<List<ChatLog>>(emptyList()) }
+
     Dialog(
         onDismissRequest = onDismiss,
         content = {
@@ -581,22 +596,63 @@ private fun ChatLogListDialog(
                     .widthIn(min = 200.dp)
                     .padding(20.dp)
             ) {
-                Text(
-                    text = stringResource(id = R.string.chat_log_list),
-                )
-                Spacer(modifier = Modifier.size(10.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.height(35.dp)
+                ) {
+                    Text(text = stringResource(id = R.string.chat_log_list))
+                    Spacer(Modifier.weight(1f))
+                    if (isSelectionMode) {
+                        if (selectedChatLog.isNotEmpty()) {
+                            IconButton(onClick = {
+                                onDeleteChatLog(selectedChatLog)
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "delete selected chat log"
+                                )
+                            }
+                        }
+                        IconButton(onClick = {
+                            selectedChatLog = emptyList()
+                            isSelectionMode = false
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "cancel selection mode"
+                            )
+                        }
+                    }
+                }
                 LazyColumn(
                     modifier = Modifier
-                        .weight(1f)
+                        .heightIn(max = 500.dp)
                         .align(Alignment.CenterHorizontally)
                 ) {
                     items(chatLogList) { chatLog ->
-                        TextButton(
-                            onClick = { onSelectChatLog(chatLog) }
-                        ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            AnimatedVisibility(visible = isSelectionMode) {
+                                RadioButton(
+                                    modifier = Modifier.size(24.dp),
+                                    selected = selectedChatLog.contains(chatLog),
+                                    onClick = {
+                                        selectedChatLog = if (selectedChatLog.contains(chatLog)) {
+                                            selectedChatLog - chatLog
+                                        } else {
+                                            selectedChatLog + chatLog
+                                        }
+                                    })
+                            }
                             //TODO 시간 보여주기
                             Text(
-                                chatLog.previewMessage,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(10.dp)
+                                    .combinedClickable(
+                                        onClick = { if (!isSelectionMode) onSelectChatLog(chatLog) },
+                                        onLongClick = { isSelectionMode = true }
+                                    ),
+                                text = chatLog.previewMessage,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -677,7 +733,8 @@ private fun ChatLogListDialogPreView() {
         ChatLogListDialog(
             chatLogList = fakeChatLogList,
             onSelectChatLog = {},
-            onDismiss = {}
+            onDismiss = {},
+            onDeleteChatLog = {}
         )
     }
 }
