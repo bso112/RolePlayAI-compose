@@ -35,6 +35,12 @@ class ChatLocalDataSource(
         }
     }
 
+    suspend fun getChatLogByProfileId(profileId: String): List<ChatLogEntity> {
+        return db.withTransaction {
+            chatLogDao.getByProfileId(profileId)
+        }
+    }
+
     suspend fun deleteChatLog(chatLog: ChatLogEntity) {
         return db.withTransaction {
             chatLogDao.delete(chatLog)

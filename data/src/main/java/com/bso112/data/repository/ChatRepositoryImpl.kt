@@ -81,13 +81,18 @@ class ChatRepositoryImpl(
         chatLocalDataSource.getAllChat(logId).map(ChatEntity::toDomain)
     }
 
-    override fun getChatLog(): Flow<List<ChatLog>> = autoRefreshFlow {
+    override fun getAllChatLog(): Flow<List<ChatLog>> = autoRefreshFlow {
         chatLocalDataSource.getChatLog().map(ChatLogEntity::toDomain)
     }
 
+    override fun getChatLogByProfileId(profileId: String): Flow<List<ChatLog>>  = autoRefreshFlow {
+        chatLocalDataSource.getChatLogByProfileId(profileId).map(ChatLogEntity::toDomain)
+    }
+
+
     override suspend fun deleteChatLog(chatLog: ChatLog) {
         chatLocalDataSource.deleteChatLog(chatLog.toEntity())
-        _dataChangedEvent.emit(ChatLogChanged)
+        _dataChangedEvent.emit(ChatRepositoryImpl.ChatLogChanged)
     }
 
     override suspend fun deleteChatLogByProfileId(profileId: String) {

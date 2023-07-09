@@ -18,7 +18,8 @@ interface ChatRepository : DataChangeNotifier {
     suspend fun saveChatList(chatList: List<Chat>,  opponentId : String)
     fun sendChat(speaker: Profile, messages: List<Chat>, logId: String): Flow<Chat>
     fun getAllChat(logId: String): Flow<List<Chat>>
-    fun getChatLog(): Flow<List<ChatLog>>
+    fun getAllChatLog(): Flow<List<ChatLog>>
+    fun getChatLogByProfileId(profileId: String): Flow<List<ChatLog>>
     suspend fun deleteChatLog(chatLog: ChatLog)
     suspend fun deleteChatLogByProfileId(profileId: String)
 }

@@ -21,4 +21,7 @@ interface ChatLogDao {
 
     @Query("delete from ChatLogEntity where opponentId = :profileId")
     suspend fun deleteByProfileId(profileId: String)
+
+    @Query("select * from ChatLogEntity where opponentId = :profileId")
+    suspend fun getByProfileId(profileId: String): List<ChatLogEntity>
 }

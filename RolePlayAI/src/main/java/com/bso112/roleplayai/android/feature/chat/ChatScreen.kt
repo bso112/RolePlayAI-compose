@@ -16,30 +16,42 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.DrawerState
 import androidx.compose.material.DrawerValue
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalDrawer
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -55,19 +67,25 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.flowWithLifecycle
 import coil.compose.AsyncImage
 import com.bso112.domain.Chat
+import com.bso112.domain.ChatLog
 import com.bso112.domain.Profile
 import com.bso112.domain.Role
 import com.bso112.roleplayai.android.R
@@ -103,7 +121,14 @@ fun ChatScreenRoute(
     val userChat by viewModel.userInput.collectAsStateWithLifecycle()
     val user by viewModel.user.collectAsStateWithLifecycle()
     val opponent by viewModel.opponent.collectAsStateWithLifecycle()
+    val chatLogList by viewModel.chatLogList.collectAsStateWithLifecycle()
     val isSendingChat by viewModel.isSendingChat.collectAsStateWithLifecycle()
+    var isShowNewChatDialog by remember {
+        mutableStateOf(false)
+    }
+    var isShowChatLogDialog by remember {
+        mutableStateOf(false)
+    }
 
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val context = LocalContext.current
@@ -135,9 +160,38 @@ fun ChatScreenRoute(
         },
         onClickTranslate = {
             viewModel.translateChat(it)
+        },
+        onSelectNewChatMenu = {
+            isShowNewChatDialog = true
+        },
+        onSelectChatLogListMenu = {
+            isShowChatLogDialog = true
         }
     )
+
+    if (isShowNewChatDialog) {
+        NewChatAlertDialog(
+            onConfirm = {
+                lifecycle.coroutineScope.launch {
+                    viewModel.changeLogId(randomID)
+                }
+                isShowNewChatDialog = false
+            },
+            onDismiss = { isShowNewChatDialog = false })
+    } else if (isShowChatLogDialog) {
+        ChatLogListDialog(
+            chatLogList = chatLogList,
+            onDismiss = { isShowChatLogDialog = false },
+            onSelectChatLog = {
+                lifecycle.coroutineScope.launch {
+                    viewModel.changeLogId(it.id)
+                }
+                isShowChatLogDialog = false
+            }
+        )
+    }
 }
+
 
 @Composable
 fun ChatScreen(
@@ -149,59 +203,75 @@ fun ChatScreen(
     onClickTranslate: (Chat) -> Unit = {},
     onClickBackButton: () -> Unit = {},
     onUserTextChanged: (String) -> Unit = {},
-    onUserSubmitChat: (String) -> Unit = {}
+    onUserSubmitChat: (String) -> Unit = {},
+    onSelectNewChatMenu: () -> Unit = {},
+    onSelectChatLogListMenu: () -> Unit = {}
 ) {
     val focusManager = LocalFocusManager.current
     val listState = rememberLazyListState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     var selectedProfile: Profile by remember { mutableStateOf(Profile.Empty) }
     val coroutineScope = rememberCoroutineScope()
+    var isShowTopBarMenu by remember { mutableStateOf(false) }
 
     LaunchedEffect(chatList) {
         listState.animateScrollToItem(chatList.lastIndex.coerceAtLeast(0))
     }
 
-    ChatDrawer(
-        profile = selectedProfile,
-        drawerState = drawerState,
-    ) {
-        Box {
-//            TopAppBar {
-//                IconButton(onClick = onClickBackButton) {
-//                    Icon(Icons.Filled.ArrowBack, contentDescription = "go back")
-//                }
-//                Text(opponent.name, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-//                Spacer(Modifier.weight(1f))
-//            }
-            LazyColumn(
-                state = listState,
-                modifier = Modifier
-                    .background(MaterialTheme.colors.chatBackground)
-                    .fillMaxSize()
-            ) {
-                itemsIndexed(chatList) { index, chat ->
-                    ChatItem(
-                        chat = chat,
-                        onClickTranslate = onClickTranslate,
-                        onClickThumbnail = {
-                            coroutineScope.launch {
-                                val isUser = chat.profileId == user.id
-                                selectedProfile = if (isUser) user else opponent
-                                drawerState.open()
-                            }
-                        })
-
-                    if (index != chatList.lastIndex) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                    } else {
-                        Spacer(modifier = Modifier.height(60.dp))
+    Scaffold(
+        topBar = {
+            TopAppBar {
+                IconButton(onClick = onClickBackButton) {
+                    Icon(Icons.Filled.ArrowBack, contentDescription = "go back")
+                }
+                Spacer(modifier = Modifier.width(10.dp))
+                AsyncImage(
+                    model = opponent.thumbnail,
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clip(CircleShape),
+                    contentDescription = "thumbnail",
+                    contentScale = ContentScale.Crop,
+                    error = ColorPainter(Color.LightGray),
+                    placeholder = ColorPainter(Color.LightGray)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(opponent.name, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.weight(1f))
+                Box {
+                    IconButton(
+                        modifier = Modifier
+                            .size(42.dp)
+                            .padding(end = 10.dp),
+                        onClick = { isShowTopBarMenu = true }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.MoreVert,
+                            contentDescription = "more options"
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = isShowTopBarMenu,
+                        onDismissRequest = { isShowTopBarMenu = false }) {
+                        DropdownMenuItem(onClick = {
+                            onSelectChatLogListMenu()
+                            isShowTopBarMenu = false
+                        }) {
+                            Text(text = "채팅 목록")
+                        }
+                        DropdownMenuItem(onClick = {
+                            onSelectNewChatMenu()
+                            isShowTopBarMenu = false
+                        }) {
+                            Text(text = "새로운 채팅")
+                        }
                     }
                 }
             }
+        },
+        bottomBar = {
             Row(
-                Modifier
-                    .height(52.dp)
-                    .align(Alignment.BottomCenter),
+                Modifier.height(52.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TextField(
@@ -227,6 +297,7 @@ fun ChatScreen(
                 if (isSendingChat) {
                     CircularProgressIndicator(
                         modifier = Modifier
+                            .background(MaterialTheme.colors.surface)
                             .aspectRatio(1f)
                             .fillMaxSize()
                             .padding(15.dp),
@@ -241,8 +312,42 @@ fun ChatScreen(
                             onUserSubmitChat(userChat)
                             focusManager.clearFocus()
                         }) {
-                        Icon(Icons.Filled.Send, contentDescription = "send")
+                        Icon(
+                            Icons.Filled.Send,
+                            contentDescription = "send",
+                            tint = MaterialTheme.colors.onPrimary
+                        )
                     }
+                }
+            }
+        }
+    ) { paddingValue ->
+        LazyColumn(
+            state = listState,
+            modifier = Modifier
+                .background(MaterialTheme.colors.chatBackground)
+                .fillMaxSize()
+                .padding(paddingValue)
+        ) {
+            item {
+                Spacer(modifier = Modifier.height(20.dp))
+            }
+            itemsIndexed(chatList) { index, chat ->
+                ChatItem(
+                    chat = chat,
+                    onClickTranslate = onClickTranslate,
+                    onClickThumbnail = {
+                        coroutineScope.launch {
+                            val isUser = chat.profileId == user.id
+                            selectedProfile = if (isUser) user else opponent
+                            drawerState.open()
+                        }
+                    })
+
+                if (index != chatList.lastIndex) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                } else {
+                    Spacer(modifier = Modifier.height(15.dp))
                 }
             }
         }
@@ -425,6 +530,92 @@ fun ChatDrawer(
     )
 }
 
+@Composable
+private fun NewChatAlertDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        text = {
+            Text(
+                text = stringResource(id = R.string.msg_start_new_chat),
+                color = MaterialTheme.colors.onSurface
+            )
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(
+                    text = stringResource(id = R.string.cancel),
+                    color = MaterialTheme.colors.primary
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(
+                    text = stringResource(id = R.string.confirm),
+                    color = MaterialTheme.colors.primary
+                )
+            }
+        },
+    )
+}
+
+@Composable
+private fun ChatLogListDialog(
+    chatLogList: List<ChatLog>,
+    onSelectChatLog: (ChatLog) -> Unit,
+    onDismiss: () -> Unit
+) {
+    Dialog(
+        onDismissRequest = onDismiss,
+        content = {
+            Column(
+                modifier = Modifier
+                    .background(
+                        MaterialTheme.colors.background,
+                        RoundedCornerShape(10.dp)
+                    )
+                    .heightIn(min = 200.dp)
+                    .widthIn(min = 200.dp)
+                    .padding(20.dp)
+            ) {
+                Text(
+                    text = stringResource(id = R.string.chat_log_list),
+                )
+                Spacer(modifier = Modifier.size(10.dp))
+                LazyColumn(
+                    modifier = Modifier
+                        .weight(1f)
+                        .align(Alignment.CenterHorizontally)
+                ) {
+                    items(chatLogList) { chatLog ->
+                        TextButton(
+                            onClick = { onSelectChatLog(chatLog) }
+                        ) {
+                            //TODO 시간 보여주기
+                            Text(
+                                chatLog.previewMessage,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.size(10.dp))
+                TextButton(modifier = Modifier.align(Alignment.End), onClick = onDismiss) {
+                    Text(
+                        text = stringResource(id = R.string.cancel),
+                        color = MaterialTheme.colors.primary
+                    )
+                }
+            }
+        }
+    )
+}
+
+
 @Preview
 @Composable
 private fun ChatScreenPreView() {
@@ -467,6 +658,44 @@ private fun ChatItemPreView() {
         )
     }
 }
+
+@Preview
+@Composable
+private fun NewChatDialogPreView() {
+    DefaultPreview {
+        NewChatAlertDialog(
+            onConfirm = {},
+            onDismiss = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ChatLogListDialogPreView() {
+    DefaultPreview {
+        ChatLogListDialog(
+            chatLogList = fakeChatLogList,
+            onSelectChatLog = {},
+            onDismiss = {}
+        )
+    }
+}
+
+private val fakeChatLogList = buildList {
+    repeat(20) {
+        add(
+            ChatLog(
+                id = "$it",
+                opponentId = "1",
+                name = "Yuzu",
+                thumbnail = "",
+                previewMessage = "hello world"
+            )
+        )
+    }
+}
+
 
 private val fakeOpponent = Profile(
     id = UUID.randomUUID().toString(),

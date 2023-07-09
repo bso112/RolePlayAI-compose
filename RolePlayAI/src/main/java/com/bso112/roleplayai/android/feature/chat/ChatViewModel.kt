@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bso112.data.local.AppPreference
 import com.bso112.domain.Chat
+import com.bso112.domain.ChatLog
 import com.bso112.domain.ChatRepository
 import com.bso112.domain.Profile
 import com.bso112.domain.ProfileRepository
@@ -27,6 +28,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -49,19 +51,22 @@ class ChatViewModel(
         appPreference.lastChatLogId.asFlow(argument.profileId),
         String.Empty
     )
+    val chatLogList : StateFlow<List<ChatLog>> = stateIn(chatRepository.getChatLogByProfileId(argument.profileId))
 
+    private val opponentAsFlow = opponent.filter { it != Profile.Empty }
+    private val chatListAsFlow = logId.filter { it.isNotEmpty() }.flatMapLatest {
+        chatRepository.getAllChat(it)
+    }
 
     val chatList: StateFlow<List<Chat>> =
-        opponent.filter { it != Profile.Empty }
-            .combine(logId.filter { it.isNotEmpty() }) { opponent: Profile, logId: String ->
-                val chatList = chatRepository.getAllChat(logId).first()
-                buildList {
-                    if (chatList.isEmpty()) {
-                        add(opponent.createChat(opponent.firstMessage, logId, Role.Assistant))
-                    }
-                    addAll(chatList)
+        opponentAsFlow.combine(chatListAsFlow) { opponent, chatList ->
+            buildList {
+                if (chatList.isEmpty()) {
+                    add(opponent.createChat(opponent.firstMessage, logId.value, Role.Assistant))
                 }
-            }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+                addAll(chatList)
+            }
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     val userInput = MutableStateFlow("")
 
@@ -154,10 +159,8 @@ class ChatViewModel(
         }
     }
 
-    fun changeLogId(logId: String) {
-        viewModelScope.launch {
-            appPreference.lastChatLogId.setValue(opponent.value.id, logId)
-        }
+    suspend fun changeLogId(logId: String) {
+        appPreference.lastChatLogId.setValue(opponent.value.id, logId)
     }
 
     companion object {

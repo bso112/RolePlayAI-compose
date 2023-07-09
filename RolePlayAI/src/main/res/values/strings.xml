@@ -4,6 +4,13 @@
     <string name="chat">대화하기</string>
     <string name="submit">등록하기</string>
 
+    <string name="confirm">확인</string>
+    <string name="cancel">취소</string>
+
+    <string name="msg_start_new_chat">새로운 채팅을 시작하시겠습니까?</string>
+    <string name="chat_log_list">채팅목록</string>
+
+
     <string name="error_genetic">에러가 발생했습니다. 다시 시도해 주세요.</string>
 
     <string name="translate">번역하기</string>

@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 class ChatHistoryViewModel(
     private val chatRepository: ChatRepository
 ) : ViewModel() {
-    val chatList: StateFlow<List<ChatLog>> = stateIn(chatRepository.getChatLog())
+    val chatList: StateFlow<List<ChatLog>> = stateIn(chatRepository.getAllChatLog())
 
     fun deleteChatLog(chatLog: ChatLog) {
         viewModelScope.launch {
