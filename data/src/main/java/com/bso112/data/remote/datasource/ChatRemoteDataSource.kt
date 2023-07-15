@@ -77,8 +77,7 @@ class ChatRemoteDataSource(
             messages = messages,
             temperature = appPreference.temperature.getValue()
         )
-
-        return client.post(url) {
+        return  client.post(url) {
             contentType(ContentType.Application.Json)
             setBody(body)
             headers {

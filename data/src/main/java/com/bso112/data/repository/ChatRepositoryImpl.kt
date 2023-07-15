@@ -14,6 +14,7 @@ import com.bso112.domain.ChatRepository
 import com.bso112.domain.DataChangedEvent
 import com.bso112.domain.LanguageCode
 import com.bso112.domain.Profile
+import com.bso112.domain.Role
 import com.bso112.domain.autoRefreshFlow
 import com.bso112.domain.toChatLog
 import com.bso112.util.alsoSuspend
@@ -58,7 +59,7 @@ class ChatRepositoryImpl(
     }
 
 
-    override suspend fun saveChatList(chatList: List<Chat>, opponentId : String) {
+    override suspend fun saveChatList(chatList: List<Chat>, opponentId: String) {
         if (chatList.isEmpty()) return
         chatLocalDataSource.saveChatList(chatList.map(Chat::toEntity))
         chatLocalDataSource.saveChatLog(chatList.last().toChatLog(opponentId).toEntity())
@@ -71,7 +72,9 @@ class ChatRepositoryImpl(
         messages: List<Chat>,
         logId: String
     ): Flow<Chat> = flow {
-        chatRemoteDataSource.sendChat(messages.map(Chat::toApiModel))
+        val systemMessage = messages.filter { it.role == Role.System }
+        val requestMessages = systemMessage + messages.takeLast(5)
+        chatRemoteDataSource.sendChat(requestMessages.map(Chat::toApiModel))
             .toDomain(speaker, logId).alsoSuspend(::emit)
     }
 
@@ -85,7 +88,7 @@ class ChatRepositoryImpl(
         chatLocalDataSource.getChatLog().map(ChatLogEntity::toDomain)
     }
 
-    override fun getChatLogByProfileId(profileId: String): Flow<List<ChatLog>>  = autoRefreshFlow {
+    override fun getChatLogByProfileId(profileId: String): Flow<List<ChatLog>> = autoRefreshFlow {
         chatLocalDataSource.getChatLogByProfileId(profileId).map(ChatLogEntity::toDomain)
     }
 
