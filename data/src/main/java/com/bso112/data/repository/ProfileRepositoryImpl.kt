@@ -27,7 +27,7 @@ class ProfileRepositoryImpl(
     private val _dataChangedEvent = MutableSharedFlow<DataChangedEvent<*>>()
     override val dataChangedEvent = _dataChangedEvent.asSharedFlow()
 
-   override suspend fun changeUser(name: String, description: String, thumbnail: String) {
+    override suspend fun changeUser(name: String, description: String, thumbnail: String) {
         val userId = appPreference.userId.getValue() ?: error("User not found")
         saveProfile(Profile(userId, name, thumbnail, description, String.Empty))
         _dataChangedEvent.emit(UserChanged)
@@ -48,7 +48,8 @@ class ProfileRepositoryImpl(
     }
 
     override fun getProfiles(): Flow<List<Profile>> = autoRefreshFlow {
-        localDataSource.getAllProfile().map(ProfileEntity::toDomain)
+        val userId = appPreference.userId.getValue()
+        localDataSource.getAllProfile().filterNot { it.id == userId }.map(ProfileEntity::toDomain)
     }
 
     override suspend fun deleteProfile(profile: Profile) {

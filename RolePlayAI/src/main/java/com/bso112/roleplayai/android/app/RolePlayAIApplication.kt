@@ -15,7 +15,6 @@ import com.bso112.data.repository.ProfileRepositoryImpl
 import com.bso112.domain.ChatRepository
 import com.bso112.domain.ProfileRepository
 import com.bso112.roleplayai.android.feature.chat.ChatViewModel
-import com.bso112.roleplayai.android.feature.chathistory.ChatHistoryViewModel
 import com.bso112.roleplayai.android.feature.home.HomeViewModel
 import com.bso112.roleplayai.android.feature.profile.CreateProfileViewModel
 import com.bso112.roleplayai.android.util.DispatcherProvider
@@ -38,7 +37,6 @@ class RolePlayAIApplication : Application(), ImageLoaderFactory {
         single<ProfileRepository> { ProfileRepositoryImpl(get(), get()) }
         single<DispatcherProvider> { DispatcherProviderImpl }
         viewModel { HomeViewModel(get(), get(), get()) }
-        viewModel { ChatHistoryViewModel(get()) }
         viewModel { (state: SavedStateHandle) -> ChatViewModel(get(), get(), get(), get(), state) }
         viewModel { (state: SavedStateHandle) -> CreateProfileViewModel(get(), get(), state, get()) }
     }

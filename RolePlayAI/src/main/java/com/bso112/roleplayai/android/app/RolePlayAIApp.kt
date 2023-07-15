@@ -5,38 +5,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.currentBackStackEntryAsState
-import com.bso112.roleplayai.android.feature.chat.CHAT_ROUTE
 import com.bso112.roleplayai.android.feature.chat.chatScreen
-import com.bso112.roleplayai.android.feature.chathistory.chatHistory
 import com.bso112.roleplayai.android.feature.home.HOME_ROUTE
 import com.bso112.roleplayai.android.feature.home.homeScreen
-import com.bso112.roleplayai.android.feature.profile.CREATE_PROFILE_ROUTE
 import com.bso112.roleplayai.android.feature.profile.createProfile
 
 @Composable
 fun RolePlayAIApp(
     appState: RolePlayAppState,
 ) {
-    val navBackStackEntry by appState.navController.currentBackStackEntryAsState()
-    val excludeBottomBarRoute = listOf(CHAT_ROUTE, CREATE_PROFILE_ROUTE)
-
     RolePlayAITheme {
         Scaffold(
             modifier = Modifier
                 .fillMaxSize(),
             snackbarHost = { SnackbarHost(hostState = appState.snackBarHostState) },
-            bottomBar = {
-                val isBottomBarVisible = excludeBottomBarRoute.none { route ->
-                    navBackStackEntry?.destination?.route.orEmpty().contains(route)
-                }
-                if (isBottomBarVisible) {
-                    RolePlayBottomNavigation(appState.navController)
-                }
-            }
         ) { padding ->
             RolePlayAINavHost(Modifier.padding(padding), appState)
         }
@@ -55,7 +39,6 @@ fun RolePlayAINavHost(
         startDestination = HOME_ROUTE
     ) {
         homeScreen(appState)
-        chatHistory(appState)
         chatScreen(appState)
         createProfile(appState)
     }
