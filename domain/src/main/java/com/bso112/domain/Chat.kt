@@ -13,8 +13,7 @@ data class Chat(
     val name: String,
     val message: String,
     val role: Role,
-    val createdAt: Long,
-    val onlyForUi: Boolean = false
+    val createdAt: Long
 )
 
 fun String.asPrompt(userName: String, charName: String) =

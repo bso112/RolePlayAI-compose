@@ -99,7 +99,7 @@ class ChatViewModel(
 
                 USER_PROMPT.plus(user.value.description).toPromptChat(role = Role.User).also(::add)
 
-                addAll(chatList.value.filterNot { it.onlyForUi })
+                addAll(chatList.value)
             }
 
             _isSendingChat.update { true }
@@ -129,23 +129,6 @@ class ChatViewModel(
         role = role,
         createdAt = System.currentTimeMillis(),
     )
-
-    fun addSystemChat(name: String, message: String) {
-        viewModelScope.launch(coroutineContext) {
-            val chat = Chat(
-                id = UUID.randomUUID().toString(),
-                logId = logId.value,
-                profileId = UUID.randomUUID().toString(),
-                thumbnail = "",
-                name = name,
-                message = message,
-                role = Role.System,
-                onlyForUi = true,
-                createdAt = System.currentTimeMillis(),
-            )
-            chatRepository.saveChatList(chatList.value + chat, opponent.value.id)
-        }
-    }
 
     fun translateChat(chat: Chat) {
         viewModelScope.launch(coroutineContext) {

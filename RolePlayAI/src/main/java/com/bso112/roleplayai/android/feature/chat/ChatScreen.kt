@@ -142,10 +142,7 @@ fun ChatScreenRoute(
 
     LaunchedEffect(viewModel.errorMessagesRes) {
         viewModel.errorMessagesRes.flowWithLifecycle(lifecycle).collectLatest {
-            viewModel.addSystemChat(
-                name = context.getString(R.string.name_system),
-                message = context.getString(it)
-            )
+            context.toast(context.getString(it))
         }
     }
 

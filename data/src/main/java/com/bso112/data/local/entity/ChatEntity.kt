@@ -15,7 +15,6 @@ data class ChatEntity(
     val thumbnail: String,
     val message: String,
     val role: String,
-    val onlyForUi: Boolean,
     val createdAt: Long
 )
 
@@ -39,8 +38,7 @@ fun Chat.toEntity() = ChatEntity(
     thumbnail = thumbnail,
     message = message,
     role = role.alias,
-    createdAt = createdAt,
-    onlyForUi = onlyForUi
+    createdAt = createdAt
 )
 
 fun ChatEntity.toChatLog(opponentId: String): ChatLogEntity {
