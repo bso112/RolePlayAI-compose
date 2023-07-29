@@ -59,3 +59,7 @@ val Colors.placeHolder get() = Color.LightGray
 val Colors.chatBackground get() = Color(0xFFB2C7DA)
 val Colors.chatBubbleOther get() = Color.White
 val Colors.chatBubbleUser get() = Color(0xFFFFEB33)
+
+val Colors.darkGray get() = Color(0xFF5A5A5A)
+
+val Colors.gray get() = Color(0xFFECECEA)

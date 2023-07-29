@@ -2,9 +2,12 @@ package com.bso112.roleplayai.android.feature.home
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,7 +15,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.FloatingActionButton
@@ -34,16 +39,23 @@ import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.bso112.data.toDateString
+import com.bso112.domain.ChatLog
 import com.bso112.domain.Profile
 import com.bso112.roleplayai.android.R
 import com.bso112.roleplayai.android.app.RolePlayAppState
+import com.bso112.roleplayai.android.app.darkGray
+import com.bso112.roleplayai.android.app.gray
 import com.bso112.roleplayai.android.app.placeHolder
+import com.bso112.roleplayai.android.fakeChatLogList
 import com.bso112.roleplayai.android.feature.chat.navigateChat
 import com.bso112.roleplayai.android.feature.profile.navigateCreateProfile
 import com.bso112.roleplayai.android.util.DefaultPreview
@@ -68,8 +80,11 @@ fun HomeScreenRoute(
     viewModel: HomeViewModel = koinViewModel()
 ) {
     val profileList by viewModel.profileList.collectAsStateWithLifecycle()
+    val chatLogList by viewModel.chatLogList.collectAsStateWithLifecycle()
+
     HomeScreen(
         profileList = profileList,
+        chatLogList = chatLogList,
         navController = appState.navController,
         isUser = { it.id == appState.userId.value },
         onDeleteProfile = { profile ->
@@ -81,6 +96,7 @@ fun HomeScreenRoute(
 @Composable
 private fun HomeScreen(
     profileList: List<Profile>,
+    chatLogList: List<ChatLog>,
     isUser: (Profile) -> Boolean = { false },
     navController: NavController,
     onDeleteProfile: (Profile) -> Unit = {}
@@ -90,17 +106,59 @@ private fun HomeScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        LazyColumn {
-            items(profileList) { profile ->
-                ProfileItem(
-                    profile = profile,
-                    onProfileClick = {
-                        navController.navigateChat(profileId = profile.id)
-                    },
-                    onProfileLongClick = {
-                        profileActionDialogState = ProfileActionDialogState.Open(profile)
-                    }
+        Column(
+            modifier = Modifier
+                .background(MaterialTheme.colors.gray)
+        ) {
+            Text(
+                "Characters",
+                modifier = Modifier.padding(
+                    start = 15.dp,
+                    end = 15.dp,
+                    top = 20.dp,
+                    bottom = 15.dp
+                ),
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+            )
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(start = 15.dp)
+            ) {
+                items(profileList) { profile ->
+                    ProfileItem(
+                        profile = profile,
+                        onProfileClick = {
+                            navController.navigateChat(profileId = profile.id)
+                        },
+                        onProfileLongClick = {
+                            profileActionDialogState = ProfileActionDialogState.Open(profile)
+                        }
+                    )
+                    Spacer(modifier = Modifier.size(15.dp))
+                }
+            }
+            Spacer(modifier = Modifier.size(15.dp))
+            LazyColumn(
+                modifier = Modifier.background(
+                    MaterialTheme.colors.background,
+                    shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)
                 )
+            ) {
+                item {
+                    Spacer(modifier = Modifier.size(30.dp))
+                }
+                items(chatLogList) { chatLog ->
+                    ChatLogItem(
+                        chatLog = chatLog,
+                        onChatLogClick = {
+                            navController.navigateChat(profileId = chatLog.opponentId)
+                        },
+                        onChatLogLongClick = {
+
+                        }
+                    )
+                }
             }
         }
         FloatingActionButton(
@@ -141,6 +199,7 @@ private fun HomeScreen(
     }
 }
 
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ProfileItem(
@@ -148,31 +207,84 @@ private fun ProfileItem(
     onProfileClick: () -> Unit,
     onProfileLongClick: () -> Unit
 ) {
+    Column(
+        modifier = Modifier.combinedClickable(
+            onLongClick = { onProfileLongClick() },
+            onClick = { onProfileClick() },
+        ),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        AsyncImage(
+            modifier = Modifier
+                .size(60.dp)
+                .clip(CircleShape),
+            model = profile.thumbnail,
+            contentScale = ContentScale.Crop,
+            contentDescription = null,
+            error = ColorPainter(MaterialTheme.colors.placeHolder),
+            placeholder = ColorPainter(MaterialTheme.colors.placeHolder)
+        )
+        Text(
+            text = profile.name,
+            fontWeight = FontWeight.Bold,
+            fontSize = 14.sp,
+            modifier = Modifier.padding(top = 5.dp)
+        )
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun ChatLogItem(
+    chatLog: ChatLog,
+    onChatLogClick: () -> Unit,
+    onChatLogLongClick: () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
-                onLongClick = { onProfileLongClick() },
-                onClick = { onProfileClick() }
+                onLongClick = { onChatLogLongClick() },
+                onClick = { onChatLogClick() }
             )
     ) {
         Row(
             modifier = Modifier
-                .padding(10.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(horizontal = 20.dp, vertical = 20.dp),
         ) {
             AsyncImage(
                 modifier = Modifier
-                    .size(50.dp)
-                    .clip(RoundedCornerShape(15.dp)),
-                model = profile.thumbnail,
+                    .size(60.dp)
+                    .align(Alignment.CenterVertically)
+                    .clip(CircleShape),
+                model = chatLog.thumbnail,
                 contentScale = ContentScale.Crop,
                 contentDescription = null,
                 error = ColorPainter(MaterialTheme.colors.placeHolder),
                 placeholder = ColorPainter(MaterialTheme.colors.placeHolder)
             )
             Spacer(modifier = Modifier.size(10.dp))
-            Text(profile.name)
+            Column(
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .weight(1f),
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(chatLog.name, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(
+                    chatLog.previewMessage,
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colors.darkGray,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+            Text(
+                modifier = Modifier.padding(top = 10.dp),
+                text = chatLog.modifiedAt.toDateString(),
+                fontSize = 12.sp,
+                color = MaterialTheme.colors.darkGray,
+            )
         }
     }
 }
@@ -209,6 +321,7 @@ private fun HomeScreenPreview() {
     DefaultPreview {
         HomeScreen(
             profileList = fakeProfileList,
+            chatLogList = fakeChatLogList,
             navController = rememberNavController(),
             isUser = { false },
             onDeleteProfile = {}

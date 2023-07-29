@@ -88,6 +88,10 @@ class ChatRepositoryImpl(
         chatLocalDataSource.getChatLog().map(ChatLogEntity::toDomain)
     }
 
+    override fun getChatLogDistinctByOpponentId(): Flow<List<ChatLog>> = autoRefreshFlow {
+        chatLocalDataSource.getChatLogDistinctByOpponentId().map(ChatLogEntity::toDomain)
+    }
+
     override fun getChatLogByProfileId(profileId: String): Flow<List<ChatLog>> = autoRefreshFlow {
         chatLocalDataSource.getChatLogByProfileId(profileId).map(ChatLogEntity::toDomain)
     }

@@ -2,6 +2,7 @@ package com.bso112.roleplayai.android.feature.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bso112.domain.ChatLog
 import com.bso112.domain.ChatRepository
 import com.bso112.domain.Profile
 import com.bso112.domain.ProfileRepository
@@ -18,6 +19,7 @@ class HomeViewModel(
 
     val profileList: StateFlow<List<Profile>> = stateIn(profileRepository.getProfiles())
 
+    val chatLogList: StateFlow<List<ChatLog>> = stateIn(chatRepository.getChatLogDistinctByOpponentId())
     fun deleteProfile(profile: Profile) {
         viewModelScope.launch(dispatcherProvider.io) {
             launch { profileRepository.deleteProfile(profile) }

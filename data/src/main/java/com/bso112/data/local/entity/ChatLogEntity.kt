@@ -11,7 +11,8 @@ data class ChatLogEntity(
     val name: String,
     val opponentId: String,
     val thumbnail: String,
-    val previewMessage: String
+    val previewMessage: String,
+    val modifiedAt: Long = System.currentTimeMillis()
 )
 
 fun ChatLogEntity.toDomain() = ChatLog(
@@ -19,7 +20,8 @@ fun ChatLogEntity.toDomain() = ChatLog(
     name = name,
     opponentId = opponentId,
     thumbnail = thumbnail,
-    previewMessage = previewMessage
+    previewMessage = previewMessage,
+    modifiedAt = modifiedAt
 )
 
 fun ChatLog.toEntity() = ChatLogEntity(

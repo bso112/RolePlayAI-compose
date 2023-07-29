@@ -11,16 +11,17 @@ interface ChatRepository : DataChangeNotifier {
     ): Flow<String>
 
     fun translateWithGPT(
-        message : String
-    ) : Flow<String>
+        message: String
+    ): Flow<String>
 
 
-    suspend fun saveChatList(chatList: List<Chat>,  opponentId : String)
+    suspend fun saveChatList(chatList: List<Chat>, opponentId: String)
     fun sendChat(speaker: Profile, messages: List<Chat>, logId: String): Flow<Chat>
     fun getAllChat(logId: String): Flow<List<Chat>>
     fun getAllChatLog(): Flow<List<ChatLog>>
+    fun getChatLogDistinctByOpponentId(): Flow<List<ChatLog>>
     fun getChatLogByProfileId(profileId: String): Flow<List<ChatLog>>
     suspend fun deleteChatLog(chatLog: ChatLog)
-    suspend fun deleteChatLogList(chatLogList : List<ChatLog>)
+    suspend fun deleteChatLogList(chatLogList: List<ChatLog>)
     suspend fun deleteChatLogByProfileId(profileId: String)
 }

@@ -10,7 +10,7 @@ import com.bso112.data.local.entity.ChatLogEntity
 @Dao
 interface ChatLogDao {
 
-    @Query("select * from ChatLogEntity limit 10")
+    @Query("select * from ChatLogEntity")
     suspend fun getAll(): List<ChatLogEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -20,11 +20,12 @@ interface ChatLogDao {
     suspend fun delete(chatLog: ChatLogEntity)
 
     @Delete
-    suspend fun deleteList(chatLogList : List<ChatLogEntity>)
+    suspend fun deleteList(chatLogList: List<ChatLogEntity>)
 
     @Query("delete from ChatLogEntity where opponentId = :profileId")
     suspend fun deleteByProfileId(profileId: String)
 
     @Query("select * from ChatLogEntity where opponentId = :profileId")
     suspend fun getByProfileId(profileId: String): List<ChatLogEntity>
+
 }

@@ -41,19 +41,30 @@ class ChatLocalDataSource(
         }
     }
 
+    suspend fun getChatLogDistinctByOpponentId(): List<ChatLogEntity> {
+        return db.withTransaction {
+            chatLogDao.getAll()
+                .groupBy { it.opponentId }
+                .values
+                .mapNotNull { list ->
+                    list.maxByOrNull { it.modifiedAt }
+                }
+        }
+    }
+
     suspend fun deleteChatLog(chatLog: ChatLogEntity) {
         return db.withTransaction {
             chatLogDao.delete(chatLog)
         }
     }
 
-    suspend fun deleteChatLogList(chatLogList : List<ChatLogEntity>){
+    suspend fun deleteChatLogList(chatLogList: List<ChatLogEntity>) {
         return db.withTransaction {
             chatLogDao.deleteList(chatLogList)
         }
     }
 
-    suspend fun deleteByProfileId(profileId : String){
+    suspend fun deleteByProfileId(profileId: String) {
         return db.withTransaction {
             chatLogDao.deleteByProfileId(profileId)
         }
