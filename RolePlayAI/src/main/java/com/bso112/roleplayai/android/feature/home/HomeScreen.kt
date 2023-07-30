@@ -52,9 +52,9 @@ import com.bso112.domain.ChatLog
 import com.bso112.domain.Profile
 import com.bso112.roleplayai.android.R
 import com.bso112.roleplayai.android.app.RolePlayAppState
-import com.bso112.roleplayai.android.app.darkGray
-import com.bso112.roleplayai.android.app.gray
+import com.bso112.roleplayai.android.app.caption
 import com.bso112.roleplayai.android.app.placeHolder
+import com.bso112.roleplayai.android.app.subText
 import com.bso112.roleplayai.android.fakeChatLogList
 import com.bso112.roleplayai.android.feature.chat.navigateChat
 import com.bso112.roleplayai.android.feature.profile.navigateCreateProfile
@@ -107,7 +107,7 @@ private fun HomeScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colors.gray)
+                .background(MaterialTheme.colors.primary)
         ) {
             Text(
                 "Characters",
@@ -117,12 +117,14 @@ private fun HomeScreen(
                     top = 20.dp,
                     bottom = 15.dp
                 ),
+                color = MaterialTheme.colors.onPrimary,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
             )
             if (profileList.isEmpty()) {
                 Text(
                     text = "No characters yet",
+                    color = MaterialTheme.colors.onPrimary,
                     modifier = Modifier.padding(start = 15.dp, bottom = 10.dp),
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
@@ -150,7 +152,7 @@ private fun HomeScreen(
             LazyColumn(
                 modifier = Modifier
                     .background(
-                        MaterialTheme.colors.background,
+                        MaterialTheme.colors.surface,
                         shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)
                     )
                     .fillMaxWidth()
@@ -238,7 +240,8 @@ private fun ProfileItem(
             text = profile.name,
             fontWeight = FontWeight.Bold,
             fontSize = 14.sp,
-            modifier = Modifier.padding(top = 5.dp)
+            modifier = Modifier.padding(top = 5.dp),
+            color = MaterialTheme.colors.onPrimary,
         )
     }
 }
@@ -280,11 +283,16 @@ private fun ChatLogItem(
                     .weight(1f),
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(chatLog.name, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(
+                    chatLog.name,
+                    color = MaterialTheme.colors.onSurface,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                )
                 Text(
                     chatLog.previewMessage,
                     fontSize = 14.sp,
-                    color = MaterialTheme.colors.darkGray,
+                    color = MaterialTheme.colors.subText,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -293,7 +301,7 @@ private fun ChatLogItem(
                 modifier = Modifier.padding(top = 10.dp),
                 text = chatLog.modifiedAt.toDateString(),
                 fontSize = 12.sp,
-                color = MaterialTheme.colors.darkGray,
+                color = MaterialTheme.colors.caption,
             )
         }
     }
@@ -330,7 +338,7 @@ private fun ProfileActionDialog(
 private fun HomeScreenPreview() {
     DefaultPreview {
         HomeScreen(
-            profileList = emptyList(),
+            profileList = fakeProfileList,
             chatLogList = fakeChatLogList,
             navController = rememberNavController(),
             onDeleteProfile = {}

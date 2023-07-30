@@ -1,5 +1,6 @@
 package com.bso112.roleplayai.android.feature.chat
 
+import android.content.res.Configuration
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.widget.AppCompatTextView
@@ -96,9 +97,11 @@ import com.bso112.domain.Role
 import com.bso112.roleplayai.android.R
 import com.bso112.roleplayai.android.app.RolePlayAITheme
 import com.bso112.roleplayai.android.app.RolePlayAppState
-import com.bso112.roleplayai.android.app.chatBackground
 import com.bso112.roleplayai.android.app.chatBubbleOther
 import com.bso112.roleplayai.android.app.chatBubbleUser
+import com.bso112.roleplayai.android.app.highlightText
+import com.bso112.roleplayai.android.app.onChatBubbleOther
+import com.bso112.roleplayai.android.app.onChatBubbleUser
 import com.bso112.roleplayai.android.fakeChatData
 import com.bso112.roleplayai.android.fakeChatLogList
 import com.bso112.roleplayai.android.fakeOpponent
@@ -273,7 +276,9 @@ fun ChatScreen(
         },
         bottomBar = {
             Row(
-                Modifier.height(52.dp),
+                Modifier
+                    .height(52.dp)
+                    .background(MaterialTheme.colors.surface),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TextField(
@@ -299,7 +304,6 @@ fun ChatScreen(
                 if (isSendingChat) {
                     CircularProgressIndicator(
                         modifier = Modifier
-                            .background(MaterialTheme.colors.surface)
                             .aspectRatio(1f)
                             .fillMaxSize()
                             .padding(15.dp),
@@ -307,8 +311,8 @@ fun ChatScreen(
                 } else {
                     IconButton(
                         modifier = Modifier
-                            .background(MaterialTheme.colors.primary)
                             .aspectRatio(1f)
+                            .background(Color.LightGray)
                             .fillMaxSize(),
                         onClick = {
                             onUserSubmitChat(userChat)
@@ -317,7 +321,7 @@ fun ChatScreen(
                         Icon(
                             Icons.Filled.Send,
                             contentDescription = "send",
-                            tint = MaterialTheme.colors.onPrimary
+                            tint = Color.White
                         )
                     }
                 }
@@ -327,9 +331,10 @@ fun ChatScreen(
         LazyColumn(
             state = listState,
             modifier = Modifier
-                .background(MaterialTheme.colors.chatBackground)
                 .fillMaxSize()
+                .background(MaterialTheme.colors.surface)
                 .padding(paddingValue)
+                .padding(top = 10.dp)
         ) {
             item {
                 Spacer(modifier = Modifier.height(20.dp))
@@ -376,6 +381,12 @@ fun ChatItem(
         MaterialTheme.colors.chatBubbleUser
     }
 
+    val onBubbleColor = if (isNotUserChat) {
+        MaterialTheme.colors.onChatBubbleOther
+    } else {
+        MaterialTheme.colors.onChatBubbleUser
+    }
+
     val padding = if (isNotUserChat) {
         PaddingValues(start = 5.dp)
     } else {
@@ -397,19 +408,18 @@ fun ChatItem(
                 .widthIn(max = 250.dp)
                 .align(alignment)
         ) {
-            ChatContentText(chat = chat)
+            ChatContentText(chat = chat, textColor = onBubbleColor)
         }
     }
 }
 
 @Composable
-fun ChatContentText(chat: Chat) {
-    val theme = MaterialTheme.colors
+fun ChatContentText(chat: Chat, textColor: Color) {
     AndroidView(
         factory = { context ->
             AppCompatTextView(context).apply {
                 textSize = 15f
-                setTextColor(theme.onSurface.toArgb())
+                setTextColor(textColor.toArgb())
                 setTextIsSelectable(true)
                 customSelectionActionModeCallback =
                     object : android.view.ActionMode.Callback {
@@ -555,7 +565,7 @@ private fun NewChatAlertDialog(
             TextButton(onClick = onDismiss) {
                 Text(
                     text = stringResource(id = R.string.cancel),
-                    color = MaterialTheme.colors.primary
+                    color = MaterialTheme.colors.highlightText
                 )
             }
         },
@@ -563,7 +573,7 @@ private fun NewChatAlertDialog(
             TextButton(onClick = onConfirm) {
                 Text(
                     text = stringResource(id = R.string.confirm),
-                    color = MaterialTheme.colors.primary
+                    color = MaterialTheme.colors.highlightText
                 )
             }
         },
@@ -588,7 +598,7 @@ private fun ChatLogListDialog(
             Column(
                 modifier = Modifier
                     .background(
-                        MaterialTheme.colors.background,
+                        MaterialTheme.colors.surface,
                         RoundedCornerShape(10.dp)
                     )
                     .heightIn(min = 200.dp)
@@ -662,7 +672,7 @@ private fun ChatLogListDialog(
                 TextButton(modifier = Modifier.align(Alignment.End), onClick = onDismiss) {
                     Text(
                         text = stringResource(id = R.string.cancel),
-                        color = MaterialTheme.colors.primary
+                        color = MaterialTheme.colors.onSurface
                     )
                 }
             }
@@ -728,6 +738,73 @@ private fun NewChatDialogPreView() {
 @Preview
 @Composable
 private fun ChatLogListDialogPreView() {
+    DefaultPreview {
+        ChatLogListDialog(
+            chatLogList = fakeChatLogList,
+            onSelectChatLog = {},
+            onDismiss = {},
+            onDeleteChatLog = {}
+        )
+    }
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun ChatScreenPreViewDark() {
+    RolePlayAITheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colors.background,
+        ) {
+            ChatScreen(
+                chatList = fakeChatData,
+                user = fakeUser,
+                opponent = fakeOpponent,
+                userChat = "hello world",
+                isSendingChat = false
+            )
+        }
+    }
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DrawerPreViewDark() {
+    DefaultPreview {
+        ChatDrawer(
+            drawerState = rememberDrawerState(initialValue = DrawerValue.Open),
+            content = {},
+            profile = fakeOpponent
+        )
+    }
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun ChatItemPreViewDark() {
+    DefaultPreview {
+        ChatItem(
+            chat = fakeChatData[0],
+            onClickTranslate = {},
+            onClickThumbnail = {}
+        )
+    }
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun NewChatDialogPreViewDark() {
+    DefaultPreview {
+        NewChatAlertDialog(
+            onConfirm = {},
+            onDismiss = {}
+        )
+    }
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun ChatLogListDialogPreViewDark() {
     DefaultPreview {
         ChatLogListDialog(
             chatLogList = fakeChatLogList,

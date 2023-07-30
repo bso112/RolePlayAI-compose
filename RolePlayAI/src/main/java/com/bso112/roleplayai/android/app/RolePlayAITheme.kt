@@ -1,5 +1,6 @@
 package com.bso112.roleplayai.android.app
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Colors
@@ -16,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+@SuppressLint("ConflictingOnColor")
 @Composable
 fun RolePlayAITheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -23,15 +25,21 @@ fun RolePlayAITheme(
 ) {
     val colors = if (darkTheme) {
         darkColors(
-            primary = Color(0xFFBB86FC),
-            primaryVariant = Color(0xFF3700B3),
-            secondary = Color(0xFF03DAC5),
+            primary = Color(0xFF1B202D),
+            primaryVariant = Color(0xFF7B8195),
+            secondary = Color(0xFF1B202D),
+            surface = Color(0xFF292F3F),
+            onSurface = Color.White,
+            onPrimary = Color.White
         )
     } else {
         lightColors(
-            primary = Color(0xFF6200EE),
-            primaryVariant = Color(0xFF3700B3),
-            secondary = Color(0xFF03DAC5)
+            primary = Color(0xFF7758CC),
+            primaryVariant = Color(0xFFE0D4FE),
+            secondary = Color(0xFF7758CC),
+            surface = Color.White,
+            onSurface = Color.Black,
+            onPrimary = Color.White
         )
     }
     val typography = Typography(
@@ -56,10 +64,12 @@ fun RolePlayAITheme(
 }
 
 val Colors.placeHolder get() = Color.LightGray
-val Colors.chatBackground get() = Color(0xFFB2C7DA)
-val Colors.chatBubbleOther get() = Color.White
-val Colors.chatBubbleUser get() = Color(0xFFFFEB33)
+val Colors.chatBubbleOther get() = if (isLight) Color(0xFFEBEBEB) else Color(0xFF383E4E)
 
-val Colors.darkGray get() = Color(0xFF5A5A5A)
+val Colors.chatBubbleUser get() = primaryVariant
 
-val Colors.gray get() = Color(0xFFECECEA)
+val Colors.highlightText get() = if (isLight) Color(0xFF7758CC) else Color.White
+val Colors.onChatBubbleOther get() = if (isLight) Color.Black else Color.White
+val Colors.onChatBubbleUser get() = if (isLight) Color.Black else Color.White
+val Colors.caption get() = Color.LightGray
+val Colors.subText get() = if (isLight) Color.DarkGray else Color.LightGray
