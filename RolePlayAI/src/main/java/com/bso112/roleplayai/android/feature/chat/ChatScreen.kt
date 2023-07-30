@@ -87,7 +87,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.flowWithLifecycle
 import coil.compose.AsyncImage
 import com.bso112.domain.Chat
@@ -176,9 +175,7 @@ fun ChatScreenRoute(
     if (isShowNewChatDialog) {
         NewChatAlertDialog(
             onConfirm = {
-                lifecycle.coroutineScope.launch {
-                    viewModel.changeLogId(randomID)
-                }
+                viewModel.changeLogId(randomID)
                 isShowNewChatDialog = false
             },
             onDismiss = { isShowNewChatDialog = false })
@@ -190,9 +187,7 @@ fun ChatScreenRoute(
                 viewModel.deleteChatLogList(it)
             },
             onSelectChatLog = {
-                lifecycle.coroutineScope.launch {
-                    viewModel.changeLogId(it.id)
-                }
+                viewModel.changeLogId(it.id)
                 isShowChatLogDialog = false
             }
         )
@@ -387,7 +382,7 @@ fun ChatItem(
         PaddingValues(end = 5.dp)
     }
 
-    val bubbleShape = if(isNotUserChat){
+    val bubbleShape = if (isNotUserChat) {
         RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp, bottomEnd = 15.dp)
     } else {
         RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp, bottomStart = 15.dp)

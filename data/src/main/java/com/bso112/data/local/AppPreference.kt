@@ -11,7 +11,6 @@ import com.bso112.data.logD
 import com.bso112.data.writeToFile
 import com.bso112.domain.Model
 import com.bso112.domain.Profile
-import com.bso112.util.randomID
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -45,7 +44,6 @@ class AppPreference(
         Profile.DefaultUser
     )
 
-    val lastChatLogId = lazyKeyAccessor(defaultValue = randomID)
     val mainPrompt = notNullAccessor(stringPreferencesKey("mainPromptKey"), DEFAULT_MAIN_PROMPT)
     val temperature = notNullAccessor(floatPreferencesKey("temperature"), 0.8f)
     val languageModel =

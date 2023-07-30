@@ -17,6 +17,7 @@ import com.bso112.roleplayai.android.util.DispatcherProvider
 import com.bso112.roleplayai.android.util.Empty
 import com.bso112.roleplayai.android.util.replace
 import com.bso112.roleplayai.android.util.stateIn
+import com.bso112.util.randomID
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -47,22 +48,20 @@ class ChatViewModel(
     val user: StateFlow<Profile> = stateIn(profileRepository.getUser(), Profile.Empty)
     val opponent: StateFlow<Profile> =
         stateIn(profileRepository.getProfile(argument.profileId), Profile.Empty)
-    private val logId: StateFlow<String> = stateIn(
-        appPreference.lastChatLogId.asFlow(argument.profileId),
-        String.Empty
-    )
-    val chatLogList : StateFlow<List<ChatLog>> = stateIn(chatRepository.getChatLogByProfileId(argument.profileId))
+    private val chatLogId: MutableStateFlow<String> =
+        MutableStateFlow(argument.chatLogId ?: randomID)
+    val chatLogList: StateFlow<List<ChatLog>> =
+        stateIn(chatRepository.getChatLogByProfileId(argument.profileId))
 
     private val opponentAsFlow = opponent.filter { it != Profile.Empty }
-    private val chatListAsFlow = logId.filter { it.isNotEmpty() }.flatMapLatest {
-        chatRepository.getAllChat(it)
-    }
+    private val chatListAsFlow = chatLogId.flatMapLatest { chatRepository.getAllChat(it) }
+
 
     val chatList: StateFlow<List<Chat>> =
         opponentAsFlow.combine(chatListAsFlow) { opponent, chatList ->
             buildList {
                 if (chatList.isEmpty()) {
-                    add(opponent.createChat(opponent.firstMessage, logId.value, Role.Assistant))
+                    add(opponent.createChat(opponent.firstMessage, chatLogId.value, Role.Assistant))
                 }
                 addAll(chatList)
             }
@@ -88,7 +87,7 @@ class ChatViewModel(
     fun sendChat(message: String) {
         viewModelScope.launch(coroutineContext) {
             val userChat =
-                checkNotNull(user.value).createChat(message, logId.value, Role.User)
+                checkNotNull(user.value).createChat(message, chatLogId.value, Role.User)
             chatRepository.saveChatList(chatList.value + userChat, opponent.value.id)
 
             val requestChatList: List<Chat> = buildList {
@@ -106,7 +105,7 @@ class ChatViewModel(
             val chat = chatRepository.sendChat(
                 speaker = checkNotNull(opponent.value),
                 messages = requestChatList,
-                logId = logId.value
+                logId = chatLogId.value
             ).first()
 
             chatRepository.saveChatList(chatList.value + chat, opponent.value.id)
@@ -142,11 +141,11 @@ class ChatViewModel(
         }
     }
 
-    suspend fun changeLogId(logId: String) {
-        appPreference.lastChatLogId.setValue(opponent.value.id, logId)
+    fun changeLogId(logId: String) {
+        chatLogId.update { logId }
     }
 
-    fun deleteChatLogList(chatLogList: List<ChatLog>){
+    fun deleteChatLogList(chatLogList: List<ChatLog>) {
         viewModelScope.launch(coroutineContext) {
             chatRepository.deleteChatLogList(chatLogList)
         }

@@ -163,7 +163,10 @@ private fun HomeScreen(
                     ChatLogItem(
                         chatLog = chatLog,
                         onChatLogClick = {
-                            navController.navigateChat(profileId = chatLog.opponentId)
+                            navController.navigateChat(
+                                profileId = chatLog.opponentId,
+                                chatLogId = chatLog.id
+                            )
                         },
                         onChatLogLongClick = {
 
