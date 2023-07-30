@@ -19,6 +19,10 @@ import com.bso112.roleplayai.android.feature.home.HomeViewModel
 import com.bso112.roleplayai.android.feature.profile.CreateProfileViewModel
 import com.bso112.roleplayai.android.util.DispatcherProvider
 import com.bso112.roleplayai.android.util.DispatcherProviderImpl
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.plus
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -27,9 +31,16 @@ import org.koin.dsl.module
 
 class RolePlayAIApplication : Application(), ImageLoaderFactory {
 
+    private val applicationScope = CoroutineScope(SupervisorJob())
+
     private val appModule = module {
-        single { AppPreference(this@RolePlayAIApplication) }
-        single { createDataBase(this@RolePlayAIApplication, get()) }
+        single {
+            AppPreference(
+                this@RolePlayAIApplication,
+                stateRetainedScope = applicationScope + Dispatchers.IO
+            )
+        }
+        single { createDataBase(this@RolePlayAIApplication) }
         single { ChatRemoteDataSource(appPreference = get()) }
         single { ChatLocalDataSource(get()) }
         single { ProfileLocalDataSource(get()) }
@@ -38,7 +49,14 @@ class RolePlayAIApplication : Application(), ImageLoaderFactory {
         single<DispatcherProvider> { DispatcherProviderImpl }
         viewModel { HomeViewModel(get(), get(), get()) }
         viewModel { (state: SavedStateHandle) -> ChatViewModel(get(), get(), get(), get(), state) }
-        viewModel { (state: SavedStateHandle) -> CreateProfileViewModel(get(), get(), state, get()) }
+        viewModel { (state: SavedStateHandle) ->
+            CreateProfileViewModel(
+                get(),
+                get(),
+                state,
+                get()
+            )
+        }
     }
 
     override fun onCreate() {

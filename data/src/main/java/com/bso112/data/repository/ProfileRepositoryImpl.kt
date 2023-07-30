@@ -9,7 +9,6 @@ import com.bso112.domain.DataChangedEvent
 import com.bso112.domain.Profile
 import com.bso112.domain.ProfileRepository
 import com.bso112.domain.autoRefreshFlow
-import com.bso112.util.Empty
 import com.bso112.util.alsoSuspend
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -28,14 +27,18 @@ class ProfileRepositoryImpl(
     override val dataChangedEvent = _dataChangedEvent.asSharedFlow()
 
     override suspend fun changeUser(name: String, description: String, thumbnail: String) {
-        val userId = appPreference.userId.getValue() ?: error("User not found")
-        saveProfile(Profile(userId, name, thumbnail, description, String.Empty))
+        saveProfile(
+            appPreference.user.value.copy(
+                name = name,
+                description = description,
+                thumbnail = thumbnail
+            )
+        )
         _dataChangedEvent.emit(UserChanged)
     }
 
     override fun getUser(): Flow<Profile> = autoRefreshFlow {
-        val userId = appPreference.userId.getValue().orEmpty()
-        localDataSource.getProfileById(userId)?.toDomain() ?: error("User not found")
+        appPreference.user.value
     }
 
     override suspend fun saveProfile(profile: Profile) {
@@ -48,8 +51,7 @@ class ProfileRepositoryImpl(
     }
 
     override fun getProfiles(): Flow<List<Profile>> = autoRefreshFlow {
-        val userId = appPreference.userId.getValue()
-        localDataSource.getAllProfile().filterNot { it.id == userId }.map(ProfileEntity::toDomain)
+        localDataSource.getAllProfile().map(ProfileEntity::toDomain)
     }
 
     override suspend fun deleteProfile(profile: Profile) {

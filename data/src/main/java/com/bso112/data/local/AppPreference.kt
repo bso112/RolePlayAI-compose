@@ -7,18 +7,44 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.bso112.data.dataStore
+import com.bso112.data.logD
+import com.bso112.data.writeToFile
 import com.bso112.domain.Model
+import com.bso112.domain.Profile
 import com.bso112.util.randomID
+import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import java.io.File
 
 class AppPreference(
-    private val context: Context
+    private val context: Context,
+    private val stateRetainedScope: CoroutineScope
 ) {
     private val dataStore = context.dataStore
 
-    val userId = accessor(stringPreferencesKey("userProfileIdKey"))
+    val user: StateFlow<Profile> = flow {
+        val userFileName = "user.json"
+        val userFile = File(context.filesDir, userFileName)
+        if (userFile.exists()) {
+            logD("user: " + userFile.readText())
+            emit(Gson().fromJson(userFile.readText(), Profile::class.java))
+        } else {
+            Profile.DefaultUser.writeToFile(context, userFileName)
+            emit(Profile.DefaultUser)
+        }
+    }.stateIn(
+        stateRetainedScope,
+        SharingStarted.Eagerly,
+        Profile.DefaultUser
+    )
+
     val lastChatLogId = lazyKeyAccessor(defaultValue = randomID)
     val mainPrompt = notNullAccessor(stringPreferencesKey("mainPromptKey"), DEFAULT_MAIN_PROMPT)
     val temperature = notNullAccessor(floatPreferencesKey("temperature"), 0.8f)

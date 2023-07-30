@@ -36,8 +36,8 @@ class CreateProfileViewModel(
     val profileImage = MutableStateFlow(profile?.thumbnail.orEmpty())
     val firstMessage = MutableStateFlow(profile?.firstMessage.orEmpty())
 
-    val isUser = appPreference.userId.asFlow().map {
-        profile?.id == it
+    val isUser = appPreference.user.map {
+        profile?.id == it.id
     }.stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     private val _error = MutableSharedFlow<Throwable>()

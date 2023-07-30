@@ -20,6 +20,13 @@ data class Profile(
             description = "",
             firstMessage = ""
         )
+        val DefaultUser = Profile(
+            id = UUID.randomUUID().toString(),
+            thumbnail = "",
+            name = "User",
+            description = "",
+            firstMessage = ""
+        )
     }
 }
 

@@ -86,7 +86,6 @@ fun HomeScreenRoute(
         profileList = profileList,
         chatLogList = chatLogList,
         navController = appState.navController,
-        isUser = { it.id == appState.userId.value },
         onDeleteProfile = { profile ->
             viewModel.deleteProfile(profile)
             profile.thumbnail.takeIf { it.isNotEmpty() }?.let(::File)?.delete()
@@ -97,7 +96,6 @@ fun HomeScreenRoute(
 private fun HomeScreen(
     profileList: List<Profile>,
     chatLogList: List<ChatLog>,
-    isUser: (Profile) -> Boolean = { false },
     navController: NavController,
     onDeleteProfile: (Profile) -> Unit = {}
 ) {
@@ -108,6 +106,7 @@ private fun HomeScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
+                .fillMaxSize()
                 .background(MaterialTheme.colors.gray)
         ) {
             Text(
@@ -121,29 +120,41 @@ private fun HomeScreen(
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
             )
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(start = 15.dp)
-            ) {
-                items(profileList) { profile ->
-                    ProfileItem(
-                        profile = profile,
-                        onProfileClick = {
-                            navController.navigateChat(profileId = profile.id)
-                        },
-                        onProfileLongClick = {
-                            profileActionDialogState = ProfileActionDialogState.Open(profile)
-                        }
-                    )
-                    Spacer(modifier = Modifier.size(15.dp))
+            if (profileList.isEmpty()) {
+                Text(
+                    text = "No characters yet",
+                    modifier = Modifier.padding(start = 15.dp, bottom = 10.dp),
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            } else {
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(start = 15.dp)
+                ) {
+                    items(profileList) { profile ->
+                        ProfileItem(
+                            profile = profile,
+                            onProfileClick = {
+                                navController.navigateChat(profileId = profile.id)
+                            },
+                            onProfileLongClick = {
+                                profileActionDialogState = ProfileActionDialogState.Open(profile)
+                            }
+                        )
+                        Spacer(modifier = Modifier.size(15.dp))
+                    }
                 }
             }
             Spacer(modifier = Modifier.size(15.dp))
             LazyColumn(
-                modifier = Modifier.background(
-                    MaterialTheme.colors.background,
-                    shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)
-                )
+                modifier = Modifier
+                    .background(
+                        MaterialTheme.colors.background,
+                        shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)
+                    )
+                    .fillMaxWidth()
+                    .weight(1f)
             ) {
                 item {
                     Spacer(modifier = Modifier.size(30.dp))
@@ -173,11 +184,7 @@ private fun HomeScreen(
     }
     profileActionDialogState.ifIs<ProfileActionDialogState.Open> { state ->
         ProfileActionDialog(
-            profileActions = if (isUser(state.profile)) {
-                arrayOf(ProfileLongClickAction.EDIT)
-            } else {
-                ProfileLongClickAction.values()
-            },
+            profileActions = ProfileLongClickAction.values(),
             profile = state.profile,
             onClickOption = { action ->
                 when (action) {
@@ -320,10 +327,9 @@ private fun ProfileActionDialog(
 private fun HomeScreenPreview() {
     DefaultPreview {
         HomeScreen(
-            profileList = fakeProfileList,
+            profileList = emptyList(),
             chatLogList = fakeChatLogList,
             navController = rememberNavController(),
-            isUser = { false },
             onDeleteProfile = {}
         )
     }
