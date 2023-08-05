@@ -32,6 +32,7 @@ class CreateProfileViewModel(
     //프로필 수정인 경우의 프로필
     val profile: Profile? = argument.profile
     val name = MutableStateFlow(profile?.name.orEmpty())
+    val singleLineDesc = MutableStateFlow(profile?.singleLineDesc.orEmpty())
     val description = MutableStateFlow(profile?.description.orEmpty())
     val profileImage = MutableStateFlow(profile?.thumbnail.orEmpty())
     val firstMessage = MutableStateFlow(profile?.firstMessage.orEmpty())
@@ -72,7 +73,8 @@ class CreateProfileViewModel(
             thumbnail = thumbnailUri,
             name = name.value,
             description = description.value,
-            firstMessage = firstMessage.value
+            firstMessage = firstMessage.value,
+            singleLineDesc = singleLineDesc.value
         )
 
         profileRepository.saveProfile(newProfile)

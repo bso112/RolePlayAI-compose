@@ -11,6 +11,7 @@ data class ProfileEntity(
     val name: String,
     val thumbnail: String,
     val description: String,
+    val singleLineDesc: String,
     val firstMessage: String,
 )
 
@@ -20,7 +21,8 @@ fun ProfileEntity.toDomain() =
         name = name,
         thumbnail = thumbnail,
         description = description,
-        firstMessage = firstMessage
+        firstMessage = firstMessage,
+        singleLineDesc = singleLineDesc
     )
 
 fun Profile.toEntity() =
@@ -29,5 +31,6 @@ fun Profile.toEntity() =
         name = name,
         thumbnail = thumbnail,
         description = description,
-        firstMessage = firstMessage
+        firstMessage = firstMessage,
+        singleLineDesc = singleLineDesc
     )

@@ -54,7 +54,8 @@ val fakeOpponent = Profile(
             "(Do not determine {{user}}'s behavior.)\n" +
             "(The setting is fantasy, and {{user}}'s parents are both nobles. {{user}}'s father is a duke and {{user}}'s mother is the eldest daughter of an earl. They are good people)\n" +
             "(Don't rush through the scene, but narrate it very slowly)",
-    firstMessage = String.Empty
+    firstMessage = String.Empty,
+    singleLineDesc = "Yuzu, the shy cat girl maid"
 )
 
 val fakeChatData = buildList {

@@ -5,18 +5,19 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,23 +30,18 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.DrawerState
-import androidx.compose.material.DrawerValue
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ModalDrawer
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
@@ -60,7 +56,8 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Send
-import androidx.compose.material.rememberDrawerState
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -78,6 +75,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -214,7 +212,7 @@ fun ChatScreen(
 ) {
     val focusManager = LocalFocusManager.current
     val listState = rememberLazyListState()
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scaffoldState = rememberScaffoldState()
     var selectedProfile: Profile by remember { mutableStateOf(Profile.Empty) }
     val coroutineScope = rememberCoroutineScope()
     var isShowTopBarMenu by remember { mutableStateOf(false) }
@@ -224,25 +222,39 @@ fun ChatScreen(
     }
 
     Scaffold(
+        scaffoldState = scaffoldState,
+        drawerContent = {
+            ChatDrawer(opponent)
+        },
         topBar = {
             TopAppBar {
                 IconButton(onClick = onClickBackButton) {
                     Icon(Icons.Filled.ArrowBack, contentDescription = "go back")
                 }
                 Spacer(modifier = Modifier.width(10.dp))
-                AsyncImage(
-                    model = opponent.thumbnail,
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .size(30.dp)
-                        .clip(CircleShape),
-                    contentDescription = "thumbnail",
-                    contentScale = ContentScale.Crop,
-                    error = ColorPainter(Color.LightGray),
-                    placeholder = ColorPainter(Color.LightGray)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(opponent.name, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                Spacer(Modifier.weight(1f))
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .clickable {
+                            coroutineScope.launch {
+                                scaffoldState.drawerState.open()
+                            }
+                        }) {
+                    AsyncImage(
+                        model = opponent.thumbnail,
+                        modifier = Modifier
+                            .size(30.dp)
+                            .clip(CircleShape),
+                        contentDescription = "thumbnail",
+                        contentScale = ContentScale.Crop,
+                        error = ColorPainter(Color.LightGray),
+                        placeholder = ColorPainter(Color.LightGray)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(opponent.name, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                }
                 Box {
                     IconButton(
                         modifier = Modifier
@@ -284,8 +296,8 @@ fun ChatScreen(
                 TextField(
                     value = userChat,
                     colors = TextFieldDefaults.textFieldColors(
-                        backgroundColor = Color.White,
                         disabledTextColor = Color.Transparent,
+                        backgroundColor = Color.White,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                         disabledIndicatorColor = Color.Transparent
@@ -306,13 +318,20 @@ fun ChatScreen(
                         modifier = Modifier
                             .aspectRatio(1f)
                             .fillMaxSize()
+                            .background(Color.LightGray)
                             .padding(15.dp),
+                        color = Color.White
                     )
                 } else {
+                    val iconBackgroundColor = if (userChat.isNotEmpty()) {
+                        MaterialTheme.colors.primary
+                    } else {
+                        Color.LightGray
+                    }
                     IconButton(
                         modifier = Modifier
                             .aspectRatio(1f)
-                            .background(Color.LightGray)
+                            .background(iconBackgroundColor)
                             .fillMaxSize(),
                         onClick = {
                             onUserSubmitChat(userChat)
@@ -333,23 +352,14 @@ fun ChatScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colors.surface)
-                .padding(paddingValue)
-                .padding(top = 10.dp)
+                .padding(paddingValue),
+            contentPadding = PaddingValues(top = 30.dp)
         ) {
-            item {
-                Spacer(modifier = Modifier.height(20.dp))
-            }
             itemsIndexed(chatList) { index, chat ->
                 ChatItem(
                     chat = chat,
-                    onClickTranslate = onClickTranslate,
-                    onClickThumbnail = {
-                        coroutineScope.launch {
-                            val isUser = chat.profileId == user.id
-                            selectedProfile = if (isUser) user else opponent
-                            drawerState.open()
-                        }
-                    })
+                    onClickTranslate = onClickTranslate
+                )
 
                 if (index != chatList.lastIndex) {
                     Spacer(modifier = Modifier.height(8.dp))
@@ -366,7 +376,6 @@ fun ChatScreen(
 fun ChatItem(
     chat: Chat,
     onClickTranslate: (Chat) -> Unit = {},
-    onClickThumbnail: () -> Unit = {}
 ) {
     val isNotUserChat = chat.role == Role.Assistant || chat.role == Role.System
     val alignment = if (isNotUserChat) {
@@ -486,66 +495,88 @@ fun ChatContentText(chat: Chat, textColor: Color) {
 @Composable
 fun ChatDrawer(
     profile: Profile,
-    drawerState: DrawerState,
-    content: @Composable () -> Unit
 ) {
-    ModalDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            Column {
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(20.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        AsyncImage(
-                            modifier = Modifier
-                                .size(60.dp)
-                                .clip(RoundedCornerShape(15.dp)),
-                            model = profile.thumbnail,
-                            contentDescription = "thumbnail",
-                            error = ColorPainter(Color.LightGray),
-                            placeholder = ColorPainter(Color.LightGray)
-                        )
-                        Text(
-                            modifier = Modifier.padding(start = 10.dp),
-                            text = profile.name,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp
-                        )
-                    }
-                    Spacer(modifier = Modifier.size(20.dp))
-                    Text(text = "설명")
-                    Spacer(Modifier.size(5.dp))
-                    Text(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .verticalScroll(rememberScrollState())
-                            .defaultMinSize(minHeight = 100.dp)
-                            .border(BorderStroke(width = 1.dp, color = Color.LightGray))
-                            .padding(10.dp),
-                        text = profile.description,
-                    )
-                    Spacer(modifier = Modifier.size(20.dp))
-                }
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .height(40.dp)
-                        .background(Color.LightGray),
-                ) {
-
-                }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colors.surface)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 24.dp, top = 24.dp, end = 24.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            AsyncImage(
+                modifier = Modifier
+                    .size(50.dp)
+                    .clip(RoundedCornerShape(15.dp)),
+                model = profile.thumbnail,
+                contentDescription = "thumbnail",
+                error = ColorPainter(Color.LightGray),
+                placeholder = ColorPainter(Color.LightGray)
+            )
+            Column(Modifier.padding(start = 15.dp), verticalArrangement = Arrangement.Center) {
+                Text(
+                    text = profile.name,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                )
+                Text(
+                    text = profile.singleLineDesc.ifEmpty { "No Description" },
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
             }
+        }
+        Spacer(modifier = Modifier.size(30.dp))
+        DrawerItem(
+            icon = {
+                Icon(
+                    Icons.Outlined.Add,
+                    contentDescription = "New Chat",
+                    Modifier.size(25.dp),
+                )
+            },
+            text = {
+                Text(text = "New Chat")
+            },
+            onClickItem = {}
+        )
+        DrawerItem(
+            icon = {
+                Icon(
+                    painterResource(id = R.drawable.history),
+                    contentDescription = "History",
+                    Modifier.size(25.dp)
+                )
+            },
+            text = {
+                Text(text = "History")
+            },
+            onClickItem = {}
+        )
+    }
+}
 
-        },
-        content = content
-    )
+@Composable
+private fun DrawerItem(
+    icon: @Composable RowScope.() -> Unit,
+    text: @Composable RowScope.() -> Unit,
+    onClickItem: () -> Unit
+) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(vertical = 15.dp, horizontal = 24.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        icon()
+        Spacer(modifier = Modifier.size(15.dp))
+        text()
+    }
 }
 
 @Composable
@@ -705,8 +736,6 @@ private fun ChatScreenPreView() {
 private fun DrawerPreView() {
     DefaultPreview {
         ChatDrawer(
-            drawerState = rememberDrawerState(initialValue = DrawerValue.Open),
-            content = {},
             profile = fakeOpponent
         )
     }
@@ -719,7 +748,6 @@ private fun ChatItemPreView() {
         ChatItem(
             chat = fakeChatData[0],
             onClickTranslate = {},
-            onClickThumbnail = {}
         )
     }
 }
@@ -772,8 +800,6 @@ private fun ChatScreenPreViewDark() {
 private fun DrawerPreViewDark() {
     DefaultPreview {
         ChatDrawer(
-            drawerState = rememberDrawerState(initialValue = DrawerValue.Open),
-            content = {},
             profile = fakeOpponent
         )
     }
@@ -786,7 +812,6 @@ private fun ChatItemPreViewDark() {
         ChatItem(
             chat = fakeChatData[0],
             onClickTranslate = {},
-            onClickThumbnail = {}
         )
     }
 }

@@ -353,6 +353,7 @@ private val fakeProfileList = List(20) {
         thumbnail = "",
         name = "Bot $it",
         description = "",
-        firstMessage = String.Empty
+        firstMessage = String.Empty,
+        singleLineDesc = ""
     )
 }

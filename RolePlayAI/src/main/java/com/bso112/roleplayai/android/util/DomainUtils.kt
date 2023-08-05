@@ -8,7 +8,8 @@ val fakeUser = Profile(
     thumbnail = "",
     name = "유저",
     description = "",
-    firstMessage = ""
+    firstMessage = "",
+    singleLineDesc = ""
 )
 
 const val MENU_ITEM_ID_PAPAGO = 111111
