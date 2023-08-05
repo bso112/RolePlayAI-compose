@@ -88,7 +88,11 @@ class ChatViewModel(
         viewModelScope.launch(coroutineContext) {
             val userChat =
                 checkNotNull(user.value).createChat(message, chatLogId.value, Role.User)
-            chatRepository.saveChatList(chatList.value + userChat, opponent.value.id)
+            chatRepository.saveChatList(
+                chatList.value + userChat,
+                opponentName = opponent.value.name,
+                opponentId = opponent.value.id
+            )
 
             val requestChatList: List<Chat> = buildList {
                 appPreference.mainPrompt.getValue().toPromptChat(role = Role.System).also(::add)
@@ -108,7 +112,11 @@ class ChatViewModel(
                 logId = chatLogId.value
             ).first()
 
-            chatRepository.saveChatList(chatList.value + chat, opponent.value.id)
+            chatRepository.saveChatList(
+                chatList.value + chat,
+                opponentName = opponent.value.name,
+                opponentId = opponent.value.id
+            )
 
             _isSendingChat.update { false }
         }
@@ -136,7 +144,8 @@ class ChatViewModel(
             val translatedChat = chat.copy(message = translated)
             chatRepository.saveChatList(
                 chatList.value.replace(chat, translatedChat),
-                opponent.value.id
+                opponentName = opponent.value.name,
+                opponentId = opponent.value.id
             )
         }
     }

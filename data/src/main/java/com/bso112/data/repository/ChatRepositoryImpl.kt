@@ -59,10 +59,17 @@ class ChatRepositoryImpl(
     }
 
 
-    override suspend fun saveChatList(chatList: List<Chat>, opponentId: String) {
+    override suspend fun saveChatList(
+        chatList: List<Chat>,
+        opponentName: String,
+        opponentId: String
+    ) {
         if (chatList.isEmpty()) return
         chatLocalDataSource.saveChatList(chatList.map(Chat::toEntity))
-        chatLocalDataSource.saveChatLog(chatList.last().toChatLog(opponentId).toEntity())
+        chatLocalDataSource.saveChatLog(
+            chatList.last().toChatLog(opponentName = opponentName, opponentId = opponentId)
+                .toEntity()
+        )
         _dataChangedEvent.emit(ChatListChanged)
         _dataChangedEvent.emit(ChatLogChanged)
     }

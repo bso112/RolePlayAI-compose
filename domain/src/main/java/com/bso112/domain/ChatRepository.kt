@@ -15,7 +15,7 @@ interface ChatRepository : DataChangeNotifier {
     ): Flow<String>
 
 
-    suspend fun saveChatList(chatList: List<Chat>, opponentId: String)
+    suspend fun saveChatList(chatList: List<Chat>, opponentName: String, opponentId: String)
     fun sendChat(speaker: Profile, messages: List<Chat>, logId: String): Flow<Chat>
     fun getAllChat(logId: String): Flow<List<Chat>>
     fun getAllChatLog(): Flow<List<ChatLog>>

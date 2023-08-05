@@ -4,16 +4,19 @@ data class ChatLog(
     val id: String,
     val opponentId: String,
     val name: String,
+    val opponentName: String,
     val thumbnail: String,
     val previewMessage: String,
-    val modifiedAt : Long
+    val modifiedAt: Long
 )
 
 /**
  * @param opponentId 대화 상대방의 id
+ * @param opponentName 대화 상대방의 이름
  */
-fun Chat.toChatLog(opponentId: String = profileId) = ChatLog(
+fun Chat.toChatLog(opponentName: String, opponentId: String = profileId) = ChatLog(
     id = logId,
+    opponentName = opponentName,
     opponentId = opponentId,
     name = name,
     thumbnail = thumbnail,

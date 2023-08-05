@@ -284,7 +284,7 @@ private fun ChatLogItem(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    chatLog.name,
+                    chatLog.opponentName,
                     color = MaterialTheme.colors.onSurface,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
