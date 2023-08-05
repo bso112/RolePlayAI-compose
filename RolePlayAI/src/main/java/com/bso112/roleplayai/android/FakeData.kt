@@ -17,7 +17,9 @@ val fakeChatLogList = buildList {
                 name = "Yuzu",
                 thumbnail = "",
                 previewMessage = "hello world",
-                modifiedAt = System.currentTimeMillis()
+                modifiedAt = System.currentTimeMillis(),
+                opponentName = "Yuzu",
+                alias = "hello world"
             )
         )
     }

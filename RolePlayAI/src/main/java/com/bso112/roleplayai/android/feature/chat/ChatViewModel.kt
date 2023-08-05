@@ -154,9 +154,15 @@ class ChatViewModel(
         chatLogId.update { logId }
     }
 
-    fun deleteChatLogList(chatLogList: List<ChatLog>) {
+    fun updateChatLog(chatLog: ChatLog){
         viewModelScope.launch(coroutineContext) {
-            chatRepository.deleteChatLogList(chatLogList)
+            chatRepository.updateChatLog(chatLog)
+        }
+    }
+
+    fun deleteChatLog(chatLog: ChatLog) {
+        viewModelScope.launch(coroutineContext) {
+            chatRepository.deleteChatLog(chatLog)
         }
     }
 

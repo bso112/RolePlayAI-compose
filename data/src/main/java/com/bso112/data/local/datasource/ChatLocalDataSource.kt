@@ -52,6 +52,12 @@ class ChatLocalDataSource(
         }
     }
 
+    suspend fun updateChatLog(chatLog: ChatLogEntity) {
+        return db.withTransaction {
+            chatLogDao.update(chatLog)
+        }
+    }
+
     suspend fun deleteChatLog(chatLog: ChatLogEntity) {
         return db.withTransaction {
             chatLogDao.delete(chatLog)

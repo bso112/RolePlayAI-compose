@@ -41,12 +41,15 @@ fun Chat.toEntity() = ChatEntity(
     createdAt = createdAt
 )
 
-fun ChatEntity.toChatLog(opponentId: String): ChatLogEntity {
+fun ChatEntity.toChatLog(opponentName: String, opponentId: String): ChatLogEntity {
     return ChatLogEntity(
         id = logId,
         name = name,
         thumbnail = thumbnail,
         previewMessage = message,
-        opponentId = opponentId
-    )
+        opponentId = opponentId,
+        opponentName = opponentName,
+        modifiedAt = System.currentTimeMillis(),
+        alias = message,
+        )
 }

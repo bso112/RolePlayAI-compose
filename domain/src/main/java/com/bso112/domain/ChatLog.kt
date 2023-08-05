@@ -7,7 +7,8 @@ data class ChatLog(
     val opponentName: String,
     val thumbnail: String,
     val previewMessage: String,
-    val modifiedAt: Long
+    val modifiedAt: Long,
+    val alias: String
 )
 
 /**
@@ -21,5 +22,6 @@ fun Chat.toChatLog(opponentName: String, opponentId: String = profileId) = ChatL
     name = name,
     thumbnail = thumbnail,
     previewMessage = message,
-    modifiedAt = System.currentTimeMillis()
+    modifiedAt = System.currentTimeMillis(),
+    alias = message
 )

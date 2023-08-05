@@ -4,7 +4,6 @@ import android.content.res.Configuration
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,6 +31,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -42,7 +42,6 @@ import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.RadioButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -54,6 +53,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.outlined.Add
@@ -68,6 +69,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.toArgb
@@ -77,8 +80,11 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -88,6 +94,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import coil.compose.AsyncImage
+import com.bso112.data.toDateString
 import com.bso112.domain.Chat
 import com.bso112.domain.ChatLog
 import com.bso112.domain.Profile
@@ -185,13 +192,16 @@ fun ChatScreenRoute(
         ChatLogListDialog(
             chatLogList = chatLogList,
             onDismiss = { isShowChatLogDialog = false },
-            onDeleteChatLog = {
-                viewModel.deleteChatLogList(it)
-            },
             onSelectChatLog = {
                 viewModel.changeLogId(it.id)
                 isShowChatLogDialog = false
-            }
+            },
+            onEditChatLogAlias = {
+                viewModel.updateChatLog(it)
+            },
+            onDeleteChatLog = {
+                viewModel.deleteChatLog(it)
+            },
         )
     }
 }
@@ -214,7 +224,6 @@ fun ChatScreen(
     val focusManager = LocalFocusManager.current
     val listState = rememberLazyListState()
     val scaffoldState = rememberScaffoldState()
-    var selectedProfile: Profile by remember { mutableStateOf(Profile.Empty) }
     val coroutineScope = rememberCoroutineScope()
     var isShowTopBarMenu by remember { mutableStateOf(false) }
 
@@ -625,12 +634,22 @@ private fun NewChatAlertDialog(
 private fun ChatLogListDialog(
     chatLogList: List<ChatLog>,
     onSelectChatLog: (ChatLog) -> Unit,
-    onDeleteChatLog: (List<ChatLog>) -> Unit,
+    onDeleteChatLog: (ChatLog) -> Unit,
+    onEditChatLogAlias: (ChatLog) -> Unit,
     onDismiss: () -> Unit
 ) {
 
-    var isSelectionMode by remember { mutableStateOf(false) }
-    var selectedChatLog by remember { mutableStateOf<List<ChatLog>>(emptyList()) }
+    var isEditChatLogMode by remember { mutableStateOf(false) }
+    var isEditChatLogAliasMode by remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(isEditChatLogMode, isEditChatLogAliasMode) {
+        if (isEditChatLogAliasMode) {
+            focusRequester.requestFocus()
+        } else {
+            focusRequester.freeFocus()
+        }
+    }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -646,25 +665,15 @@ private fun ChatLogListDialog(
                     .padding(20.dp)
             ) {
                 Row(
+                    modifier = Modifier.height(50.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.height(35.dp)
                 ) {
                     Text(text = stringResource(id = R.string.chat_log_list))
                     Spacer(Modifier.weight(1f))
-                    if (isSelectionMode) {
-                        if (selectedChatLog.isNotEmpty()) {
-                            IconButton(onClick = {
-                                onDeleteChatLog(selectedChatLog)
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Default.Delete,
-                                    contentDescription = "delete selected chat log"
-                                )
-                            }
-                        }
+                    if (isEditChatLogMode) {
                         IconButton(onClick = {
-                            selectedChatLog = emptyList()
-                            isSelectionMode = false
+                            isEditChatLogMode = false
+                            isEditChatLogAliasMode = false
                         }) {
                             Icon(
                                 imageVector = Icons.Default.Close,
@@ -679,32 +688,76 @@ private fun ChatLogListDialog(
                         .align(Alignment.CenterHorizontally)
                 ) {
                     items(chatLogList) { chatLog ->
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            AnimatedVisibility(visible = isSelectionMode) {
-                                RadioButton(
-                                    modifier = Modifier.size(24.dp),
-                                    selected = selectedChatLog.contains(chatLog),
-                                    onClick = {
-                                        selectedChatLog = if (selectedChatLog.contains(chatLog)) {
-                                            selectedChatLog - chatLog
-                                        } else {
-                                            selectedChatLog + chatLog
-                                        }
-                                    })
-                            }
-                            //TODO 시간 보여주기
-                            Text(
-                                modifier = Modifier
+                        var chatLogAlias by remember { mutableStateOf(TextFieldValue(chatLog.alias)) }
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .height(60.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(
+                                Modifier
                                     .weight(1f)
                                     .padding(10.dp)
                                     .combinedClickable(
-                                        onClick = { if (!isSelectionMode) onSelectChatLog(chatLog) },
-                                        onLongClick = { isSelectionMode = true }
+                                        onClick = { onSelectChatLog(chatLog) },
+                                        onLongClick = { isEditChatLogMode = true }
+                                    )
+                            ) {
+                                BasicTextField(
+                                    modifier = Modifier
+                                        .focusRequester(focusRequester),
+                                    value = chatLogAlias,
+                                    enabled = isEditChatLogAliasMode,
+                                    onValueChange = { chatLogAlias = it },
+                                    maxLines = 1,
+                                    textStyle = TextStyle(
+                                        color = MaterialTheme.colors.onSurface,
+                                        fontSize = 16.sp
                                     ),
-                                text = chatLog.previewMessage,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
+                                )
+                                Text(
+                                    modifier = Modifier
+                                        .padding(top = 3.dp),
+                                    text = chatLog.modifiedAt.toDateString(),
+                                    color = MaterialTheme.colors.caption,
+                                    maxLines = 1,
+                                    fontSize = 12.sp
+                                )
+                            }
+                            if (isEditChatLogMode) {
+                                IconButton(
+                                    onClick = {
+                                        if (!isEditChatLogAliasMode) {
+                                            isEditChatLogAliasMode = true
+                                            chatLogAlias = chatLogAlias.copy(
+                                                selection = TextRange(chatLogAlias.text.length)
+                                            )
+                                        } else {
+                                            isEditChatLogMode = false
+                                            isEditChatLogAliasMode = false
+                                            onEditChatLogAlias(chatLog.copy(alias = chatLogAlias.text))
+                                        }
+                                    }) {
+                                    if (isEditChatLogAliasMode) {
+                                        Icon(
+                                            imageVector = Icons.Default.Done,
+                                            contentDescription = "done edit chatlog"
+                                        )
+                                    } else {
+                                        Icon(
+                                            imageVector = Icons.Default.Edit,
+                                            contentDescription = "edit chatlog"
+                                        )
+                                    }
+                                }
+                                IconButton(onClick = { onDeleteChatLog(chatLog) }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Delete,
+                                        contentDescription = "delete chatlog"
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -712,7 +765,7 @@ private fun ChatLogListDialog(
                 TextButton(modifier = Modifier.align(Alignment.End), onClick = onDismiss) {
                     Text(
                         text = stringResource(id = R.string.cancel),
-                        color = MaterialTheme.colors.onSurface
+                        color = MaterialTheme.colors.highlightText
                     )
                 }
             }
@@ -780,7 +833,8 @@ private fun ChatLogListDialogPreView() {
             chatLogList = fakeChatLogList,
             onSelectChatLog = {},
             onDismiss = {},
-            onDeleteChatLog = {}
+            onDeleteChatLog = {},
+            onEditChatLogAlias = {}
         )
     }
 }
@@ -844,7 +898,8 @@ private fun ChatLogListDialogPreViewDark() {
             chatLogList = fakeChatLogList,
             onSelectChatLog = {},
             onDismiss = {},
-            onDeleteChatLog = {}
+            onDeleteChatLog = {},
+            onEditChatLogAlias = {}
         )
     }
 }

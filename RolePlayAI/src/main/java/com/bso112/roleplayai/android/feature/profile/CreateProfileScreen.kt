@@ -101,9 +101,9 @@ fun CreateProfileScreenRoute(
         },
         onNameChanged = viewModel.name::value::set,
         onDescriptionChanged = viewModel.description::value::set,
+        onSingleLineDescriptionChanged = viewModel.singleLineDesc::value::set,
         onProfileImageChanged = viewModel.profileImage::value::set,
         onFirstMessageChanged = viewModel.firstMessage::value::set,
-        onSingleLineDescriptionChanged = viewModel.singleLineDesc::value::set,
     )
 }
 
@@ -297,7 +297,7 @@ private fun CreateProfileScreenPreView() {
             name = "세이버",
             description = "영국의 기사왕",
             profileImage = "그대가 나의 마스터인가?",
-
+            singleLineDesc = "영국의 기사왕",
             )
     }
 }

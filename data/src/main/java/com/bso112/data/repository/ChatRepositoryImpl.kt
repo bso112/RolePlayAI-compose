@@ -109,6 +109,11 @@ class ChatRepositoryImpl(
         _dataChangedEvent.emit(ChatLogChanged)
     }
 
+    override suspend fun updateChatLog(chatLog: ChatLog) {
+        chatLocalDataSource.updateChatLog(chatLog.toEntity())
+        _dataChangedEvent.emit(ChatLogChanged)
+    }
+
     override suspend fun deleteChatLogList(chatLogList: List<ChatLog>) {
         chatLocalDataSource.deleteChatLogList(chatLogList.map(ChatLog::toEntity))
         _dataChangedEvent.emit(ChatLogChanged)

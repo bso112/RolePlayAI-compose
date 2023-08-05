@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.bso112.data.local.entity.ChatLogEntity
 
 @Dao
@@ -15,6 +16,9 @@ interface ChatLogDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(chatLog: ChatLogEntity)
+
+    @Update
+    suspend fun update(chatLog: ChatLogEntity)
 
     @Delete
     suspend fun delete(chatLog: ChatLogEntity)

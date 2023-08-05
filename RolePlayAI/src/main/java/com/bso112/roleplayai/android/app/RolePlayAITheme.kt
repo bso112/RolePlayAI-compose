@@ -68,7 +68,7 @@ val Colors.chatBubbleOther get() = if (isLight) Color(0xFFEBEBEB) else Color(0xF
 
 val Colors.chatBubbleUser get() = primaryVariant
 
-val Colors.highlightText get() = if (isLight) Color(0xFF7758CC) else Color.White
+val Colors.highlightText get() = if (isLight) primary else Color.White
 
 val Colors.chatTextFieldBackground get() = if(isLight) Color(0xFFF2ECFF) else Color(0xFFA6A9B6)
 
