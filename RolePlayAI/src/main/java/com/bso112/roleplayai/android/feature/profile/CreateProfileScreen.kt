@@ -3,33 +3,47 @@ package com.bso112.roleplayai.android.feature.profile
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
-import androidx.compose.material.TextField
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -56,6 +70,7 @@ fun CreateProfileScreenRoute(
 ) {
     val name: String by viewModel.name.collectAsStateWithLifecycle()
     val description: String by viewModel.description.collectAsStateWithLifecycle()
+    val singleLineDesc: String by viewModel.singleLineDesc.collectAsStateWithLifecycle()
     val profileImage: String by viewModel.profileImage.collectAsStateWithLifecycle(initialValue = viewModel.argument.profile?.thumbnail.orEmpty())
     val firstMessage: String by viewModel.firstMessage.collectAsStateWithLifecycle()
     val isUser: Boolean by viewModel.isUser.collectAsStateWithLifecycle()
@@ -73,6 +88,7 @@ fun CreateProfileScreenRoute(
         name = name,
         description = description,
         firstMessage = firstMessage,
+        singleLineDesc = singleLineDesc,
         isUser = isUser,
         onClickBackButton = {
             appState.navController.popBackStack()
@@ -87,6 +103,7 @@ fun CreateProfileScreenRoute(
         onDescriptionChanged = viewModel.description::value::set,
         onProfileImageChanged = viewModel.profileImage::value::set,
         onFirstMessageChanged = viewModel.firstMessage::value::set,
+        onSingleLineDescriptionChanged = viewModel.singleLineDesc::value::set,
     )
 }
 
@@ -96,11 +113,13 @@ private fun CreateProfileScreen(
     name: String,
     isUser: Boolean,
     description: String,
+    singleLineDesc: String,
     firstMessage: String,
     onClickBackButton: () -> Unit = {},
     onClickSubmit: () -> Unit = {},
     onNameChanged: (String) -> Unit = {},
     onDescriptionChanged: (String) -> Unit = {},
+    onSingleLineDescriptionChanged: (String) -> Unit = {},
     onProfileImageChanged: (String) -> Unit = {},
     onFirstMessageChanged: (String) -> Unit = {},
 ) {
@@ -135,53 +154,137 @@ private fun CreateProfileScreen(
 
     val themeColors = MaterialTheme.colors
 
-    Column(
-        modifier = Modifier
-            .verticalScroll(rememberScrollState())
-    ) {
-        TopAppBar {
-            IconButton(onClick = onClickBackButton) {
-                Icon(Icons.Filled.ArrowBack, contentDescription = "go back")
-            }
-            Spacer(Modifier.weight(1f))
-            TextButton(onClick = onClickSubmit) {
-                Text(
-                    text = stringResource(id = R.string.submit),
-                    fontSize = 16.sp,
-                    color = themeColors.onPrimary
-                )
+    Scaffold(
+        topBar = {
+            TopAppBar {
+                IconButton(onClick = onClickBackButton) {
+                    Icon(Icons.Filled.ArrowBack, contentDescription = "go back")
+                }
+                Spacer(Modifier.weight(1f))
+                TextButton(onClick = onClickSubmit) {
+                    Text(
+                        text = stringResource(id = R.string.submit),
+                        fontSize = 16.sp,
+                        color = themeColors.onPrimary
+                    )
+                }
             }
         }
-        Column(modifier = Modifier.padding(16.dp)) {
-            AsyncImage(
-                modifier = Modifier
-                    .size(100.dp)
-                    .clickable { getContent.launch("image/*") },
-                model = profileImage,
-                placeholder = painterResource(id = R.drawable.saber),
-                contentScale = ContentScale.Crop,
-                error = ColorPainter(Color.Red),
-                contentDescription = "portrait"
-            )
+    ) { paddingValue ->
+        Column(
+            modifier = Modifier
+                .padding(paddingValue)
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                AsyncImage(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clickable { getContent.launch("image/*") }
+                        .clip(CircleShape),
+                    model = profileImage,
+                    placeholder = painterResource(id = R.drawable.saber),
+                    contentScale = ContentScale.Crop,
+                    error = ColorPainter(Color.Red),
+                    contentDescription = "portrait"
+                )
+                IconButton(
+                    onClick = { /*TODO*/ },
+                    modifier = Modifier
+                        .shadow(2.dp, CircleShape)
+                        .background(Color.White, shape = CircleShape)
+                        .align(Alignment.BottomEnd)
+                        .size(30.dp)
+                ) {
+                    Icon(
+                        modifier = Modifier.size(18.dp),
+                        painter = painterResource(id = R.drawable.add_photo2),
+                        contentDescription = "add photo"
+                    )
+                }
+            }
             Spacer(modifier = Modifier.size(10.dp))
-            Column {
-                TextField(value = name, label = { Text("name") }, onValueChange = onNameChanged)
-                TextField(
+            Column(Modifier.padding(horizontal = 10.dp)) {
+                ProfileInput(
+                    title = "name",
+                    value = name,
+                    onValueChange = onNameChanged
+                )
+                Spacer(modifier = Modifier.size(10.dp))
+                ProfileInput(
+                    title = "singleline description",
+                    value = singleLineDesc,
+                    onValueChange = onSingleLineDescriptionChanged
+                )
+                Spacer(modifier = Modifier.size(10.dp))
+                ProfileInput(
+                    title = "description",
                     value = description,
-                    label = { Text("description") },
+                    textFieldBoxHeight = 200.dp,
                     onValueChange = onDescriptionChanged
                 )
+                Spacer(modifier = Modifier.size(10.dp))
                 if (!isUser) {
-                    TextField(
+                    ProfileInput(
+                        title = "first message",
                         value = firstMessage,
-                        label = { Text("first Message") },
-                        onValueChange = onFirstMessageChanged,
+                        onValueChange = onFirstMessageChanged
+                    )
+                }
+                Spacer(modifier = Modifier.size(20.dp))
+                TextButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            MaterialTheme.colors.primary,
+                            shape = RoundedCornerShape(5.dp)
+                        ),
+                    onClick = onClickSubmit
+                ) {
+                    Text(
+                        text = "Save",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colors.onPrimary,
                     )
                 }
             }
         }
     }
+}
 
+@Composable
+private fun ProfileInput(
+    title: String,
+    value: String,
+    textFieldBoxHeight: Dp? = null,
+    onValueChange: (String) -> Unit = {}
+) {
+    val modifier = if (textFieldBoxHeight == null) {
+        Modifier
+            .fillMaxWidth()
+            .border(1.dp, Color.LightGray, RoundedCornerShape(5.dp))
+    } else {
+        Modifier
+            .fillMaxWidth()
+            .height(textFieldBoxHeight)
+            .border(1.dp, Color.LightGray, RoundedCornerShape(5.dp))
+    }
+    Text(title, fontWeight = FontWeight.Bold)
+    Spacer(modifier = Modifier.size(5.dp))
+    Box(
+        modifier = modifier
+    ) {
+        BasicTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp),
+            value = value,
+            onValueChange = onValueChange,
+            cursorBrush = SolidColor(MaterialTheme.colors.primary),
+        )
+    }
 }
 
 @Composable
@@ -193,7 +296,8 @@ private fun CreateProfileScreenPreView() {
             firstMessage = "안녕하세요",
             name = "세이버",
             description = "영국의 기사왕",
-            profileImage = "그대가 나의 마스터인가?"
-        )
+            profileImage = "그대가 나의 마스터인가?",
+
+            )
     }
 }

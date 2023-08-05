@@ -95,6 +95,7 @@ import com.bso112.domain.Role
 import com.bso112.roleplayai.android.R
 import com.bso112.roleplayai.android.app.RolePlayAITheme
 import com.bso112.roleplayai.android.app.RolePlayAppState
+import com.bso112.roleplayai.android.app.caption
 import com.bso112.roleplayai.android.app.chatBubbleOther
 import com.bso112.roleplayai.android.app.chatBubbleUser
 import com.bso112.roleplayai.android.app.highlightText
@@ -253,7 +254,12 @@ fun ChatScreen(
                         placeholder = ColorPainter(Color.LightGray)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(opponent.name, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    Text(
+                        opponent.name,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
                 }
                 Box {
                     IconButton(
@@ -289,30 +295,33 @@ fun ChatScreen(
         bottomBar = {
             Row(
                 Modifier
-                    .height(52.dp)
-                    .background(MaterialTheme.colors.surface),
+                    .height(52.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TextField(
-                    value = userChat,
-                    colors = TextFieldDefaults.textFieldColors(
-                        disabledTextColor = Color.Transparent,
-                        backgroundColor = Color.White,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        disabledIndicatorColor = Color.Transparent
-                    ),
-                    onValueChange = onUserTextChanged,
-                    enabled = !isSendingChat,
-                    modifier = Modifier
-                        .weight(1f),
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = {
-                        onUserSubmitChat(userChat)
-                        focusManager.clearFocus()
-                    }),
-                    singleLine = true
-                )
+                Box(
+                    Modifier
+                        .background(Color.White)
+                        .weight(1f)
+                ) {
+                    TextField(
+                        value = userChat,
+                        colors = TextFieldDefaults.textFieldColors(
+                            disabledTextColor = Color.Transparent,
+                            backgroundColor = Color.White,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent
+                        ),
+                        onValueChange = onUserTextChanged,
+                        enabled = !isSendingChat,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(onDone = {
+                            onUserSubmitChat(userChat)
+                            focusManager.clearFocus()
+                        }),
+                        singleLine = true
+                    )
+                }
                 if (isSendingChat) {
                     CircularProgressIndicator(
                         modifier = Modifier
@@ -527,7 +536,7 @@ fun ChatDrawer(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     fontSize = 14.sp,
-                    color = Color.DarkGray
+                    color = MaterialTheme.colors.caption
                 )
             }
         }
