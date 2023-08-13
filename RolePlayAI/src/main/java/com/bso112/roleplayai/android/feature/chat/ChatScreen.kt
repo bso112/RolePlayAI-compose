@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -725,37 +726,42 @@ private fun ChatLogListDialog(
                                     fontSize = 12.sp
                                 )
                             }
-                            if (isEditChatLogMode) {
-                                IconButton(
-                                    onClick = {
-                                        if (!isEditChatLogAliasMode) {
-                                            isEditChatLogAliasMode = true
-                                            chatLogAlias = chatLogAlias.copy(
-                                                selection = TextRange(chatLogAlias.text.length)
+                            AnimatedVisibility(visible = isEditChatLogMode) {
+                                Row(
+                                    modifier = Modifier.padding(start = 5.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    IconButton(
+                                        onClick = {
+                                            if (!isEditChatLogAliasMode) {
+                                                isEditChatLogAliasMode = true
+                                                chatLogAlias = chatLogAlias.copy(
+                                                    selection = TextRange(chatLogAlias.text.length)
+                                                )
+                                            } else {
+                                                isEditChatLogMode = false
+                                                isEditChatLogAliasMode = false
+                                                onEditChatLogAlias(chatLog.copy(alias = chatLogAlias.text))
+                                            }
+                                        }) {
+                                        if (isEditChatLogAliasMode) {
+                                            Icon(
+                                                imageVector = Icons.Default.Done,
+                                                contentDescription = "done edit chatlog"
                                             )
                                         } else {
-                                            isEditChatLogMode = false
-                                            isEditChatLogAliasMode = false
-                                            onEditChatLogAlias(chatLog.copy(alias = chatLogAlias.text))
+                                            Icon(
+                                                imageVector = Icons.Default.Edit,
+                                                contentDescription = "edit chatlog"
+                                            )
                                         }
-                                    }) {
-                                    if (isEditChatLogAliasMode) {
+                                    }
+                                    IconButton(onClick = { onDeleteChatLog(chatLog) }) {
                                         Icon(
-                                            imageVector = Icons.Default.Done,
-                                            contentDescription = "done edit chatlog"
-                                        )
-                                    } else {
-                                        Icon(
-                                            imageVector = Icons.Default.Edit,
-                                            contentDescription = "edit chatlog"
+                                            imageVector = Icons.Default.Delete,
+                                            contentDescription = "delete chatlog"
                                         )
                                     }
-                                }
-                                IconButton(onClick = { onDeleteChatLog(chatLog) }) {
-                                    Icon(
-                                        imageVector = Icons.Default.Delete,
-                                        contentDescription = "delete chatlog"
-                                    )
                                 }
                             }
                         }
