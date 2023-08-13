@@ -5,10 +5,12 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -76,6 +78,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -123,6 +126,7 @@ import com.bso112.roleplayai.android.util.sliceSafe
 import com.bso112.roleplayai.android.util.toast
 import com.bso112.roleplayai.android.util.tryOpenPapagoMini
 import com.bso112.util.randomID
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -227,10 +231,9 @@ fun ChatScreen(
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
     var isShowTopBarMenu by remember { mutableStateOf(false) }
+    var lastLazyColumnHeight by remember { mutableStateOf(0) }
+    var lastChatCount: Int by remember { mutableStateOf(chatList.size) }
 
-    LaunchedEffect(chatList) {
-        listState.animateScrollToItem(chatList.lastIndex.coerceAtLeast(0))
-    }
 
     Scaffold(
         scaffoldState = scaffoldState,
@@ -371,7 +374,19 @@ fun ChatScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colors.surface)
-                .padding(paddingValue),
+                .padding(paddingValue)
+                .onSizeChanged { size ->
+                    if (lastLazyColumnHeight == size.height) return@onSizeChanged
+                    coroutineScope.launch {
+                        if (listState.canScrollForward && listState.canScrollBackward && lastLazyColumnHeight != 0) {
+                            listState.animateScrollBy(
+                                lastLazyColumnHeight.toFloat() - size.height,
+                                tween(durationMillis = 20)
+                            )
+                        }
+                        lastLazyColumnHeight = size.height
+                    }
+                },
             contentPadding = PaddingValues(top = 30.dp)
         ) {
             itemsIndexed(chatList) { index, chat ->
@@ -386,6 +401,14 @@ fun ChatScreen(
                     Spacer(modifier = Modifier.height(15.dp))
                 }
             }
+        }
+    }
+
+    LaunchedEffect(chatList) {
+        delay(10)
+        val lasItem = listState.layoutInfo.visibleItemsInfo.lastOrNull() ?: return@LaunchedEffect
+        coroutineScope.launch {
+            listState.scrollToItem(chatList.size - 1, lasItem.size)
         }
     }
 }
