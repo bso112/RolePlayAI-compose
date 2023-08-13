@@ -3,6 +3,7 @@
     <string name="edit">수정하기</string>
     <string name="chat">대화하기</string>
     <string name="submit">등록하기</string>
+    <string name="btn_submit">등록</string>
 
     <string name="confirm">확인</string>
     <string name="cancel">취소</string>
@@ -19,4 +20,19 @@
     <string name="menu_papago">파파고 번역</string>
 
     <string name="fail_open_app">앱을 열 수 없습니다.</string>
+
+    <string name="title_character">캐릭터</string>
+    <string name="profile_name">이름</string>
+    <string name="profile_single_line_description">한줄 소개</string>
+    <string name="profile_description">설명</string>
+    <string name="profile_first_message">첫 메시지</string>
+
+    <string name="time_years_ago">%d년 전</string>
+    <string name="time_months_ago">%d개월 전</string>
+    <string name="time_days_ago">%d일 전</string>
+    <string name="time_hours_ago">%d시간 전</string>
+    <string name="time_minutes_ago">%d분 전</string>
+    <string name="time_just_now">방금 전</string>
+
+
 </resources>

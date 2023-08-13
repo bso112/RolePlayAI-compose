@@ -98,7 +98,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import coil.compose.AsyncImage
-import com.bso112.data.toDateString
 import com.bso112.domain.Chat
 import com.bso112.domain.ChatLog
 import com.bso112.domain.Profile
@@ -123,6 +122,7 @@ import com.bso112.roleplayai.android.util.PAPAGO_PACKAGE_NAME
 import com.bso112.roleplayai.android.util.fakeUser
 import com.bso112.roleplayai.android.util.isAppInstalled
 import com.bso112.roleplayai.android.util.sliceSafe
+import com.bso112.roleplayai.android.util.toDateString
 import com.bso112.roleplayai.android.util.toast
 import com.bso112.roleplayai.android.util.tryOpenPapagoMini
 import com.bso112.util.randomID
@@ -666,6 +666,7 @@ private fun ChatLogListDialog(
     var isEditChatLogMode by remember { mutableStateOf(false) }
     var isEditChatLogAliasMode by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
+    val context = LocalContext.current
 
     LaunchedEffect(isEditChatLogMode, isEditChatLogAliasMode) {
         if (isEditChatLogAliasMode) {
@@ -743,7 +744,7 @@ private fun ChatLogListDialog(
                                 Text(
                                     modifier = Modifier
                                         .padding(top = 3.dp),
-                                    text = chatLog.modifiedAt.toDateString(),
+                                    text = chatLog.modifiedAt.toDateString(context),
                                     color = MaterialTheme.colors.caption,
                                     maxLines = 1,
                                     fontSize = 12.sp

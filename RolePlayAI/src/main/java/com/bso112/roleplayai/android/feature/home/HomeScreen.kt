@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -47,7 +48,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
-import com.bso112.data.toDateString
 import com.bso112.domain.ChatLog
 import com.bso112.domain.Profile
 import com.bso112.roleplayai.android.R
@@ -61,6 +61,7 @@ import com.bso112.roleplayai.android.feature.profile.navigateCreateProfile
 import com.bso112.roleplayai.android.util.DefaultPreview
 import com.bso112.roleplayai.android.util.Empty
 import com.bso112.roleplayai.android.util.ifIs
+import com.bso112.roleplayai.android.util.toDateString
 import com.bso112.util.randomID
 import org.koin.androidx.compose.koinViewModel
 import java.io.File
@@ -110,7 +111,7 @@ private fun HomeScreen(
                 .background(MaterialTheme.colors.primary)
         ) {
             Text(
-                "Characters",
+                text = stringResource(id = R.string.title_character),
                 modifier = Modifier.padding(
                     start = 15.dp,
                     end = 15.dp,
@@ -253,6 +254,7 @@ private fun ChatLogItem(
     onChatLogClick: () -> Unit,
     onChatLogLongClick: () -> Unit
 ) {
+    val context = LocalContext.current
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -299,7 +301,7 @@ private fun ChatLogItem(
             }
             Text(
                 modifier = Modifier.padding(top = 10.dp),
-                text = chatLog.modifiedAt.toDateString(),
+                text = chatLog.modifiedAt.toDateString(context),
                 fontSize = 12.sp,
                 color = MaterialTheme.colors.caption,
             )

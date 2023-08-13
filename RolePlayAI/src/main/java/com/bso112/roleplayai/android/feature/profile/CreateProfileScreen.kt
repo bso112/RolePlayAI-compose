@@ -184,7 +184,7 @@ private fun CreateProfileScreen(
                         .clickable { getContent.launch("image/*") }
                         .clip(CircleShape),
                     model = profileImage,
-                    placeholder = painterResource(id = R.drawable.saber),
+                    placeholder = ColorPainter(Color.LightGray),
                     contentScale = ContentScale.Crop,
                     error = ColorPainter(Color.Red),
                     contentDescription = "portrait"
@@ -207,19 +207,19 @@ private fun CreateProfileScreen(
             Spacer(modifier = Modifier.size(10.dp))
             Column(Modifier.padding(horizontal = 10.dp)) {
                 ProfileInput(
-                    title = "name",
+                    title = stringResource(id = R.string.profile_name),
                     value = name,
                     onValueChange = onNameChanged
                 )
                 Spacer(modifier = Modifier.size(10.dp))
                 ProfileInput(
-                    title = "singleline description",
+                    title = stringResource(id = R.string.profile_single_line_description),
                     value = singleLineDesc,
                     onValueChange = onSingleLineDescriptionChanged
                 )
                 Spacer(modifier = Modifier.size(10.dp))
                 ProfileInput(
-                    title = "description",
+                    title = stringResource(id = R.string.profile_description),
                     value = description,
                     textFieldBoxHeight = 200.dp,
                     onValueChange = onDescriptionChanged
@@ -227,7 +227,7 @@ private fun CreateProfileScreen(
                 Spacer(modifier = Modifier.size(10.dp))
                 if (!isUser) {
                     ProfileInput(
-                        title = "first message",
+                        title = stringResource(id = R.string.profile_first_message),
                         value = firstMessage,
                         onValueChange = onFirstMessageChanged
                     )
@@ -243,7 +243,7 @@ private fun CreateProfileScreen(
                     onClick = onClickSubmit
                 ) {
                     Text(
-                        text = "Save",
+                        text = stringResource(id = R.string.btn_submit),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colors.onPrimary,
@@ -298,6 +298,6 @@ private fun CreateProfileScreenPreView() {
             description = "영국의 기사왕",
             profileImage = "그대가 나의 마스터인가?",
             singleLineDesc = "영국의 기사왕",
-            )
+        )
     }
 }
