@@ -510,6 +510,7 @@ fun ChatContentText(chat: Chat, textColor: Color) {
                                     mode?.finish()
                                     true
                                 }
+
                                 else -> false
                             }
                         }
@@ -654,16 +655,16 @@ private fun ChatLogListDialog(
     onDismiss: () -> Unit
 ) {
 
-    var isEditChatLogMode by remember { mutableStateOf(false) }
+    var focusedChatLog: ChatLog? by remember { mutableStateOf(null) }
     var isEditChatLogAliasMode by remember { mutableStateOf(false) }
-    val focusRequester = remember { FocusRequester() }
+    val focusRequester = remember { chatLogList.associateWith { FocusRequester() } }
     val context = LocalContext.current
 
-    LaunchedEffect(isEditChatLogMode, isEditChatLogAliasMode) {
+    LaunchedEffect(focusedChatLog, isEditChatLogAliasMode) {
         if (isEditChatLogAliasMode) {
-            focusRequester.requestFocus()
+            focusRequester[focusedChatLog]?.requestFocus()
         } else {
-            focusRequester.freeFocus()
+            focusRequester[focusedChatLog]?.freeFocus()
         }
     }
 
@@ -686,9 +687,9 @@ private fun ChatLogListDialog(
                 ) {
                     Text(text = stringResource(id = R.string.chat_log_list))
                     Spacer(Modifier.weight(1f))
-                    if (isEditChatLogMode) {
+                    if (focusedChatLog != null) {
                         IconButton(onClick = {
-                            isEditChatLogMode = false
+                            focusedChatLog = null
                             isEditChatLogAliasMode = false
                         }) {
                             Icon(
@@ -717,12 +718,14 @@ private fun ChatLogListDialog(
                                     .padding(10.dp)
                                     .combinedClickable(
                                         onClick = { onSelectChatLog(chatLog) },
-                                        onLongClick = { isEditChatLogMode = true }
+                                        onLongClick = { focusedChatLog = chatLog }
                                     )
                             ) {
                                 BasicTextField(
                                     modifier = Modifier
-                                        .focusRequester(focusRequester),
+                                        .focusRequester(
+                                            focusRequester[chatLog] ?: FocusRequester()
+                                        ),
                                     value = chatLogAlias,
                                     enabled = isEditChatLogAliasMode,
                                     onValueChange = { chatLogAlias = it },
@@ -741,7 +744,7 @@ private fun ChatLogListDialog(
                                     fontSize = 12.sp
                                 )
                             }
-                            AnimatedVisibility(visible = isEditChatLogMode) {
+                            AnimatedVisibility(visible = focusedChatLog == chatLog) {
                                 Row(
                                     modifier = Modifier.padding(start = 5.dp),
                                     verticalAlignment = Alignment.CenterVertically
@@ -754,7 +757,7 @@ private fun ChatLogListDialog(
                                                     selection = TextRange(chatLogAlias.text.length)
                                                 )
                                             } else {
-                                                isEditChatLogMode = false
+                                                focusedChatLog = null
                                                 isEditChatLogAliasMode = false
                                                 onEditChatLogAlias(chatLog.copy(alias = chatLogAlias.text))
                                             }
