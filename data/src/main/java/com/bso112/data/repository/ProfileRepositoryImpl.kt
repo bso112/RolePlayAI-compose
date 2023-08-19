@@ -9,11 +9,9 @@ import com.bso112.domain.DataChangedEvent
 import com.bso112.domain.Profile
 import com.bso112.domain.ProfileRepository
 import com.bso112.domain.autoRefreshFlow
-import com.bso112.util.alsoSuspend
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.flow
 
 class ProfileRepositoryImpl(
     private val localDataSource: ProfileLocalDataSource,
@@ -46,8 +44,8 @@ class ProfileRepositoryImpl(
         _dataChangedEvent.emit(ProfileListChanged)
     }
 
-    override fun getProfile(profileId: String): Flow<Profile> = flow {
-        localDataSource.getProfileById(profileId)?.toDomain()?.alsoSuspend(::emit)
+    override fun getProfile(profileId: String): Flow<Profile> = autoRefreshFlow {
+        localDataSource.getProfileById(profileId)?.toDomain()!!
     }
 
     override fun getProfiles(): Flow<List<Profile>> = autoRefreshFlow {

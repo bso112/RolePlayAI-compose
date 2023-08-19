@@ -20,8 +20,8 @@ interface ChatLogDao {
     @Update
     suspend fun update(chatLog: ChatLogEntity)
 
-    @Query("UPDATE ChatLogEntity SET thumbnail  = :thumbnail WHERE opponentId = :profileId")
-    suspend fun updateChatLogThumbnail(profileId: String, thumbnail: String)
+    @Query("update ChatLogEntity set opponentName = :name, thumbnail = :thumbnail where opponentId = :id")
+    suspend fun updateChatLogOpponent(id: String, name: String, thumbnail: String)
 
     @Delete
     suspend fun delete(chatLog: ChatLogEntity)

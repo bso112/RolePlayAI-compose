@@ -23,5 +23,5 @@ fun Chat.toChatLog(opponentName: String, opponentId: String = profileId) = ChatL
     thumbnail = thumbnail,
     previewMessage = message,
     modifiedAt = System.currentTimeMillis(),
-    alias = message
+    alias = message.take(20)
 )

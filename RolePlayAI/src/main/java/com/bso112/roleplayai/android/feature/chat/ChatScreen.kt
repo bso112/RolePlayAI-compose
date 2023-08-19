@@ -115,6 +115,7 @@ import com.bso112.roleplayai.android.app.placeHolder
 import com.bso112.roleplayai.android.fakeChatData
 import com.bso112.roleplayai.android.fakeChatLogList
 import com.bso112.roleplayai.android.fakeOpponent
+import com.bso112.roleplayai.android.feature.profile.navigateCreateProfile
 import com.bso112.roleplayai.android.util.DefaultPreview
 import com.bso112.roleplayai.android.util.MENU_ITEM_ID_GOOGLE
 import com.bso112.roleplayai.android.util.MENU_ITEM_ID_PAPAGO
@@ -167,6 +168,9 @@ fun ChatScreenRoute(
         isSendingChat = isSendingChat,
         user = user,
         opponent = opponent,
+        onClickProfile = {
+            appState.navController.navigateCreateProfile(profile = it)
+        },
         onClickBackButton = {
             appState.navController.popBackStack()
         },
@@ -220,6 +224,7 @@ fun ChatScreen(
     opponent: Profile,
     userChat: String,
     isSendingChat: Boolean,
+    onClickProfile: (Profile) -> Unit = {},
     onClickTranslate: (Chat) -> Unit = {},
     onClickBackButton: () -> Unit = {},
     onUserTextChanged: (String) -> Unit = {},
@@ -250,9 +255,7 @@ fun ChatScreen(
                         .weight(1f)
                         .fillMaxHeight()
                         .clickable {
-                            coroutineScope.launch {
-                                scaffoldState.drawerState.open()
-                            }
+                            onClickProfile(opponent)
                         }) {
                     AsyncImage(
                         model = opponent.thumbnail,
@@ -657,14 +660,14 @@ private fun ChatLogListDialog(
 
     var focusedChatLog: ChatLog? by remember { mutableStateOf(null) }
     var isEditChatLogAliasMode by remember { mutableStateOf(false) }
-    val focusRequester = remember { chatLogList.associateWith { FocusRequester() } }
+    val focusRequester = remember { chatLogList.associate { it.id to FocusRequester() } }
     val context = LocalContext.current
 
     LaunchedEffect(focusedChatLog, isEditChatLogAliasMode) {
         if (isEditChatLogAliasMode) {
-            focusRequester[focusedChatLog]?.requestFocus()
+            focusRequester[focusedChatLog?.id]?.requestFocus()
         } else {
-            focusRequester[focusedChatLog]?.freeFocus()
+            focusRequester[focusedChatLog?.id]?.freeFocus()
         }
     }
 
@@ -724,12 +727,12 @@ private fun ChatLogListDialog(
                                 BasicTextField(
                                     modifier = Modifier
                                         .focusRequester(
-                                            focusRequester[chatLog] ?: FocusRequester()
+                                            focusRequester[chatLog.id] ?: FocusRequester()
                                         ),
                                     value = chatLogAlias,
                                     enabled = isEditChatLogAliasMode,
                                     onValueChange = { chatLogAlias = it },
-                                    maxLines = 1,
+                                    singleLine = true,
                                     textStyle = TextStyle(
                                         color = MaterialTheme.colors.onSurface,
                                         fontSize = 16.sp

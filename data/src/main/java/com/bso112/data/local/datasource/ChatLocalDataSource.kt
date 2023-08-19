@@ -4,6 +4,7 @@ import androidx.room.withTransaction
 import com.bso112.data.local.AppDataBase
 import com.bso112.data.local.entity.ChatEntity
 import com.bso112.data.local.entity.ChatLogEntity
+import com.bso112.data.local.entity.ProfileEntity
 
 class ChatLocalDataSource(
     private val db: AppDataBase
@@ -58,9 +59,13 @@ class ChatLocalDataSource(
         }
     }
 
-    suspend fun updateChatLogThumbnail(profileId : String, picture : String) {
+    suspend fun updateChatLogByProfile(profile: ProfileEntity) {
         return db.withTransaction {
-            chatLogDao.updateChatLogThumbnail(profileId, picture)
+            chatLogDao.updateChatLogOpponent(
+                id = profile.id,
+                name = profile.name,
+                thumbnail = profile.thumbnail
+            )
         }
     }
 

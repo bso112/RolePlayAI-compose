@@ -82,7 +82,7 @@ class CreateProfileViewModel(
 
         coroutineScope {
             launch { profileRepository.saveProfile(newProfile) }
-            launch { chatLogRepository.updateChatLogThumbnail(profileId, thumbnailUri) }
+            launch { chatLogRepository.updateChatLogByProfile(newProfile) }
         }
     }.onFailure { t ->
         viewModelScope.launch {
