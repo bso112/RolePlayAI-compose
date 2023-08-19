@@ -325,7 +325,10 @@ private fun ProfileActionDialog(
                     TextButton(onClick = {
                         onClickOption(option)
                     }) {
-                        Text(stringResource(id = option.titleRes))
+                        Text(
+                            stringResource(id = option.titleRes),
+                            color = MaterialTheme.colors.onSurface
+                        )
                     }
                 }
             }

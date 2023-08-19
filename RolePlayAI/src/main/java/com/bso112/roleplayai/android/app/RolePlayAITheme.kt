@@ -29,8 +29,8 @@ fun RolePlayAITheme(
             primaryVariant = Color(0xFF7B8195),
             secondary = Color(0xFF1B202D),
             surface = Color(0xFF292F3F),
-            onSurface = Color.White,
-            onPrimary = Color.White
+            onSurface = Color(0xFFE6E6E6),
+            onPrimary = Color(0xFFE6E6E6),
         )
     } else {
         lightColors(

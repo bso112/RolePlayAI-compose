@@ -1,5 +1,6 @@
 package com.bso112.roleplayai.android.feature.profile
 
+import android.content.res.Configuration
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -42,6 +43,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -202,6 +204,7 @@ private fun CreateProfileScreen(
                     Icon(
                         modifier = Modifier.size(18.dp),
                         painter = painterResource(id = R.drawable.add_photo2),
+                        tint = MaterialTheme.colors.primary,
                         contentDescription = "add photo"
                     )
                 }
@@ -273,7 +276,7 @@ private fun ProfileInput(
             .height(textFieldBoxHeight)
             .border(1.dp, Color.LightGray, RoundedCornerShape(5.dp))
     }
-    Text(title, fontWeight = FontWeight.Bold)
+    Text(title, fontWeight = FontWeight.Bold, color = MaterialTheme.colors.onSurface)
     Spacer(modifier = Modifier.size(5.dp))
     Box(
         modifier = modifier
@@ -283,6 +286,7 @@ private fun ProfileInput(
                 .fillMaxSize()
                 .padding(10.dp),
             value = value,
+            textStyle = TextStyle(color = MaterialTheme.colors.onSurface),
             onValueChange = onValueChange,
             cursorBrush = SolidColor(MaterialTheme.colors.primary),
         )
@@ -292,6 +296,21 @@ private fun ProfileInput(
 @Composable
 @Preview
 private fun CreateProfileScreenPreView() {
+    DefaultPreview {
+        CreateProfileScreen(
+            isUser = false,
+            firstMessage = "안녕하세요",
+            name = "세이버",
+            description = "영국의 기사왕",
+            profileImage = "그대가 나의 마스터인가?",
+            singleLineDesc = "영국의 기사왕",
+        )
+    }
+}
+
+@Composable
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+private fun CreateProfileScreenNightPreView() {
     DefaultPreview {
         CreateProfileScreen(
             isUser = false,
