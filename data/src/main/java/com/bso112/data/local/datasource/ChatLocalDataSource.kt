@@ -58,6 +58,12 @@ class ChatLocalDataSource(
         }
     }
 
+    suspend fun updateChatLogThumbnail(profileId : String, picture : String) {
+        return db.withTransaction {
+            chatLogDao.updateChatLogThumbnail(profileId, picture)
+        }
+    }
+
     suspend fun deleteChatLog(chatLog: ChatLogEntity) {
         return db.withTransaction {
             chatLogDao.delete(chatLog)

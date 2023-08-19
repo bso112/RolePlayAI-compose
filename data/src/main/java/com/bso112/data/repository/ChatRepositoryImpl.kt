@@ -114,6 +114,11 @@ class ChatRepositoryImpl(
         _dataChangedEvent.emit(ChatLogChanged)
     }
 
+    override suspend fun updateChatLogThumbnail(profileId: String, picture: String) {
+        chatLocalDataSource.updateChatLogThumbnail(profileId, picture)
+        _dataChangedEvent.emit(ChatLogChanged)
+    }
+
     override suspend fun deleteChatLogList(chatLogList: List<ChatLog>) {
         chatLocalDataSource.deleteChatLogList(chatLogList.map(ChatLog::toEntity))
         _dataChangedEvent.emit(ChatLogChanged)

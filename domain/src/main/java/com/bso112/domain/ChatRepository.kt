@@ -22,8 +22,9 @@ interface ChatRepository : DataChangeNotifier {
     fun getChatLogDistinctByOpponentId(): Flow<List<ChatLog>>
     fun getChatLogByProfileId(profileId: String): Flow<List<ChatLog>>
     suspend fun deleteChatLog(chatLog: ChatLog)
-
     suspend fun updateChatLog(chatLog: ChatLog)
+    suspend fun updateChatLogThumbnail(profileId : String, picture : String)
+
     suspend fun deleteChatLogList(chatLogList: List<ChatLog>)
     suspend fun deleteChatLogByProfileId(profileId: String)
 }

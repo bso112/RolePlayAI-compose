@@ -6,12 +6,14 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bso112.data.local.AppPreference
+import com.bso112.domain.ChatRepository
 import com.bso112.domain.Profile
 import com.bso112.domain.ProfileRepository
 import com.bso112.roleplayai.android.util.DispatcherProvider
 import com.bso112.roleplayai.android.util.copyToFile
 import com.bso112.roleplayai.android.util.logD
 import com.bso112.util.randomID
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -22,6 +24,7 @@ import kotlinx.coroutines.launch
 
 class CreateProfileViewModel(
     private val profileRepository: ProfileRepository,
+    private val chatLogRepository: ChatRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val savedStateHandle: SavedStateHandle,
     private val appPreference: AppPreference
@@ -77,7 +80,10 @@ class CreateProfileViewModel(
             singleLineDesc = singleLineDesc.value
         )
 
-        profileRepository.saveProfile(newProfile)
+        coroutineScope {
+            launch { profileRepository.saveProfile(newProfile) }
+            launch { chatLogRepository.updateChatLogThumbnail(profileId, thumbnailUri) }
+        }
     }.onFailure { t ->
         viewModelScope.launch {
             _error.emit(t)

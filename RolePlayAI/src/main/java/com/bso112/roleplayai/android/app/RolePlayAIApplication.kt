@@ -53,6 +53,7 @@ class RolePlayAIApplication : Application(), ImageLoaderFactory {
             CreateProfileViewModel(
                 get(),
                 get(),
+                get(),
                 state,
                 get()
             )

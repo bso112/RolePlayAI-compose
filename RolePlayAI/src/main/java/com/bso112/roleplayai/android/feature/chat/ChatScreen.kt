@@ -111,6 +111,7 @@ import com.bso112.roleplayai.android.app.chatBubbleUser
 import com.bso112.roleplayai.android.app.highlightText
 import com.bso112.roleplayai.android.app.onChatBubbleOther
 import com.bso112.roleplayai.android.app.onChatBubbleUser
+import com.bso112.roleplayai.android.app.placeHolder
 import com.bso112.roleplayai.android.fakeChatData
 import com.bso112.roleplayai.android.fakeChatLogList
 import com.bso112.roleplayai.android.fakeOpponent
@@ -237,9 +238,6 @@ fun ChatScreen(
 
     Scaffold(
         scaffoldState = scaffoldState,
-        drawerContent = {
-            ChatDrawer(opponent)
-        },
         topBar = {
             TopAppBar {
                 IconButton(onClick = onClickBackButton) {
@@ -263,8 +261,8 @@ fun ChatScreen(
                             .clip(CircleShape),
                         contentDescription = "thumbnail",
                         contentScale = ContentScale.Crop,
-                        error = ColorPainter(Color.LightGray),
-                        placeholder = ColorPainter(Color.LightGray)
+                        error = ColorPainter(MaterialTheme.colors.placeHolder),
+                        placeholder = ColorPainter(MaterialTheme.colors.placeHolder)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
@@ -486,7 +484,6 @@ fun ChatContentText(chat: Chat, textColor: Color) {
                                     context.getString(R.string.menu_papago)
                                 )
                             }
-                            mode.menuInflater.inflate(R.menu.menu_chat_content, menu)
                             return true
                         }
 
@@ -513,12 +510,6 @@ fun ChatContentText(chat: Chat, textColor: Color) {
                                     mode?.finish()
                                     true
                                 }
-
-                                R.id.menu_translate -> {
-                                    mode?.finish()
-                                    true
-                                }
-
                                 else -> false
                             }
                         }
@@ -555,8 +546,8 @@ fun ChatDrawer(
                     .clip(RoundedCornerShape(15.dp)),
                 model = profile.thumbnail,
                 contentDescription = "thumbnail",
-                error = ColorPainter(Color.LightGray),
-                placeholder = ColorPainter(Color.LightGray)
+                error = ColorPainter(MaterialTheme.colors.placeHolder),
+                placeholder = ColorPainter(MaterialTheme.colors.placeHolder)
             )
             Column(Modifier.padding(start = 15.dp), verticalArrangement = Arrangement.Center) {
                 Text(

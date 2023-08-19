@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -51,6 +52,7 @@ import androidx.lifecycle.lifecycleScope
 import coil.compose.AsyncImage
 import com.bso112.roleplayai.android.R
 import com.bso112.roleplayai.android.app.RolePlayAppState
+import com.bso112.roleplayai.android.app.placeHolder
 import com.bso112.roleplayai.android.util.DefaultPreview
 import com.bso112.roleplayai.android.util.logD
 import com.bso112.roleplayai.android.util.logE
@@ -184,13 +186,13 @@ private fun CreateProfileScreen(
                         .clickable { getContent.launch("image/*") }
                         .clip(CircleShape),
                     model = profileImage,
-                    placeholder = ColorPainter(Color.LightGray),
+                    placeholder = ColorPainter(MaterialTheme.colors.placeHolder),
                     contentScale = ContentScale.Crop,
-                    error = ColorPainter(Color.Red),
+                    error = ColorPainter(MaterialTheme.colors.placeHolder),
                     contentDescription = "portrait"
                 )
                 IconButton(
-                    onClick = { /*TODO*/ },
+                    onClick = { getContent.launch("image/*") },
                     modifier = Modifier
                         .shadow(2.dp, CircleShape)
                         .background(Color.White, shape = CircleShape)
@@ -278,7 +280,7 @@ private fun ProfileInput(
     ) {
         BasicTextField(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .padding(10.dp),
             value = value,
             onValueChange = onValueChange,

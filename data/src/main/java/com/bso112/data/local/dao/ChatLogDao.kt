@@ -20,6 +20,9 @@ interface ChatLogDao {
     @Update
     suspend fun update(chatLog: ChatLogEntity)
 
+    @Query("UPDATE ChatLogEntity SET thumbnail  = :thumbnail WHERE opponentId = :profileId")
+    suspend fun updateChatLogThumbnail(profileId: String, thumbnail: String)
+
     @Delete
     suspend fun delete(chatLog: ChatLogEntity)
 
@@ -29,7 +32,7 @@ interface ChatLogDao {
     @Query("delete from ChatLogEntity where opponentId = :profileId")
     suspend fun deleteByProfileId(profileId: String)
 
-    @Query("select * from ChatLogEntity where opponentId = :profileId")
+    @Query("select * from ChatLogEntity where opponentId = :profileId ORDER BY modifiedAt DESC")
     suspend fun getByProfileId(profileId: String): List<ChatLogEntity>
 
 }
