@@ -10,3 +10,11 @@ To Build this project, you'll need to obtain your OpenAI API key. Then, insert y
 ```
 CHAT_GPT_API_KEY=YOUR_API_KEY
 ```
+
+## Demo
+<img src="https://github.com/bso112/RolePlayAI/assets/40523630/7c0b6bb1-5583-4438-b607-7ef876981e47" width="200" height="440"/>
+<img src="https://github.com/bso112/RolePlayAI/assets/40523630/a3a26d86-570b-45fa-be95-fc2ea93df094" width="200" height="440"/>
+<img src="https://github.com/bso112/RolePlayAI/assets/40523630/c4b825d7-3e6f-4b03-84e6-d4e969081475" width="200" height="440"/>
+
+
+
