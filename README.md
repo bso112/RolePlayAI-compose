@@ -1,5 +1,6 @@
 # RolePalyAI
 Chat App using OpenAI's Completions API
+
 This projecs allows you to create a character of your choosing. ChatGPT will embody the character you've created.
 
 For instance, if you'd like to engage in a conversation with Iron Man from the Marvel movies, you can designate Iron Man as your character. Just provide a description of Iron Man's name, personality, and other traits, and ChatGPT will assume the role of Iron Man.
